@@ -387,7 +387,7 @@ struct AzeritePowerSetMemberEntry
     int32 AzeritePowerSetID;
     int32 AzeritePowerID;
     int32 Class;
-    int32 Tier;
+    int8 Tier;
     int32 OrderIndex;
 };
 
@@ -690,6 +690,7 @@ struct ChrCustomizationChoiceEntry
     int32 ChrCustomizationReqID;
     uint16 SortOrder;
     int32 SwatchColor1;
+    int32 AddedInPatch;
     int32 SwatchColor2;
     uint16 UiOrderIndex;
     int32 Flags;
@@ -732,6 +733,7 @@ struct ChrCustomizationOptionEntry
     int32 ChrCustomizationID;
     int32 ChrCustomizationReqID;
     int32 UiOrderIndex;
+    int32 AddedInPatch;
 };
 
 struct ChrCustomizationReqEntry
@@ -867,6 +869,7 @@ struct CinematicCameraEntry
     uint32 SoundID;                                         // Sound ID       (voiceover for cinematic)
     float OriginFacing;                                     // Orientation in map used for basis for M2 co
     uint32 FileDataID;                                      // Model
+    int32 Unknown915;
 };
 
 struct CinematicSequencesEntry
@@ -1482,10 +1485,10 @@ struct GarrAbilityEntry
     LocalizedString Description;
     uint32 ID;
     uint8 GarrAbilityCategoryID;
-    uint8 GarrFollowerTypeID;
+    int8 GarrFollowerTypeID;
     int32 IconFileDataID;
     uint16 FactionChangeGarrAbilityID;
-    uint16 Flags;
+    int32 Flags;
 };
 
 struct GarrBuildingEntry
@@ -1496,7 +1499,7 @@ struct GarrBuildingEntry
     LocalizedString Description;
     LocalizedString Tooltip;
     uint8 GarrTypeID;
-    uint8 BuildingType;
+    int8 BuildingType;
     int32 HordeGameObjectID;
     int32 AllianceGameObjectID;
     int32 GarrSiteID;
@@ -1514,7 +1517,7 @@ struct GarrBuildingEntry
     uint16 GarrAbilityID;
     uint16 BonusGarrAbilityID;
     uint16 GoldCost;
-    uint8 Flags;
+    int32 Flags;
 };
 
 struct GarrBuildingPlotInstEntry
@@ -1535,7 +1538,7 @@ struct GarrClassSpecEntry
     uint16 UiTextureAtlasMemberID;
     uint16 GarrFollItemSetID;
     uint8 FollowerClassLimit;
-    uint8 Flags;
+    int32 Flags;
 };
 
 struct GarrFollowerEntry
@@ -1545,14 +1548,14 @@ struct GarrFollowerEntry
     LocalizedString TitleName;
     uint32 ID;
     uint8 GarrTypeID;
-    uint8 GarrFollowerTypeID;
+    int8 GarrFollowerTypeID;
     int32 HordeCreatureID;
     int32 AllianceCreatureID;
     uint8 HordeGarrFollRaceID;
     uint8 AllianceGarrFollRaceID;
     int32 HordeGarrClassSpecID;
     int32 AllianceGarrClassSpecID;
-    uint8 Quality;
+    int8 Quality;
     uint8 FollowerLevel;
     uint16 ItemLevelWeapon;
     uint16 ItemLevelArmor;
@@ -1570,7 +1573,7 @@ struct GarrFollowerEntry
     uint32 HordeSlottingBroadcastTextID;
     uint32 AllySlottingBroadcastTextID;
     uint8 ChrClassID;
-    uint8 Flags;
+    int32 Flags;
     uint8 Gender;
     int32 AutoCombatantID;
     int32 CovenantID;
@@ -1595,7 +1598,7 @@ struct GarrMissionEntry
     uint32 ID;
     uint8  GarrTypeID;
     uint8  GarrMissionTypeID;
-    uint8  GarrFollowerTypeID;
+    int8 GarrFollowerTypeID;
     uint8  MaxFollowers;
     uint32 MissionCost;
     uint16 MissionCostCurrencyTypesID;
@@ -1615,7 +1618,7 @@ struct GarrMissionEntry
     uint32 OvermaxRewardPackID;
     uint8  FollowerDeathChance;
     uint32 AreaID;
-    uint32 Flags;
+    int32 Flags;
     float AutoMissionScalar;
     int32 AutoMissionScalarCurveID;
     int32 AutoCombatantEnvCasterID;
@@ -1747,8 +1750,8 @@ struct HeirloomEntry
     int8 SourceTypeEnum;
     uint8 Flags;
     int32 LegacyItemID;
-    int32 UpgradeItemID[4];
-    uint16 UpgradeItemBonusListID[4];
+    int32 UpgradeItemID[6];
+    uint16 UpgradeItemBonusListID[6];
 };
 
 #define MAX_HOLIDAY_DURATIONS 10
@@ -1809,13 +1812,14 @@ struct ItemEntry
     int8 SoundOverrideSubclassID;
     int32 IconFileDataID;
     uint8 ItemGroupSoundsID;
+    int32 ContentTuningID;
     int32 ModifiedCraftingReagentItemID;
 };
 
 struct ItemAppearanceEntry
 {
     uint32 ID;
-    uint8 DisplayType;
+    int32 DisplayType;
     int32 ItemDisplayInfoID;
     int32 DefaultIconFileDataID;
     int32 UiOrder;
@@ -2062,10 +2066,10 @@ struct ItemModifiedAppearanceEntry
 {
     uint32 ID;
     int32 ItemID;
-    uint8 ItemAppearanceModifierID;
-    uint16 ItemAppearanceID;
-    uint8 OrderIndex;
-    int8 TransmogSourceTypeEnum;
+    int32 ItemAppearanceModifierID;
+    int32 ItemAppearanceID;
+    int32 OrderIndex;
+    uint8 TransmogSourceTypeEnum;
 };
 
 struct ItemNameDescriptionEntry
@@ -2187,8 +2191,8 @@ struct ItemSparseEntry
     uint8 RequiredPVPMedal;
     uint8 RequiredPVPRank;
     int8 RequiredLevel;
-    uint8 InventoryType;
-    uint8 OverallQualityID;
+    int8 InventoryType;
+    int8 OverallQualityID;
 };
 
 struct ItemSpecEntry
@@ -2395,6 +2399,7 @@ struct MapChallengeModeEntry
     uint16 MapID;
     uint8 Flags;
     uint32 ExpansionLevel;
+    int32 RequiredWorldStateID;
     int16 CriteriaCount[3];
 };
 
@@ -2741,7 +2746,7 @@ struct QuestInfoEntry
     uint32 ID;
     LocalizedString InfoName;
     int8 Type;
-    uint8 Modifiers;
+    int32 Modifiers;
     uint16 Profession;
 };
 
@@ -2858,6 +2863,7 @@ struct SceneScriptEntry
     uint32 ID;
     uint16 FirstSceneScriptID;
     uint16 NextSceneScriptID;
+    int32 Unknown915;
 };
 
 struct SceneScriptGlobalTextEntry
@@ -2871,6 +2877,7 @@ struct SceneScriptPackageEntry
 {
     uint32 ID;
     char const* Name;
+    int32 Unknown915;
 };
 
 struct SceneScriptTextEntry
@@ -3071,7 +3078,7 @@ struct SpellEffectEntry
     int16 EffectAura;
     int32 DifficultyID;
     int32 EffectIndex;
-    int32 Effect;
+    uint32 Effect;
     float EffectAmplitude;
     int32 EffectAttributes;
     int32 EffectAuraPeriod;
@@ -3527,8 +3534,8 @@ struct UiMapEntry
     uint32 ID;
     int32 ParentUiMapID;
     int32 Flags;
-    int32 System;
-    int32 Type;
+    uint32 System;
+    uint32 Type;
     int32 BountySetID;
     uint32 BountyDisplayLocation;
     int32 VisibilityPlayerConditionID;
@@ -3687,7 +3694,7 @@ struct VehicleSeatEntry
     int16 CameraModeID;
 
     inline bool HasFlag(VehicleSeatFlags flag) const { return !!(Flags & flag); }
-    inline bool HasFlag(VehicleSeatFlagsB flag) const { return !!(Flags & flag); }
+    inline bool HasFlag(VehicleSeatFlagsB flag) const { return !!(FlagsB & flag); }
 
     inline bool CanEnterOrExit() const { return HasFlag(VehicleSeatFlags(VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT | VEHICLE_SEAT_FLAG_CAN_CONTROL | VEHICLE_SEAT_FLAG_SHOULD_USE_VEH_SEAT_EXIT_ANIM_ON_VOLUNTARY_EXIT)); }
     inline bool CanSwitchFromSeat() const { return HasFlag(VEHICLE_SEAT_FLAG_CAN_SWITCH); }
@@ -3738,7 +3745,7 @@ struct WorldEffectEntry
     uint32 ID;
     uint32 QuestFeedbackEffectID;
     uint8 WhenToDisplay;
-    int8 TargetType;
+    uint8 TargetType;
     int32 TargetAsset;
     uint32 PlayerConditionID;
     uint16 CombatConditionID;

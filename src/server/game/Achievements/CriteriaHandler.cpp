@@ -1757,7 +1757,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
 {
     uint32 reqValue = modifier->Asset;
     uint32 secondaryAsset = modifier->SecondaryAsset;
-    uint32 tertiaryAsset = modifier->TertiaryAsset;
+    int32 tertiaryAsset = modifier->TertiaryAsset;
 
     switch (CriteriaAdditionalCondition(modifier->Type))
     {
@@ -2340,7 +2340,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                 GarrBuildingEntry const* followerBuilding = sGarrBuildingStore.LookupEntry(follower.PacketInfo.CurrentBuildingID);
                 if (!followerBuilding)
                     return false;
-                return followerBuilding->BuildingType == secondaryAsset && follower.HasAbility(reqValue);;
+                return followerBuilding->BuildingType == int32(secondaryAsset) && follower.HasAbility(reqValue);;
             });
             if (followerCount < 1)
                 return false;
@@ -2359,7 +2359,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                 GarrBuildingEntry const* followerBuilding = sGarrBuildingStore.LookupEntry(follower.PacketInfo.CurrentBuildingID);
                 if (!followerBuilding)
                     return false;
-                return followerBuilding->BuildingType == secondaryAsset && follower.HasAbility(reqValue);;
+                return followerBuilding->BuildingType == int32(secondaryAsset) && follower.HasAbility(reqValue);;
             });
             if (followerCount < 1)
                 return false;
@@ -2377,7 +2377,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                 GarrBuildingEntry const* followerBuilding = sGarrBuildingStore.LookupEntry(follower.PacketInfo.CurrentBuildingID);
                 if (!followerBuilding)
                     return false;
-                return followerBuilding->BuildingType == secondaryAsset;
+                return followerBuilding->BuildingType == int32(secondaryAsset);
             });
             if (followerCount < 1)
                 return false;
@@ -2394,7 +2394,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                     continue;
 
                 GarrBuildingEntry const* building = sGarrBuildingStore.LookupEntry(plot->BuildingInfo.PacketInfo->GarrBuildingID);
-                if (!building || building->UpgradeLevel < reqValue || building->BuildingType != secondaryAsset)
+                if (!building || building->UpgradeLevel < reqValue || building->BuildingType != int32(secondaryAsset))
                     continue;
 
                 return true;

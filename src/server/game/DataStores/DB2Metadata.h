@@ -171,7 +171,7 @@ struct AnimKitBoneSetMeta
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1375433, -1, 5, 5, 0x48CA2284, fields, -1);
+        static DB2Meta instance(1375433, -1, 5, 5, 0xED0473C4, fields, -1);
         return &instance;
     }
 };
@@ -211,9 +211,9 @@ struct AnimKitConfigBoneSetMeta
         {
             { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1300873, -1, 3, 2, 0xE64319C0, fields, 2);
+        static DB2Meta instance(1300873, -1, 3, 2, 0x44BD4A5F, fields, 2);
         return &instance;
     }
 };
@@ -241,9 +241,9 @@ struct AnimKitReplacementMeta
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1559807, 0, 5, 4, 0x8FB6A4A4, fields, 4);
+        static DB2Meta instance(1559807, 0, 5, 4, 0x51CD53BB, fields, 4);
         return &instance;
     }
 };
@@ -289,9 +289,9 @@ struct AnimReplacementMeta
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1301100, 0, 5, 4, 0xE3973DD4, fields, 4);
+        static DB2Meta instance(1301100, 0, 5, 4, 0xA5ADECEB, fields, 4);
         return &instance;
     }
 };
@@ -474,9 +474,9 @@ struct AreaGroupMemberMeta
         static DB2MetaField const fields[2] =
         {
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1093406, -1, 2, 1, 0x5C03C8AC, fields, 1);
+        static DB2Meta instance(1093406, -1, 2, 1, 0xE55374B3, fields, 1);
         return &instance;
     }
 };
@@ -521,9 +521,9 @@ struct AreaPOIStateMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_INT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1000631, -1, 5, 4, 0x3793DB10, fields, 4);
+        static DB2Meta instance(1000631, -1, 5, 4, 0x960E0BAF, fields, 4);
         return &instance;
     }
 };
@@ -558,7 +558,7 @@ struct AreaTableMeta
             { FT_INT, 2, true },
             { FT_SHORT, 4, false },
         };
-        static DB2Meta instance(1353545, -1, 23, 23, 0x7EF13BBB, fields, -1);
+        static DB2Meta instance(1353545, -1, 23, 23, 0x6AA8A23B, fields, -1);
         return &instance;
     }
 };
@@ -755,9 +755,9 @@ struct ArtifactAppearanceSetMeta
             { FT_SHORT, 1, false },
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1116408, 2, 9, 8, 0x397003CA, fields, 8);
+        static DB2Meta instance(1116408, 2, 9, 8, 0x4319E598, fields, 8);
         return &instance;
     }
 };
@@ -847,9 +847,9 @@ struct ArtifactPowerRankMeta
             { FT_INT, 1, true },
             { FT_SHORT, 1, false },
             { FT_FLOAT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1261405, -1, 5, 4, 0x4D77EB39, fields, 4);
+        static DB2Meta instance(1261405, -1, 5, 4, 0xD992FCE6, fields, 4);
         return &instance;
     }
 };
@@ -894,9 +894,9 @@ struct ArtifactUnlockMeta
             { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
             { FT_INT, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1094540, -1, 5, 4, 0xA7A455D2, fields, 4);
+        static DB2Meta instance(1094540, -1, 5, 4, 0x10D3E54B, fields, 4);
         return &instance;
     }
 };
@@ -1051,10 +1051,10 @@ struct AzeritePowerSetMemberMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_INT, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1846040, -1, 5, 5, 0x7880A4DD, fields, 0);
+        static DB2Meta instance(1846040, -1, 5, 5, 0x240270B4, fields, 0);
         return &instance;
     }
 };
@@ -1068,9 +1068,9 @@ struct AzeriteTierUnlockMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1846043, -1, 4, 3, 0x365B7BC1, fields, 3);
+        static DB2Meta instance(1846043, -1, 4, 3, 0xF90561B4, fields, 3);
         return &instance;
     }
 };
@@ -1128,7 +1128,7 @@ struct BannedAddonsMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1373459, -1, 3, 3, 0xF3F45B96, fields, -1);
+        static DB2Meta instance(1373459, -1, 3, 3, 0xFFC1F2CD, fields, -1);
         return &instance;
     }
 };
@@ -1223,9 +1223,9 @@ struct BattlePetAbilityStateMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(801576, -1, 3, 2, 0x04907E4D, fields, 2);
+        static DB2Meta instance(801576, -1, 3, 2, 0xF4480E72, fields, 2);
         return &instance;
     }
 };
@@ -1243,7 +1243,7 @@ struct BattlePetAbilityTurnMeta
             { FT_BYTE, 1, true },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(801577, 0, 6, 6, 0xB7645CF1, fields, 1);
+        static DB2Meta instance(801577, 0, 6, 6, 0x5E6783A5, fields, 1);
         return &instance;
     }
 };
@@ -1270,9 +1270,9 @@ struct BattlePetBreedStateMeta
         {
             { FT_INT, 1, true },
             { FT_SHORT, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(801579, -1, 3, 2, 0xBEA26E1B, fields, 2);
+        static DB2Meta instance(801579, -1, 3, 2, 0x5572DEA2, fields, 2);
         return &instance;
     }
 };
@@ -1303,7 +1303,7 @@ struct BattlePetEffectPropertiesMeta
             { FT_SHORT, 1, false },
             { FT_BYTE, 6, false },
         };
-        static DB2Meta instance(801580, -1, 3, 3, 0x5CA97862, fields, -1);
+        static DB2Meta instance(801580, -1, 3, 3, 0x1B17CCC2, fields, -1);
         return &instance;
     }
 };
@@ -1353,9 +1353,9 @@ struct BattlePetSpeciesStateMeta
         {
             { FT_SHORT, 1, false },
             { FT_INT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(801581, -1, 3, 2, 0x6ED307C3, fields, 2);
+        static DB2Meta instance(801581, -1, 3, 2, 0xE5835BBC, fields, 2);
         return &instance;
     }
 };
@@ -1369,9 +1369,9 @@ struct BattlePetSpeciesXAbilityMeta
             { FT_SHORT, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(801582, -1, 4, 3, 0xE27BBDC8, fields, 3);
+        static DB2Meta instance(801582, -1, 4, 3, 0xF061FB96, fields, 3);
         return &instance;
     }
 };
@@ -1383,9 +1383,9 @@ struct BattlePetSpeciesXCovenantMeta
         static DB2MetaField const fields[2] =
         {
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(3669304, -1, 2, 1, 0xABBC028A, fields, 1);
+        static DB2Meta instance(3669304, -1, 2, 1, 0x833D6F55, fields, 1);
         return &instance;
     }
 };
@@ -1400,7 +1400,7 @@ struct BattlePetStateMeta
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(801583, -1, 3, 3, 0xEED9BB1F, fields, -1);
+        static DB2Meta instance(801583, -1, 3, 3, 0x0A2EE604, fields, -1);
         return &instance;
     }
 };
@@ -1419,7 +1419,7 @@ struct BattlePetVisualMeta
             { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(801584, -1, 7, 7, 0x193D8649, fields, -1);
+        static DB2Meta instance(801584, -1, 7, 7, 0x396EBE73, fields, -1);
         return &instance;
     }
 };
@@ -1530,9 +1530,9 @@ struct BountyMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, false },
             { FT_INT, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1367866, 0, 6, 5, 0x66D9FE53, fields, 5);
+        static DB2Meta instance(1367866, -1, 5, 4, 0x6F5B7425, fields, 4);
         return &instance;
     }
 };
@@ -1623,9 +1623,9 @@ struct CameraEffectEntryMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1117696, -1, 16, 15, 0x57E51683, fields, 15);
+        static DB2Meta instance(1117696, -1, 16, 15, 0xCE956A7C, fields, 15);
         return &instance;
     }
 };
@@ -1672,7 +1672,7 @@ struct CampaignMeta
             { FT_INT, 1, true },
             { FT_INT, 1, false },
         };
-        static DB2Meta instance(2031607, 3, 12, 12, 0xA6065A95, fields, -1);
+        static DB2Meta instance(2031607, -1, 11, 11, 0x07E99A2F, fields, -1);
         return &instance;
     }
 };
@@ -1796,7 +1796,7 @@ struct Cfg_RegionsMeta
             { FT_BYTE, 1, false },
             { FT_INT, 1, false },
         };
-        static DB2Meta instance(1082876, -1, 5, 5, 0xDA5ACA56, fields, -1);
+        static DB2Meta instance(1082876, -1, 5, 5, 0x46753F3C, fields, -1);
         return &instance;
     }
 };
@@ -1915,9 +1915,9 @@ struct CharSectionConditionMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(2388725, -1, 6, 5, 0xC733E68B, fields, 5);
+        static DB2Meta instance(2388725, -1, 6, 5, 0x2AD06503, fields, 5);
         return &instance;
     }
 };
@@ -1955,9 +1955,9 @@ struct CharShipmentMeta
             { FT_INT, 1, false },
             { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(972425, -1, 9, 9, 0x43F2E414, fields, 0);
+        static DB2Meta instance(972425, -1, 9, 9, 0xAD22738D, fields, 0);
         return &instance;
     }
 };
@@ -1985,7 +1985,7 @@ struct CharShipmentContainerMeta
             { FT_BYTE, 1, true },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(972405, -1, 16, 16, 0x2278DB5A, fields, -1);
+        static DB2Meta instance(972405, -1, 16, 16, 0x3E17FF9F, fields, -1);
         return &instance;
     }
 };
@@ -2009,9 +2009,9 @@ struct CharStartKitMeta
             { FT_INT, 1, true },
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(3055696, -1, 14, 13, 0xF22C193E, fields, 13);
+        static DB2Meta instance(3055696, -1, 16, 15, 0xBCCA03D2, fields, 15);
         return &instance;
     }
 };
@@ -2098,11 +2098,12 @@ struct CharacterServiceInfoMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[11] =
+        static DB2MetaField const fields[12] =
         {
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
+            { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
@@ -2112,7 +2113,7 @@ struct CharacterServiceInfoMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1815417, -1, 11, 11, 0x069030E0, fields, -1);
+        static DB2Meta instance(1815417, -1, 12, 12, 0xEA8A1A38, fields, -1);
         return &instance;
     }
 };
@@ -2144,7 +2145,7 @@ struct ChatProfanityMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_BYTE, 1, true },
         };
-        static DB2Meta instance(1117084, -1, 2, 2, 0xA0404D22, fields, -1);
+        static DB2Meta instance(1117084, -1, 2, 2, 0x151A97E2, fields, -1);
         return &instance;
     }
 };
@@ -2274,7 +2275,7 @@ struct ChrClassesMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1361031, 10, 39, 39, 0x7EF5ADB3, fields, -1);
+        static DB2Meta instance(1361031, 10, 39, 39, 0x090C9967, fields, -1);
         return &instance;
     }
 };
@@ -2286,9 +2287,9 @@ struct ChrClassesXPowerTypesMeta
         static DB2MetaField const fields[2] =
         {
             { FT_BYTE, 1, true },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1121420, -1, 2, 1, 0x3BDA47A5, fields, 1);
+        static DB2Meta instance(1121420, -1, 2, 1, 0x0B71BB3C, fields, 1);
         return &instance;
     }
 };
@@ -2427,10 +2428,10 @@ struct ChrCustomizationChoiceMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_SHORT, 1, false },
             { FT_INT, 1, true },
+            { FT_INT, 2, true },
         };
-        static DB2Meta instance(3450554, 1, 9, 9, 0x5E646924, fields, 2);
+        static DB2Meta instance(3450554, 1, 9, 9, 0xA4453763, fields, 2);
         return &instance;
     }
 };
@@ -2541,7 +2542,7 @@ struct ChrCustomizationOptionMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[12] =
+        static DB2MetaField const fields[13] =
         {
             { FT_STRING, 1, true },
             { FT_INT, 1, false },
@@ -2555,8 +2556,9 @@ struct ChrCustomizationOptionMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(3384247, 1, 12, 12, 0xEB7143AC, fields, 4);
+        static DB2Meta instance(3384247, 1, 13, 13, 0x961CBF36, fields, 4);
         return &instance;
     }
 };
@@ -2779,7 +2781,7 @@ struct ChrRacesMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, true },
         };
-        static DB2Meta instance(1305311, 15, 50, 50, 0x85A50CA9, fields, -1);
+        static DB2Meta instance(1305311, -1, 51, 51, 0x40164CD9, fields, -1);
         return &instance;
     }
 };
@@ -2817,9 +2819,9 @@ struct ChrUpgradeBucketMeta
         {
             { FT_INT, 1, false },
             { FT_SHORT, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(984529, 0, 3, 2, 0x5C0C1097, fields, 2);
+        static DB2Meta instance(984529, 0, 3, 2, 0x2BA3842E, fields, 2);
         return &instance;
     }
 };
@@ -2831,9 +2833,9 @@ struct ChrUpgradeBucketSpellMeta
         static DB2MetaField const fields[2] =
         {
             { FT_INT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(984528, -1, 2, 1, 0x2FC8B981, fields, 1);
+        static DB2Meta instance(984528, -1, 2, 1, 0xF4AACE3E, fields, 1);
         return &instance;
     }
 };
@@ -2858,14 +2860,15 @@ struct CinematicCameraMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[4] =
+        static DB2MetaField const fields[5] =
         {
             { FT_FLOAT, 3, true },
             { FT_INT, 1, false },
             { FT_FLOAT, 1, true },
             { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1294214, -1, 4, 4, 0x7BA7D9AC, fields, -1);
+        static DB2Meta instance(1294214, -1, 5, 5, 0xC5F2F36C, fields, -1);
         return &instance;
     }
 };
@@ -2967,9 +2970,9 @@ struct CommentatorIndirectSpellMeta
         {
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(3067644, -1, 3, 2, 0xF5E08BAF, fields, 2);
+        static DB2Meta instance(3067644, -1, 3, 2, 0x97665B10, fields, 2);
         return &instance;
     }
 };
@@ -2997,9 +3000,9 @@ struct CommentatorTrackedCooldownMeta
             { FT_INT, 1, true },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1661584, -1, 4, 3, 0xC74F9352, fields, 3);
+        static DB2Meta instance(1661584, -1, 4, 3, 0xD798032D, fields, 3);
         return &instance;
     }
 };
@@ -3076,6 +3079,20 @@ struct ConfigurationWarningMeta
             { FT_INT, 1, false },
         };
         static DB2Meta instance(1709409, -1, 2, 2, 0x1CAAE7CC, fields, -1);
+        return &instance;
+    }
+};
+
+struct ContentRestrictionRuleSetMeta
+{
+    static DB2Meta const* Instance()
+    {
+        static DB2MetaField const fields[2] =
+        {
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
+        };
+        static DB2Meta instance(4281307, -1, 2, 2, 0x6D33A414, fields, -1);
         return &instance;
     }
 };
@@ -3265,7 +3282,7 @@ struct CreatureDifficultyMeta
             { FT_INT, 8, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(879282, -1, 9, 8, 0x592C0350, fields, 8);
+        static DB2Meta instance(879282, -1, 6, 5, 0x9474E7DE, fields, 5);
         return &instance;
     }
 };
@@ -3366,7 +3383,7 @@ struct CreatureDisplayInfoEvtMeta
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1586882, -1, 4, 3, 0xCAFD72C5, fields, 3);
+        static DB2Meta instance(1586882, -1, 4, 3, 0x192F3389, fields, 3);
         return &instance;
     }
 };
@@ -3398,9 +3415,9 @@ struct CreatureDisplayInfoGeosetDataMeta
         {
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1720141, -1, 3, 2, 0xFDFD2CDF, fields, 2);
+        static DB2Meta instance(1720141, -1, 3, 2, 0x469BDCA2, fields, 2);
         return &instance;
     }
 };
@@ -3433,7 +3450,7 @@ struct CreatureDisplayInfoTrnMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1146698, -1, 6, 5, 0x9E3B367A, fields, 5);
+        static DB2Meta instance(1146698, -1, 6, 5, 0x500975B6, fields, 5);
         return &instance;
     }
 };
@@ -3540,8 +3557,9 @@ struct CreatureSoundDataMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[37] =
+        static DB2MetaField const fields[38] =
         {
+            { FT_INT, 1, false },
             { FT_INT, 1, false },
             { FT_INT, 1, false },
             { FT_INT, 1, false },
@@ -3580,7 +3598,22 @@ struct CreatureSoundDataMeta
             { FT_INT, 5, false },
             { FT_INT, 4, false },
         };
-        static DB2Meta instance(1344466, -1, 37, 37, 0xB7C11EA1, fields, -1);
+        static DB2Meta instance(1344466, 0, 38, 38, 0x9C866B0C, fields, -1);
+        return &instance;
+    }
+};
+
+struct CreatureSoundFidgetMeta
+{
+    static DB2Meta const* Instance()
+    {
+        static DB2MetaField const fields[3] =
+        {
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
+        };
+        static DB2Meta instance(4178576, -1, 3, 2, 0xB504137B, fields, 2);
         return &instance;
     }
 };
@@ -3626,7 +3659,7 @@ struct CreatureXDisplayInfoMeta
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1864302, -1, 5, 4, 0x4BE9138D, fields, 4);
+        static DB2Meta instance(1864302, -1, 5, 4, 0x6153D141, fields, 4);
         return &instance;
     }
 };
@@ -3709,10 +3742,10 @@ struct CurrencyCategoryMeta
         static DB2MetaField const fields[3] =
         {
             { FT_STRING, 1, true },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1125667, -1, 3, 3, 0x94985672, fields, -1);
+        static DB2Meta instance(1125667, -1, 3, 3, 0xD66BAB95, fields, -1);
         return &instance;
     }
 };
@@ -3853,7 +3886,7 @@ struct DeclinedWordMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_INT, 1, false },
         };
-        static DB2Meta instance(1279100, 1, 2, 2, 0x34A8CBDE, fields, -1);
+        static DB2Meta instance(1279100, 1, 2, 2, 0x50B8E82D, fields, -1);
         return &instance;
     }
 };
@@ -3868,7 +3901,7 @@ struct DeclinedWordCasesMeta
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1279099, -1, 3, 2, 0xFD4E7262, fields, 2);
+        static DB2Meta instance(1279099, -1, 3, 2, 0x2AC7869B, fields, 2);
         return &instance;
     }
 };
@@ -3921,21 +3954,6 @@ struct DeviceBlacklistMeta
     }
 };
 
-struct DeviceDefaultSettingsMeta
-{
-    static DB2Meta const* Instance()
-    {
-        static DB2MetaField const fields[3] =
-        {
-            { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
-            { FT_BYTE, 1, true },
-        };
-        static DB2Meta instance(925422, -1, 3, 3, 0x605C20D9, fields, -1);
-        return &instance;
-    }
-};
-
 struct DifficultyMeta
 {
     static DB2Meta const* Instance()
@@ -3961,11 +3979,24 @@ struct DifficultyMeta
     }
 };
 
+struct DisplaySeasonMeta
+{
+    static DB2Meta const* Instance()
+    {
+        static DB2MetaField const fields[1] =
+        {
+            { FT_INT, 1, true },
+        };
+        static DB2Meta instance(4279827, -1, 1, 1, 0xCAAEA413, fields, -1);
+        return &instance;
+    }
+};
+
 struct DissolveEffectMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[14] =
+        static DB2MetaField const fields[19] =
         {
             { FT_FLOAT, 1, true },
             { FT_FLOAT, 1, true },
@@ -3981,8 +4012,13 @@ struct DissolveEffectMeta
             { FT_INT, 1, true },
             { FT_INT, 1, false },
             { FT_FLOAT, 1, true },
+            { FT_FLOAT, 1, true },
+            { FT_FLOAT, 1, true },
+            { FT_FLOAT, 1, true },
+            { FT_FLOAT, 1, true },
+            { FT_FLOAT, 1, true },
         };
-        static DB2Meta instance(1304325, -1, 14, 14, 0x12B80C10, fields, -1);
+        static DB2Meta instance(1304325, -1, 19, 19, 0x3E1DB42B, fields, -1);
         return &instance;
     }
 };
@@ -4097,7 +4133,7 @@ struct EmotesMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1343602, -1, 9, 9, 0x704A62E9, fields, -1);
+        static DB2Meta instance(1343602, -1, 9, 9, 0xB3BBAC91, fields, -1);
         return &instance;
     }
 };
@@ -4111,7 +4147,7 @@ struct EmotesTextMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(1347273, -1, 2, 2, 0x6C600BD2, fields, -1);
+        static DB2Meta instance(1347273, -1, 2, 2, 0x47FC6428, fields, -1);
         return &instance;
     }
 };
@@ -4124,9 +4160,9 @@ struct EmotesTextDataMeta
         {
             { FT_STRING, 1, true },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1283024, -1, 3, 2, 0x07CBBF99, fields, 2);
+        static DB2Meta instance(1283024, -1, 3, 2, 0x93E6D146, fields, 2);
         return &instance;
     }
 };
@@ -4141,9 +4177,9 @@ struct EmotesTextSoundMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_INT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1286524, -1, 5, 4, 0x18CFC9B1, fields, 4);
+        static DB2Meta instance(1286524, -1, 5, 4, 0xDDB1DE6E, fields, 4);
         return &instance;
     }
 };
@@ -4154,10 +4190,10 @@ struct EnvironmentalDamageMeta
     {
         static DB2MetaField const fields[2] =
         {
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(1278398, -1, 2, 2, 0x792416B2, fields, -1);
+        static DB2Meta instance(1343313, -1, 7, 7, 0x8C07F74D, fields, -1);
         return &instance;
     }
 };
@@ -4200,7 +4236,7 @@ struct ExpectedStatMeta
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1937326, -1, 11, 10, 0x5243495A, fields, 10);
+        static DB2Meta instance(1937326, -1, 11, 10, 0x04118896, fields, 10);
         return &instance;
     }
 };
@@ -4286,7 +4322,7 @@ struct FactionGroupMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1343595, 2, 6, 6, 0x23EDF09E, fields, -1);
+        static DB2Meta instance(1343595, -1, 5, 5, 0xE0653543, fields, -1);
         return &instance;
     }
 };
@@ -4345,13 +4381,14 @@ struct FriendshipRepReactionMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[3] =
+        static DB2MetaField const fields[4] =
         {
             { FT_STRING, 1, true },
             { FT_INT, 1, false },
             { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1237638, -1, 3, 3, 0x78A33CF1, fields, 1);
+        static DB2Meta instance(1237638, -1, 4, 4, 0x5C9EA26E, fields, 1);
         return &instance;
     }
 };
@@ -4423,9 +4460,9 @@ struct GMSurveyAnswersMeta
         {
             { FT_STRING, 1, true },
             { FT_BYTE, 1, false },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1283025, -1, 3, 2, 0x2F629F63, fields, 2);
+        static DB2Meta instance(1283025, -1, 3, 2, 0x62969172, fields, 2);
         return &instance;
     }
 };
@@ -4522,9 +4559,9 @@ struct GameObjectDiffAnimMapMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1302847, -1, 4, 3, 0xDB388EFA, fields, 3);
+        static DB2Meta instance(1302847, -1, 4, 3, 0x0BA11B63, fields, 3);
         return &instance;
     }
 };
@@ -4632,9 +4669,9 @@ struct GarrAbilityMeta
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(966238, 2, 8, 8, 0x5DBA4191, fields, -1);
+        static DB2Meta instance(966238, -1, 7, 7, 0x92AABEAD, fields, -1);
         return &instance;
     }
 };
@@ -4669,9 +4706,9 @@ struct GarrAbilityEffectMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(966241, 0, 12, 12, 0xF92DD786, fields, 1);
+        static DB2Meta instance(966241, 0, 12, 12, 0x7192C187, fields, 1);
         return &instance;
     }
 };
@@ -4727,13 +4764,13 @@ struct GarrAutoSpellEffectMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
             { FT_BYTE, 1, false },
-            { FT_INT, 1, true },
+            { FT_BYTE, 1, false },
             { FT_FLOAT, 1, true },
-            { FT_INT, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(3307335, 0, 8, 8, 0x8A09C203, fields, 1);
+        static DB2Meta instance(3307335, 0, 8, 8, 0x315DE2BB, fields, 1);
         return &instance;
     }
 };
@@ -4767,9 +4804,9 @@ struct GarrBuildingMeta
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(929747, -1, 24, 24, 0x69CFEA8D, fields, -1);
+        static DB2Meta instance(929747, -1, 24, 24, 0xB0458774, fields, -1);
         return &instance;
     }
 };
@@ -4821,9 +4858,9 @@ struct GarrClassSpecMeta
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
             { FT_BYTE, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(981570, 3, 8, 8, 0xB90D2171, fields, -1);
+        static DB2Meta instance(981570, -1, 7, 7, 0x1362C59A, fields, -1);
         return &instance;
     }
 };
@@ -4862,7 +4899,7 @@ struct GarrEncounterMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(975304, 1, 9, 9, 0x785239C5, fields, -1);
+        static DB2Meta instance(975304, -1, 8, 8, 0x51A3E8E8, fields, -1);
         return &instance;
     }
 };
@@ -4875,9 +4912,9 @@ struct GarrEncounterSetXEncounterMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, false },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1354772, 0, 3, 2, 0x9DFCF560, fields, 2);
+        static DB2Meta instance(1354772, 0, 3, 2, 0x658801AD, fields, 2);
         return &instance;
     }
 };
@@ -4890,9 +4927,9 @@ struct GarrEncounterXMechanicMeta
         {
             { FT_INT, 1, true },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(967961, -1, 3, 2, 0x7E4E18F9, fields, 2);
+        static DB2Meta instance(967961, -1, 3, 2, 0x0A692AA6, fields, 2);
         return &instance;
     }
 };
@@ -4906,9 +4943,9 @@ struct GarrFollItemSetMemberMeta
             { FT_INT, 1, true },
             { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(981569, -1, 4, 3, 0xF6172F05, fields, 3);
+        static DB2Meta instance(981569, -1, 4, 3, 0x1E95C23A, fields, 3);
         return &instance;
     }
 };
@@ -4965,12 +5002,12 @@ struct GarrFollowerMeta
             { FT_INT, 1, false },
             { FT_INT, 1, false },
             { FT_BYTE, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(949906, 3, 34, 34, 0x712646FC, fields, -1);
+        static DB2Meta instance(949906, -1, 33, 33, 0x7982FA48, fields, -1);
         return &instance;
     }
 };
@@ -4986,7 +5023,7 @@ struct GarrFollowerLevelXPMeta
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(970979, -1, 4, 4, 0x0F1A9FB8, fields, -1);
+        static DB2Meta instance(970979, -1, 4, 4, 0xA793064C, fields, -1);
         return &instance;
     }
 };
@@ -5005,7 +5042,7 @@ struct GarrFollowerQualityMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, false },
         };
-        static DB2Meta instance(1027793, -1, 7, 7, 0xB1472CA1, fields, -1);
+        static DB2Meta instance(1027793, -1, 7, 7, 0xB166AEC9, fields, -1);
         return &instance;
     }
 };
@@ -5036,9 +5073,9 @@ struct GarrFollowerTypeMeta
             { FT_SHORT, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1118784, -1, 7, 7, 0x657A7E31, fields, -1);
+        static DB2Meta instance(1118784, -1, 7, 7, 0x5D1949C4, fields, -1);
         return &instance;
     }
 };
@@ -5054,9 +5091,9 @@ struct GarrFollowerUICreatureMeta
             { FT_INT, 1, true },
             { FT_FLOAT, 1, true },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1412636, -1, 6, 5, 0x5BBE7320, fields, 5);
+        static DB2Meta instance(1412636, -1, 6, 5, 0xBA38A3BF, fields, 5);
         return &instance;
     }
 };
@@ -5070,9 +5107,9 @@ struct GarrFollowerXAbilityMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(968468, -1, 4, 3, 0x6FE46BDB, fields, 3);
+        static DB2Meta instance(968468, -1, 4, 3, 0xADCDBCC4, fields, 3);
         return &instance;
     }
 };
@@ -5087,9 +5124,9 @@ struct GarrItemLevelUpgradeDataMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_INT, 1, true },
+            { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1572314, 0, 5, 5, 0x13566AC6, fields, -1);
+        static DB2Meta instance(1572314, -1, 4, 4, 0xFBC594CE, fields, -1);
         return &instance;
     }
 };
@@ -5117,9 +5154,9 @@ struct GarrMechanicSetXMechanicMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, true },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1391531, 0, 3, 2, 0x146817DD, fields, 2);
+        static DB2Meta instance(1391531, 0, 3, 2, 0x479C09EC, fields, 2);
         return &instance;
     }
 };
@@ -5175,12 +5212,12 @@ struct GarrMissionMeta
             { FT_INT, 1, false },
             { FT_BYTE, 1, false },
             { FT_INT, 1, false },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(967962, 5, 32, 32, 0x09B91DB9, fields, 17);
+        static DB2Meta instance(967962, -1, 31, 31, 0x72156305, fields, 16);
         return &instance;
     }
 };
@@ -5297,7 +5334,7 @@ struct GarrPlotMeta
             { FT_BYTE, 1, false },
             { FT_INT, 2, false },
         };
-        static DB2Meta instance(937634, -1, 7, 7, 0x3729D438, fields, -1);
+        static DB2Meta instance(937634, -1, 7, 7, 0xCC5288E7, fields, -1);
         return &instance;
     }
 };
@@ -5325,7 +5362,7 @@ struct GarrPlotInstanceMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(929742, -1, 2, 2, 0x6096D1F7, fields, -1);
+        static DB2Meta instance(929742, -1, 2, 2, 0xA8EA67D0, fields, -1);
         return &instance;
     }
 };
@@ -5555,19 +5592,19 @@ struct GarrTalentTreeMeta
         static DB2MetaField const fields[12] =
         {
             { FT_STRING, 1, true },
-            { FT_INT, 1, false },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
+            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
-            { FT_BYTE, 1, true },
-            { FT_BYTE, 1, true },
             { FT_SHORT, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_INT, 1, true },
+            { FT_BYTE, 1, false },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1361030, 1, 12, 12, 0xA9265795, fields, -1);
+        static DB2Meta instance(1361030, -1, 12, 12, 0x5BC6917D, fields, -1);
         return &instance;
     }
 };
@@ -5576,18 +5613,19 @@ struct GarrTypeMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[8] =
+        static DB2MetaField const fields[9] =
         {
             { FT_INT, 1, false },
             { FT_INT, 1, false },
             { FT_INT, 1, false },
             { FT_INT, 1, false },
+            { FT_INT, 1, true },
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
             { FT_FLOAT, 1, true },
             { FT_INT, 2, true },
         };
-        static DB2Meta instance(1333161, -1, 8, 8, 0x2D0BF086, fields, -1);
+        static DB2Meta instance(1333161, 0, 9, 9, 0x7CB2DDC5, fields, -1);
         return &instance;
     }
 };
@@ -5687,7 +5725,7 @@ struct GlobalStringsMeta
             { FT_STRING, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1394440, -1, 3, 3, 0x9F2B05C5, fields, -1);
+        static DB2Meta instance(1394440, -1, 3, 3, 0x539B649A, fields, -1);
         return &instance;
     }
 };
@@ -5713,9 +5751,9 @@ struct GlyphBindableSpellMeta
         static DB2MetaField const fields[2] =
         {
             { FT_INT, 1, true },
-            { FT_SHORT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1270147, -1, 2, 1, 0x653A89C4, fields, 1);
+        static DB2Meta instance(1270147, -1, 2, 1, 0x5A852AEA, fields, 1);
         return &instance;
     }
 };
@@ -5756,9 +5794,9 @@ struct GlyphRequiredSpecMeta
         static DB2MetaField const fields[2] =
         {
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(948496, -1, 2, 1, 0x0C10BD3C, fields, 1);
+        static DB2Meta instance(948496, -1, 2, 1, 0x95606943, fields, 1);
         return &instance;
     }
 };
@@ -5885,17 +5923,32 @@ struct GroupFinderActivityGrpMeta
     }
 };
 
+struct GroupFinderActivityXPvpBracketMeta
+{
+    static DB2Meta const* Instance()
+    {
+        static DB2MetaField const fields[2] =
+        {
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
+        };
+        static DB2Meta instance(4206623, -1, 2, 2, 0xC373BF46, fields, -1);
+        return &instance;
+    }
+};
+
 struct GroupFinderCategoryMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[3] =
+        static DB2MetaField const fields[4] =
         {
             { FT_STRING, 1, true },
-            { FT_BYTE, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_STRING, 1, true },
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(974812, -1, 3, 3, 0x4D7ABD26, fields, -1);
+        static DB2Meta instance(974812, -1, 4, 4, 0xC3CD8E6D, fields, -1);
         return &instance;
     }
 };
@@ -6068,10 +6121,10 @@ struct HeirloomMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
-            { FT_INT, 4, true },
-            { FT_SHORT, 4, false },
+            { FT_INT, 6, true },
+            { FT_SHORT, 6, false },
         };
-        static DB2Meta instance(1097696, 1, 10, 10, 0xA62E347C, fields, -1);
+        static DB2Meta instance(1097696, 1, 10, 10, 0xECAE6D6C, fields, -1);
         return &instance;
     }
 };
@@ -6185,7 +6238,7 @@ struct HotfixesMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1995523, -1, 4, 4, 0x331CF860, fields, -1);
+        static DB2Meta instance(1995523, -1, 4, 4, 0xE753CD91, fields, -1);
         return &instance;
     }
 };
@@ -6271,7 +6324,7 @@ struct ItemMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[9] =
+        static DB2MetaField const fields[10] =
         {
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
@@ -6282,8 +6335,9 @@ struct ItemMeta
             { FT_INT, 1, true },
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(841626, -1, 9, 9, 0x5432FBBA, fields, -1);
+        static DB2Meta instance(841626, -1, 10, 10, 0x96B908A5, fields, -1);
         return &instance;
     }
 };
@@ -6294,13 +6348,13 @@ struct ItemAppearanceMeta
     {
         static DB2MetaField const fields[5] =
         {
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(982462, -1, 5, 5, 0x02129C17, fields, -1);
+        static DB2Meta instance(982462, -1, 5, 5, 0xBE2B504E, fields, -1);
         return &instance;
     }
 };
@@ -6505,9 +6559,9 @@ struct ItemBonusTreeNodeMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(987134, -1, 7, 6, 0xC2E0B160, fields, 6);
+        static DB2Meta instance(987134, -1, 7, 6, 0x215AE1FF, fields, 6);
         return &instance;
     }
 };
@@ -6554,9 +6608,9 @@ struct ItemContextPickerEntryMeta
             { FT_INT, 1, true },
             { FT_INT, 1, false },
             { FT_INT, 1, false },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1405665, -1, 6, 5, 0xA5C495F7, fields, 5);
+        static DB2Meta instance(1405665, -1, 6, 5, 0xD8F88806, fields, 5);
         return &instance;
     }
 };
@@ -6672,9 +6726,9 @@ struct ItemDisenchantLootMeta
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
             { FT_BYTE, 1, true },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1134087, -1, 7, 6, 0x088EAFF1, fields, 6);
+        static DB2Meta instance(1134087, -1, 7, 6, 0xD8262388, fields, 6);
         return &instance;
     }
 };
@@ -6716,7 +6770,7 @@ struct ItemDisplayInfoMaterialResMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1280614, -1, 3, 2, 0x76AE1016, fields, 2);
+        static DB2Meta instance(1280614, -1, 3, 2, 0xC4DFD0DA, fields, 2);
         return &instance;
     }
 };
@@ -6829,9 +6883,9 @@ struct ItemLevelSelectorQualityMeta
         {
             { FT_INT, 1, true },
             { FT_BYTE, 1, true },
-            { FT_SHORT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1624937, -1, 3, 2, 0x394EA5A6, fields, 2);
+        static DB2Meta instance(1624937, -1, 3, 2, 0xE0678608, fields, 2);
         return &instance;
     }
 };
@@ -6888,12 +6942,12 @@ struct ItemModifiedAppearanceMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, true },
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
-            { FT_BYTE, 1, false },
-            { FT_BYTE, 1, true },
         };
-        static DB2Meta instance(982457, 0, 6, 6, 0x1D3C0EBB, fields, 1);
+        static DB2Meta instance(982457, 0, 6, 6, 0xB8276541, fields, 1);
         return &instance;
     }
 };
@@ -7009,7 +7063,7 @@ struct ItemSearchNameMeta
             { FT_SHORT, 1, false },
             { FT_INT, 4, true },
         };
-        static DB2Meta instance(1273408, 2, 14, 14, 0xA5ED136F, fields, -1);
+        static DB2Meta instance(1273408, -1, 13, 13, 0x616E8BCF, fields, -1);
         return &instance;
     }
 };
@@ -7040,9 +7094,9 @@ struct ItemSetSpellMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, false },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1314689, -1, 4, 3, 0x70A56208, fields, 3);
+        static DB2Meta instance(1314689, -1, 4, 3, 0x96588F97, fields, 3);
         return &instance;
     }
 };
@@ -7115,10 +7169,10 @@ struct ItemSparseMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, true },
-            { FT_BYTE, 1, false },
-            { FT_BYTE, 1, false },
+            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, true },
         };
-        static DB2Meta instance(1572924, -1, 64, 64, 0x12CC2F52, fields, -1);
+        static DB2Meta instance(1572924, -1, 64, 64, 0x59721DCE, fields, -1);
         return &instance;
     }
 };
@@ -7150,7 +7204,7 @@ struct ItemSpecOverrideMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1134576, -1, 2, 1, 0x52DBFC86, fields, 1);
+        static DB2Meta instance(1134576, -1, 2, 1, 0xA10DBD4A, fields, 1);
         return &instance;
     }
 };
@@ -7233,7 +7287,7 @@ struct ItemXBonusTreeMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(987133, -1, 2, 1, 0x9C8FF861, fields, 1);
+        static DB2Meta instance(987133, -1, 2, 1, 0x87253AAD, fields, 1);
         return &instance;
     }
 };
@@ -7247,7 +7301,7 @@ struct ItemXItemEffectMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(3177687, -1, 2, 1, 0x5D602214, fields, 1);
+        static DB2Meta instance(3177687, -1, 2, 1, 0xAB91E2D8, fields, 1);
         return &instance;
     }
 };
@@ -7348,9 +7402,9 @@ struct JournalEncounterXDifficultyMeta
         static DB2MetaField const fields[2] =
         {
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1121901, -1, 2, 1, 0xB4C12996, fields, 1);
+        static DB2Meta instance(1121901, -1, 2, 1, 0x28A617E9, fields, 1);
         return &instance;
     }
 };
@@ -7402,9 +7456,9 @@ struct JournalItemXDifficultyMeta
         static DB2MetaField const fields[2] =
         {
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1277744, -1, 2, 1, 0x383B9DED, fields, 1);
+        static DB2Meta instance(1277744, -1, 2, 1, 0x27F32E12, fields, 1);
         return &instance;
     }
 };
@@ -7416,9 +7470,9 @@ struct JournalSectionXDifficultyMeta
         static DB2MetaField const fields[2] =
         {
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1121900, -1, 2, 1, 0x0D2AC3B1, fields, 1);
+        static DB2Meta instance(1121900, -1, 2, 1, 0xD20CD86E, fields, 1);
         return &instance;
     }
 };
@@ -7475,7 +7529,7 @@ struct KeystoneAffixMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1344761, 2, 4, 4, 0x6A1F8517, fields, -1);
+        static DB2Meta instance(1344761, 2, 4, 4, 0x50726ADB, fields, -1);
         return &instance;
     }
 };
@@ -7532,7 +7586,7 @@ struct LFGDungeonsMeta
             { FT_INT, 1, true },
             { FT_INT, 2, true },
         };
-        static DB2Meta instance(1361033, -1, 29, 29, 0x0BAF7AF1, fields, -1);
+        static DB2Meta instance(1361033, -1, 29, 29, 0x4480A7C8, fields, -1);
         return &instance;
     }
 };
@@ -7545,9 +7599,23 @@ struct LFGRoleRequirementMeta
         {
             { FT_BYTE, 1, true },
             { FT_INT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(982805, -1, 3, 2, 0xBE06BA12, fields, 2);
+        static DB2Meta instance(982805, -1, 3, 2, 0xCE4F29ED, fields, 2);
+        return &instance;
+    }
+};
+
+struct LabelXContentRestrictRuleSetMeta
+{
+    static DB2Meta const* Instance()
+    {
+        static DB2MetaField const fields[2] =
+        {
+            { FT_INT, 1, true },
+            { FT_INT, 1, true },
+        };
+        static DB2Meta instance(4281309, -1, 2, 1, 0x682EA64A, fields, 1);
         return &instance;
     }
 };
@@ -7561,7 +7629,7 @@ struct LanguageWordsMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_INT, 1, false },
         };
-        static DB2Meta instance(984702, -1, 2, 2, 0x364344E1, fields, -1);
+        static DB2Meta instance(984702, -1, 2, 2, 0x8AF6E8C1, fields, -1);
         return &instance;
     }
 };
@@ -7588,9 +7656,9 @@ struct LfgDungeonsGroupingMapMeta
         {
             { FT_SHORT, 1, false },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1339818, -1, 3, 2, 0x61F3361D, fields, 2);
+        static DB2Meta instance(1339818, -1, 3, 2, 0x51AAC642, fields, 2);
         return &instance;
     }
 };
@@ -7699,7 +7767,7 @@ struct LightSkyboxMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1308501, -1, 4, 4, 0x52988A42, fields, -1);
+        static DB2Meta instance(1308501, -1, 4, 4, 0xD466A5C2, fields, -1);
         return &instance;
     }
 };
@@ -7809,7 +7877,7 @@ struct LiquidTypeMeta
             { FT_INT, 4, false },
             { FT_FLOAT, 4, true },
         };
-        static DB2Meta instance(1371380, -1, 21, 21, 0xD4966711, fields, -1);
+        static DB2Meta instance(1371380, -1, 21, 21, 0xD0172A80, fields, -1);
         return &instance;
     }
 };
@@ -7943,7 +8011,7 @@ struct LockTypeMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1284823, 4, 6, 6, 0xC811899B, fields, -1);
+        static DB2Meta instance(1284823, -1, 5, 5, 0x9A74A59C, fields, -1);
         return &instance;
     }
 };
@@ -8072,7 +8140,7 @@ struct ManagedWorldStateBuffMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1587155, -1, 4, 3, 0x989D79A7, fields, 3);
+        static DB2Meta instance(1587155, -1, 4, 3, 0xE6CF3A6B, fields, 3);
         return &instance;
     }
 };
@@ -8145,19 +8213,6 @@ struct ManifestInterfaceTOCDataMeta
     }
 };
 
-struct ManifestMP3Meta
-{
-    static DB2Meta const* Instance()
-    {
-        static DB2MetaField const fields[1] =
-        {
-            { FT_INT, 1, false },
-        };
-        static DB2Meta instance(1375802, 0, 1, 1, 0x28EBA06A, fields, -1);
-        return &instance;
-    }
-};
-
 struct MapMeta
 {
     static DB2Meta const* Instance()
@@ -8189,7 +8244,7 @@ struct MapMeta
             { FT_INT, 1, true },
             { FT_INT, 2, true },
         };
-        static DB2Meta instance(1349477, -1, 24, 24, 0x793F4E8E, fields, -1);
+        static DB2Meta instance(1349477, -1, 23, 23, 0x9CF2F12F, fields, -1);
         return &instance;
     }
 };
@@ -8202,9 +8257,9 @@ struct MapCelestialBodyMeta
         {
             { FT_SHORT, 1, true },
             { FT_INT, 1, false },
-            { FT_SHORT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1597466, -1, 3, 2, 0x5078EC27, fields, 2);
+        static DB2Meta instance(1597466, -1, 3, 2, 0xF791CC89, fields, 2);
         return &instance;
     }
 };
@@ -8213,16 +8268,17 @@ struct MapChallengeModeMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[6] =
+        static DB2MetaField const fields[7] =
         {
             { FT_STRING, 1, true },
             { FT_INT, 1, false },
             { FT_SHORT, 1, false },
             { FT_BYTE, 1, false },
             { FT_INT, 1, false },
+            { FT_INT, 1, true },
             { FT_SHORT, 3, true },
         };
-        static DB2Meta instance(801709, 1, 6, 6, 0x0531FF07, fields, 2);
+        static DB2Meta instance(801709, 1, 7, 7, 0x6C470AF8, fields, 2);
         return &instance;
     }
 };
@@ -8236,7 +8292,7 @@ struct MapDifficultyMeta
             { FT_STRING, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
@@ -8244,7 +8300,7 @@ struct MapDifficultyMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1367868, -1, 10, 9, 0x4C303436, fields, 9);
+        static DB2Meta instance(1375435, -1, 4, 3, 0x35ACEFCA, fields, 3);
         return &instance;
     }
 };
@@ -8296,7 +8352,7 @@ struct MarketingPromotionsXLocaleMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(801710, -1, 7, 7, 0x7166C9C8, fields, -1);
+        static DB2Meta instance(801710, -1, 7, 7, 0xD951637F, fields, -1);
         return &instance;
     }
 };
@@ -8393,9 +8449,9 @@ struct ModelAnimCloakDampeningMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, false },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1465904, -1, 3, 2, 0x4AF6A146, fields, 2);
+        static DB2Meta instance(1465904, -1, 3, 2, 0x17C2AF37, fields, 2);
         return &instance;
     }
 };
@@ -8425,7 +8481,7 @@ struct ModelRibbonQualityMeta
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1399953, -1, 2, 1, 0xBFF227E9, fields, 1);
+        static DB2Meta instance(1399953, -1, 2, 1, 0x71C06725, fields, 1);
         return &instance;
     }
 };
@@ -8585,6 +8641,20 @@ struct MountEquipmentMeta
     }
 };
 
+struct MountTypeMeta
+{
+    static DB2Meta const* Instance()
+    {
+        static DB2MetaField const fields[2] =
+        {
+            { FT_INT, 1, true },
+            { FT_INT, 24, true },
+        };
+        static DB2Meta instance(1114674, -1, 2, 2, 0x22446F4F, fields, -1);
+        return &instance;
+    }
+};
+
 struct MountTypeXCapabilityMeta
 {
     static DB2Meta const* Instance()
@@ -8669,9 +8739,9 @@ struct MovieVariationMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1339819, -1, 3, 2, 0xD172EFF5, fields, 2);
+        static DB2Meta instance(1339819, -1, 3, 2, 0xF9F1832A, fields, 2);
         return &instance;
     }
 };
@@ -8694,7 +8764,7 @@ struct MultiStatePropertiesMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1965592, -1, 11, 10, 0x50FAA807, fields, 10);
+        static DB2Meta instance(1965592, -1, 11, 10, 0x9F2C68CB, fields, 10);
         return &instance;
     }
 };
@@ -8785,7 +8855,7 @@ struct NameGenMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1122117, -1, 3, 3, 0x76610958, fields, -1);
+        static DB2Meta instance(1122117, -1, 3, 3, 0x49AF9298, fields, -1);
         return &instance;
     }
 };
@@ -8799,7 +8869,7 @@ struct NamesProfanityMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_BYTE, 1, true },
         };
-        static DB2Meta instance(1117086, -1, 2, 2, 0xCE63393A, fields, -1);
+        static DB2Meta instance(1117086, -1, 2, 2, 0x7E5D907A, fields, -1);
         return &instance;
     }
 };
@@ -8812,7 +8882,7 @@ struct NamesReservedMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1117085, -1, 1, 1, 0xE722960A, fields, -1);
+        static DB2Meta instance(1117085, -1, 1, 1, 0x3F7A5E4A, fields, -1);
         return &instance;
     }
 };
@@ -8826,7 +8896,7 @@ struct NamesReservedLocaleMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1117087, -1, 2, 2, 0x5144468F, fields, -1);
+        static DB2Meta instance(1117087, -1, 2, 2, 0x939EBBCF, fields, -1);
         return &instance;
     }
 };
@@ -9007,9 +9077,9 @@ struct PVPDifficultyMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1339820, -1, 4, 3, 0x8D90498B, fields, 3);
+        static DB2Meta instance(1339820, -1, 4, 3, 0xCB799A74, fields, 3);
         return &instance;
     }
 };
@@ -9099,7 +9169,7 @@ struct PageTextMaterialMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1271600, -1, 1, 1, 0x887BEAEA, fields, -1);
+        static DB2Meta instance(1271600, -1, 1, 1, 0xA3CF1EB8, fields, -1);
         return &instance;
     }
 };
@@ -9114,7 +9184,7 @@ struct PaperDollItemFrameMeta
             { FT_INT, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1252503, -1, 3, 3, 0x203B38DB, fields, -1);
+        static DB2Meta instance(1252503, -1, 3, 3, 0x828E8A54, fields, -1);
         return &instance;
     }
 };
@@ -9308,9 +9378,9 @@ struct PhaseXPhaseGroupMeta
         static DB2MetaField const fields[2] =
         {
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(987581, -1, 2, 1, 0xF66B1AC6, fields, 1);
+        static DB2Meta instance(987581, -1, 2, 1, 0x6A500919, fields, 1);
         return &instance;
     }
 };
@@ -9462,7 +9532,7 @@ struct PositionerStateEntryMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, true },
         };
-        static DB2Meta instance(1251533, -1, 11, 11, 0xBA3F5A35, fields, -1);
+        static DB2Meta instance(1251533, -1, 11, 11, 0xD8088E90, fields, -1);
         return &instance;
     }
 };
@@ -9479,7 +9549,7 @@ struct PowerDisplayMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1332557, -1, 5, 5, 0xC091809C, fields, -1);
+        static DB2Meta instance(1332557, -1, 5, 5, 0x1CC1F41C, fields, -1);
         return &instance;
     }
 };
@@ -9504,7 +9574,7 @@ struct PowerTypeMeta
             { FT_FLOAT, 1, true },
             { FT_SHORT, 1, true },
         };
-        static DB2Meta instance(1266022, 2, 13, 13, 0x12BC9258, fields, -1);
+        static DB2Meta instance(1266022, 2, 13, 13, 0x60A61B4C, fields, -1);
         return &instance;
     }
 };
@@ -9566,7 +9636,7 @@ struct PvpScalingEffectTypeMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1591098, -1, 1, 1, 0x887BEAEA, fields, -1);
+        static DB2Meta instance(1591098, -1, 1, 1, 0x028513CE, fields, -1);
         return &instance;
     }
 };
@@ -9700,7 +9770,7 @@ struct QuestFeedbackEffectMeta
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1343388, -1, 8, 8, 0x540D504A, fields, -1);
+        static DB2Meta instance(1343388, -1, 8, 8, 0x6CA6256A, fields, -1);
         return &instance;
     }
 };
@@ -9713,10 +9783,10 @@ struct QuestInfoMeta
         {
             { FT_STRING, 1, true },
             { FT_BYTE, 1, true },
-            { FT_BYTE, 1, false },
+            { FT_INT, 1, true },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(1120960, -1, 4, 4, 0x54A97E8C, fields, -1);
+        static DB2Meta instance(1120960, -1, 4, 4, 0xC508CFB5, fields, -1);
         return &instance;
     }
 };
@@ -9741,13 +9811,14 @@ struct QuestLineXQuestMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[3] =
+        static DB2MetaField const fields[4] =
         {
             { FT_INT, 1, false },
             { FT_INT, 1, false },
             { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(973441, -1, 3, 3, 0xFF15296C, fields, 0);
+        static DB2Meta instance(973441, -1, 4, 4, 0xF6975B65, fields, 0);
         return &instance;
     }
 };
@@ -9778,9 +9849,9 @@ struct QuestObjectiveMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1251960, -1, 8, 7, 0x0815F273, fields, 7);
+        static DB2Meta instance(1251960, -1, 8, 7, 0x7EC6466C, fields, 7);
         return &instance;
     }
 };
@@ -9818,7 +9889,7 @@ struct QuestPOIPointMeta
             { FT_SHORT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1251883, 0, 5, 4, 0xD291971B, fields, 4);
+        static DB2Meta instance(1251883, 0, 5, 4, 0x845FD657, fields, 4);
         return &instance;
     }
 };
@@ -10222,9 +10293,9 @@ struct RewardPackXCurrencyTypeMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, true },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1307153, -1, 3, 2, 0xCC6A3E87, fields, 2);
+        static DB2Meta instance(1307153, -1, 3, 2, 0xFF9E3096, fields, 2);
         return &instance;
     }
 };
@@ -10394,12 +10465,13 @@ struct SceneScriptMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[2] =
+        static DB2MetaField const fields[3] =
         {
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(801754, -1, 2, 2, 0x1D557390, fields, -1);
+        static DB2Meta instance(801754, -1, 3, 3, 0x3F190B4A, fields, -1);
         return &instance;
     }
 };
@@ -10422,11 +10494,12 @@ struct SceneScriptPackageMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[1] =
+        static DB2MetaField const fields[2] =
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(801755, -1, 1, 1, 0x887BEAEA, fields, -1);
+        static DB2Meta instance(801755, -1, 2, 2, 0x7A18CA1C, fields, -1);
         return &instance;
     }
 };
@@ -10497,7 +10570,7 @@ struct ScreenEffectMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1302849, -1, 12, 12, 0x7A3A8F2E, fields, -1);
+        static DB2Meta instance(1302849, -1, 12, 12, 0x82E76E04, fields, -1);
         return &instance;
     }
 };
@@ -10523,7 +10596,7 @@ struct ScreenLocationMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1279416, -1, 1, 1, 0x887BEAEA, fields, -1);
+        static DB2Meta instance(1279416, -1, 1, 1, 0xE7C2B265, fields, -1);
         return &instance;
     }
 };
@@ -10615,7 +10688,7 @@ struct SkillLineMeta
             { FT_SHORT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1240935, 5, 13, 13, 0xE09DF4B1, fields, -1);
+        static DB2Meta instance(1240935, 5, 13, 13, 0x13763D15, fields, -1);
         return &instance;
     }
 };
@@ -10809,9 +10882,9 @@ struct SoundAmbienceFlavorMeta
         {
             { FT_INT, 1, false },
             { FT_INT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1267065, -1, 3, 2, 0xA09607B2, fields, 2);
+        static DB2Meta instance(1267065, -1, 3, 2, 0xB0DE778D, fields, 2);
         return &instance;
     }
 };
@@ -10829,9 +10902,9 @@ struct SoundBusMeta
             { FT_FLOAT, 1, true },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1310246, 0, 8, 7, 0x54D9D1C7, fields, 7);
+        static DB2Meta instance(1310246, 0, 8, 7, 0x2F26A438, fields, 7);
         return &instance;
     }
 };
@@ -10886,9 +10959,9 @@ struct SoundEmittersMeta
             { FT_INT, 1, false },
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1092316, 3, 12, 11, 0x8AACF468, fields, 11);
+        static DB2Meta instance(1092316, 3, 12, 11, 0x595EA255, fields, 11);
         return &instance;
     }
 };
@@ -10920,7 +10993,7 @@ struct SoundFilterMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1271601, -1, 1, 1, 0x887BEAEA, fields, -1);
+        static DB2Meta instance(1271601, -1, 1, 1, 0x028513CE, fields, -1);
         return &instance;
     }
 };
@@ -10933,9 +11006,9 @@ struct SoundFilterElemMeta
         {
             { FT_FLOAT, 9, true },
             { FT_BYTE, 1, true },
-            { FT_BYTE, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1267066, -1, 3, 2, 0xB82801CC, fields, 2);
+        static DB2Meta instance(1267066, -1, 3, 2, 0x1BC48044, fields, 2);
         return &instance;
     }
 };
@@ -11143,7 +11216,7 @@ struct SoundProviderPreferencesMeta
             { FT_FLOAT, 1, true },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(1279417, -1, 23, 23, 0xFE1AD33D, fields, -1);
+        static DB2Meta instance(1279417, -1, 23, 23, 0x2D23257D, fields, -1);
         return &instance;
     }
 };
@@ -11157,9 +11230,9 @@ struct SourceInfoMeta
             { FT_STRING, 1, true },
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, true },
-            { FT_INT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1313612, -1, 4, 3, 0x1945161B, fields, 3);
+        static DB2Meta instance(1313612, -1, 4, 3, 0x59076C7D, fields, 3);
         return &instance;
     }
 };
@@ -11172,7 +11245,7 @@ struct SpamMessagesMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1117088, -1, 1, 1, 0x980308B2, fields, -1);
+        static DB2Meta instance(1117088, -1, 1, 1, 0x0904D8D6, fields, -1);
         return &instance;
     }
 };
@@ -11186,7 +11259,7 @@ struct SpecSetMemberMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(2057624, -1, 2, 1, 0x7A37DBE1, fields, 1);
+        static DB2Meta instance(2057624, -1, 2, 1, 0x64CD1E2D, fields, 1);
         return &instance;
     }
 };
@@ -11256,7 +11329,7 @@ struct SpellActivationOverlayMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[9] =
+        static DB2MetaField const fields[10] =
         {
             { FT_INT, 4, true },
             { FT_INT, 1, true },
@@ -11264,11 +11337,12 @@ struct SpellActivationOverlayMeta
             { FT_BYTE, 1, true },
             { FT_INT, 1, false },
             { FT_INT, 1, true },
+            { FT_INT, 1, true },
             { FT_FLOAT, 1, true },
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1261603, -1, 9, 9, 0x03C3E8B6, fields, -1);
+        static DB2Meta instance(1261603, -1, 10, 10, 0x35F62984, fields, -1);
         return &instance;
     }
 };
@@ -11288,7 +11362,7 @@ struct SpellAuraOptionsMeta
             { FT_INT, 2, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1139952, -1, 8, 7, 0x25E72B24, fields, 7);
+        static DB2Meta instance(1139952, -1, 8, 7, 0x7418EBE8, fields, 7);
         return &instance;
     }
 };
@@ -11310,7 +11384,7 @@ struct SpellAuraRestrictionsMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(981566, -1, 10, 9, 0xA9D83D8F, fields, 9);
+        static DB2Meta instance(981566, -1, 10, 9, 0xBF42FB43, fields, 9);
         return &instance;
     }
 };
@@ -11322,9 +11396,9 @@ struct SpellAuraVisXChrSpecMeta
         static DB2MetaField const fields[2] =
         {
             { FT_SHORT, 1, true },
-            { FT_SHORT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1280615, -1, 2, 1, 0x7109EB94, fields, 1);
+        static DB2Meta instance(1280615, -1, 2, 1, 0x66548CBA, fields, 1);
         return &instance;
     }
 };
@@ -11340,7 +11414,7 @@ struct SpellAuraVisibilityMeta
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1280616, 0, 4, 3, 0xB8AA32DE, fields, 3);
+        static DB2Meta instance(1280616, 0, 4, 3, 0xCE14F092, fields, 3);
         return &instance;
     }
 };
@@ -11394,7 +11468,7 @@ struct SpellCategoriesMeta
             { FT_SHORT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1139939, -1, 9, 8, 0x78E91F91, fields, 8);
+        static DB2Meta instance(1139939, -1, 9, 8, 0x637E61DD, fields, 8);
         return &instance;
     }
 };
@@ -11607,7 +11681,7 @@ struct SpellCooldownsMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1139924, -1, 5, 4, 0x9FFFEB83, fields, 4);
+        static DB2Meta instance(1139924, -1, 5, 4, 0x8A952DCF, fields, 4);
         return &instance;
     }
 };
@@ -11620,7 +11694,7 @@ struct SpellDescriptionVariablesMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1140004, -1, 1, 1, 0x4B103A8E, fields, -1);
+        static DB2Meta instance(1140004, -1, 1, 1, 0xB3BAF484, fields, -1);
         return &instance;
     }
 };
@@ -11636,7 +11710,7 @@ struct SpellDispelTypeMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1137829, -1, 4, 4, 0x8EAAEBC3, fields, -1);
+        static DB2Meta instance(1137829, -1, 4, 4, 0xC3F3F9A3, fields, -1);
         return &instance;
     }
 };
@@ -11659,12 +11733,12 @@ struct SpellEffectMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[28] =
+        static DB2MetaField const fields[29] =
         {
             { FT_SHORT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_INT, 1, true },
+            { FT_INT, 1, false },
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
@@ -11684,13 +11758,14 @@ struct SpellEffectMeta
             { FT_FLOAT, 1, true },
             { FT_FLOAT, 1, true },
             { FT_FLOAT, 1, true },
+            { FT_INT, 1, true },
             { FT_INT, 2, true },
             { FT_INT, 2, false },
             { FT_INT, 4, true },
             { FT_SHORT, 2, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1140088, -1, 28, 27, 0x8E2EAEB1, fields, 27);
+        static DB2Meta instance(1134085, -1, 3, 2, 0xEB06A5FD, fields, 2);
         return &instance;
     }
 };
@@ -11806,7 +11881,7 @@ struct SpellInterruptsMeta
             { FT_INT, 2, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1139906, -1, 5, 4, 0x4D63688D, fields, 4);
+        static DB2Meta instance(1139906, -1, 5, 4, 0x62CE2641, fields, 4);
         return &instance;
     }
 };
@@ -11874,7 +11949,7 @@ struct SpellKeyboundOverrideMeta
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1127327, -1, 3, 3, 0x611EB481, fields, -1);
+        static DB2Meta instance(1127327, -1, 4, 4, 0x11EB6252, fields, -1);
         return &instance;
     }
 };
@@ -11888,7 +11963,7 @@ struct SpellLabelMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1347275, -1, 2, 1, 0xF7CEC3A4, fields, 1);
+        static DB2Meta instance(1347275, -1, 2, 1, 0x46008468, fields, 1);
         return &instance;
     }
 };
@@ -11921,7 +11996,7 @@ struct SpellLevelsMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1140079, -1, 6, 5, 0x79D1C0A1, fields, 5);
+        static DB2Meta instance(1140079, -1, 6, 5, 0x646702ED, fields, 5);
         return &instance;
     }
 };
@@ -11962,7 +12037,7 @@ struct SpellMiscMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1003144, -1, 16, 15, 0xB252FDD7, fields, 15);
+        static DB2Meta instance(1003144, -1, 16, 15, 0x0084BE9B, fields, 15);
         return &instance;
     }
 };
@@ -12005,7 +12080,7 @@ struct SpellMissileMotionMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(897955, -1, 4, 4, 0xA76EF553, fields, -1);
+        static DB2Meta instance(897955, -1, 4, 4, 0xA5BEAF64, fields, -1);
         return &instance;
     }
 };
@@ -12058,7 +12133,7 @@ struct SpellPowerMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(982806, 0, 14, 13, 0xD9875D83, fields, 13);
+        static DB2Meta instance(982806, 0, 14, 13, 0xC41C9FCF, fields, 13);
         return &instance;
     }
 };
@@ -12116,9 +12191,9 @@ struct SpellProcsPerMinuteModMeta
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_FLOAT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1133525, -1, 4, 3, 0x2EF9CF3F, fields, 3);
+        static DB2Meta instance(1133525, -1, 4, 3, 0xD07F9EA0, fields, 3);
         return &instance;
     }
 };
@@ -12305,7 +12380,7 @@ struct SpellTargetRestrictionsMeta
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1139993, -1, 8, 7, 0x090BE8F6, fields, 7);
+        static DB2Meta instance(1139993, -1, 8, 7, 0x573DA9BA, fields, 7);
         return &instance;
     }
 };
@@ -12377,7 +12452,7 @@ struct SpellVisualColorEffectMeta
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
             { FT_BYTE, 1, false },
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
             { FT_SHORT, 1, false },
@@ -12577,9 +12652,9 @@ struct SpellVisualMissileMeta
             { FT_INT, 1, false },
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(897954, 2, 18, 17, 0x68D6B039, fields, 17);
+        static DB2Meta instance(897954, 2, 18, 17, 0xF4F1C1E6, fields, 17);
         return &instance;
     }
 };
@@ -12631,7 +12706,7 @@ struct SpellXSpellVisualMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1101657, 0, 12, 11, 0xE4509F95, fields, 11);
+        static DB2Meta instance(1101657, 0, 12, 11, 0x06029294, fields, 11);
         return &instance;
     }
 };
@@ -12660,7 +12735,7 @@ struct Startup_StringsMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_STRING, 1, true },
         };
-        static DB2Meta instance(1375805, -1, 2, 2, 0xF6EA05C9, fields, -1);
+        static DB2Meta instance(1375805, -1, 2, 2, 0x0A561909, fields, -1);
         return &instance;
     }
 };
@@ -12851,7 +12926,7 @@ struct TerrainTypeMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1310249, -1, 5, 5, 0x7CE432CE, fields, -1);
+        static DB2Meta instance(1310249, -1, 5, 5, 0xEA86320E, fields, -1);
         return &instance;
     }
 };
@@ -12864,7 +12939,7 @@ struct TerrainTypeSoundsMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1284822, -1, 1, 1, 0xE722960A, fields, -1);
+        static DB2Meta instance(1284822, -1, 1, 1, 0x3AF6B1EA, fields, -1);
         return &instance;
     }
 };
@@ -13115,7 +13190,7 @@ struct TransportAnimationMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1140686, -1, 4, 3, 0xE69CA54B, fields, 3);
+        static DB2Meta instance(1140686, -1, 4, 3, 0x986AE487, fields, 3);
         return &instance;
     }
 };
@@ -13152,7 +13227,7 @@ struct TransportRotationMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1140687, -1, 3, 2, 0x4D88AA07, fields, 2);
+        static DB2Meta instance(1140687, -1, 3, 2, 0x9BBA6ACB, fields, 2);
         return &instance;
     }
 };
@@ -13203,7 +13278,7 @@ struct UICovenantAbilityMeta
         {
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
         };
         static DB2Meta instance(3502042, -1, 4, 4, 0x7286CBAB, fields, 0);
@@ -13302,7 +13377,7 @@ struct UISplashScreenMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[16] =
+        static DB2MetaField const fields[15] =
         {
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
@@ -13311,17 +13386,16 @@ struct UISplashScreenMeta
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
-            { FT_INT, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(2960122, 7, 16, 16, 0xCB8F573D, fields, -1);
+        static DB2Meta instance(2960122, -1, 15, 15, 0xAA415970, fields, -1);
         return &instance;
     }
 };
@@ -13375,7 +13449,7 @@ struct UiCameraMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(1120287, -1, 9, 9, 0xEA5339C9, fields, -1);
+        static DB2Meta instance(1120287, -1, 9, 9, 0xB0F77175, fields, -1);
         return &instance;
     }
 };
@@ -13390,7 +13464,7 @@ struct UiCameraTypeMeta
             { FT_INT, 1, false },
             { FT_INT, 1, false },
         };
-        static DB2Meta instance(1120288, -1, 3, 3, 0x9C86DD21, fields, -1);
+        static DB2Meta instance(1120288, -1, 3, 3, 0xF785DCB0, fields, -1);
         return &instance;
     }
 };
@@ -13439,25 +13513,26 @@ struct UiItemInteractionMeta
 {
     static DB2Meta const* Instance()
     {
-        static DB2MetaField const fields[15] =
+        static DB2MetaField const fields[16] =
         {
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
             { FT_STRING, 1, true },
-            { FT_INT, 1, false },
+            { FT_STRING, 1, true },
+            { FT_STRING, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
+            { FT_INT, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(3182424, 4, 15, 15, 0x62BB4D7F, fields, -1);
+        static DB2Meta instance(3182424, -1, 16, 16, 0x122EB2F3, fields, -1);
         return &instance;
     }
 };
@@ -13472,8 +13547,8 @@ struct UiMapMeta
             { FT_INT, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_INT, 1, true },
-            { FT_INT, 1, true },
+            { FT_INT, 1, false },
+            { FT_INT, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, false },
             { FT_INT, 1, true },
@@ -13518,7 +13593,7 @@ struct UiMapArtStyleLayerMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1957208, -1, 9, 8, 0x22F1C1C7, fields, 8);
+        static DB2Meta instance(1957208, -1, 9, 8, 0x7123828B, fields, 8);
         return &instance;
     }
 };
@@ -13535,7 +13610,7 @@ struct UiMapArtTileMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1957210, -1, 5, 4, 0xEAA72854, fields, 4);
+        static DB2Meta instance(1957210, -1, 5, 4, 0x38D8E918, fields, 4);
         return &instance;
     }
 };
@@ -13641,7 +13716,7 @@ struct UiMapXMapArtMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1957217, -1, 3, 2, 0x49452904, fields, 2);
+        static DB2Meta instance(1957217, -1, 3, 2, 0x9776E9C8, fields, 2);
         return &instance;
     }
 };
@@ -13677,7 +13752,7 @@ struct UiModelSceneActorMeta
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1548214, 2, 10, 9, 0x0E1BA837, fields, 9);
+        static DB2Meta instance(1548214, 2, 10, 9, 0xD7DABE1F, fields, 9);
         return &instance;
     }
 };
@@ -13724,7 +13799,7 @@ struct UiModelSceneCameraMeta
             { FT_FLOAT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1548213, 3, 16, 15, 0x4C74D5D0, fields, 15);
+        static DB2Meta instance(1548213, 3, 16, 15, 0x3580F257, fields, 15);
         return &instance;
     }
 };
@@ -13787,7 +13862,7 @@ struct UiTextureAtlasElementMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_INT, 1, false },
         };
-        static DB2Meta instance(1989276, 1, 2, 2, 0xEC49AEF1, fields, -1);
+        static DB2Meta instance(1989276, 1, 2, 2, 0xD65CFDA5, fields, -1);
         return &instance;
     }
 };
@@ -13825,7 +13900,7 @@ struct UiTextureAtlasMemberMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(897532, 1, 12, 12, 0xEBC1E9DA, fields, 7);
+        static DB2Meta instance(897532, 1, 12, 12, 0xBD0C10F6, fields, 7);
         return &instance;
     }
 };
@@ -13838,7 +13913,7 @@ struct UiTextureKitMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(939159, -1, 1, 1, 0x22D83F37, fields, -1);
+        static DB2Meta instance(939159, -1, 1, 1, 0xD387CFB7, fields, -1);
         return &instance;
     }
 };
@@ -13856,10 +13931,10 @@ struct UiWidgetMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
-            { FT_INT, 1, true },
+            { FT_BYTE, 1, false },
             { FT_BYTE, 1, true },
         };
-        static DB2Meta instance(1983278, 1, 9, 9, 0xBCC7B06B, fields, -1);
+        static DB2Meta instance(1983278, 1, 9, 9, 0x9D153529, fields, -1);
         return &instance;
     }
 };
@@ -13874,7 +13949,7 @@ struct UiWidgetConstantSourceMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1983639, -1, 3, 2, 0x2B8A65DD, fields, 2);
+        static DB2Meta instance(1983639, -1, 3, 2, 0x40F52391, fields, 2);
         return &instance;
     }
 };
@@ -13890,7 +13965,7 @@ struct UiWidgetDataSourceMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(1983640, -1, 4, 3, 0xCD0BD385, fields, 3);
+        static DB2Meta instance(1983640, -1, 4, 3, 0x1B3D9449, fields, 3);
         return &instance;
     }
 };
@@ -13904,7 +13979,7 @@ struct UiWidgetMapMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(2322531, -1, 2, 1, 0x2B487E93, fields, 1);
+        static DB2Meta instance(2322531, -1, 2, 1, 0x15DDC0DF, fields, 1);
         return &instance;
     }
 };
@@ -13915,10 +13990,10 @@ struct UiWidgetSetMeta
     {
         static DB2MetaField const fields[2] =
         {
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(3055925, -1, 2, 2, 0x7CB0FD20, fields, -1);
+        static DB2Meta instance(1983641, -1, 3, 2, 0x00E08529, fields, 2);
         return &instance;
     }
 };
@@ -13963,14 +14038,14 @@ struct UiWidgetVisualizationMeta
         static DB2MetaField const fields[9] =
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
-            { FT_INT, 1, false },
+            { FT_BYTE, 1, false },
             { FT_BYTE, 1, true },
             { FT_INT, 1, true },
             { FT_INT, 1, true },
             { FT_SHORT, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
-            { FT_INT, 1, true },
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
         };
         static DB2Meta instance(1983276, 1, 9, 9, 0x6089B8EF, fields, -1);
         return &instance;
@@ -13986,7 +14061,7 @@ struct UiWidgetXWidgetSetMeta
             { FT_INT, 1, true },
             { FT_INT, 1, true },
         };
-        static DB2Meta instance(3386363, -1, 2, 1, 0xA8FB2A6F, fields, 1);
+        static DB2Meta instance(3386363, -1, 2, 1, 0xBE65E823, fields, 1);
         return &instance;
     }
 };
@@ -14195,9 +14270,9 @@ struct VehicleUIIndSeatMeta
             { FT_BYTE, 1, false },
             { FT_FLOAT, 1, true },
             { FT_FLOAT, 1, true },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1279741, -1, 4, 3, 0xCD2727A6, fields, 3);
+        static DB2Meta instance(1279741, -1, 4, 3, 0x410C15F9, fields, 3);
         return &instance;
     }
 };
@@ -14246,7 +14321,7 @@ struct VirtualAttachmentMeta
             { FT_STRING_NOT_LOCALIZED, 1, true },
             { FT_SHORT, 1, true },
         };
-        static DB2Meta instance(1634482, -1, 2, 2, 0x69D4EE2F, fields, -1);
+        static DB2Meta instance(1634482, -1, 2, 2, 0xD9EF5527, fields, -1);
         return &instance;
     }
 };
@@ -14335,9 +14410,9 @@ struct WMOMinimapTextureMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
             { FT_INT, 1, true },
-            { FT_SHORT, 1, true },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1323241, -1, 5, 4, 0xF7850975, fields, 4);
+        static DB2Meta instance(1323241, -1, 5, 4, 0xECCFAA9B, fields, 4);
         return &instance;
     }
 };
@@ -14436,7 +14511,7 @@ struct WbAccessControlListMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(879634, -1, 5, 5, 0x779C0B6F, fields, -1);
+        static DB2Meta instance(879634, -1, 5, 5, 0x669122E7, fields, -1);
         return &instance;
     }
 };
@@ -14452,7 +14527,7 @@ struct WbCertWhitelistMeta
             { FT_BYTE, 1, false },
             { FT_BYTE, 1, false },
         };
-        static DB2Meta instance(879591, -1, 4, 4, 0xEDDFD030, fields, -1);
+        static DB2Meta instance(879591, -1, 4, 4, 0x543DDD18, fields, -1);
         return &instance;
     }
 };
@@ -14520,9 +14595,9 @@ struct WeaponTrailModelDefMeta
         {
             { FT_INT, 1, true },
             { FT_SHORT, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1239843, -1, 3, 2, 0xADF47FBF, fields, 2);
+        static DB2Meta instance(1239843, -1, 3, 2, 0x702920B3, fields, 2);
         return &instance;
     }
 };
@@ -14542,9 +14617,9 @@ struct WeaponTrailParamMeta
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, true },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1239842, -1, 10, 9, 0x3379426A, fields, 9);
+        static DB2Meta instance(1239842, -1, 10, 9, 0x0AFAAF35, fields, 9);
         return &instance;
     }
 };
@@ -14675,12 +14750,12 @@ struct WorldEffectMeta
         {
             { FT_INT, 1, false },
             { FT_BYTE, 1, false },
-            { FT_BYTE, 1, true },
+            { FT_BYTE, 1, false },
             { FT_INT, 1, true },
             { FT_INT, 1, false },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(1343312, -1, 6, 6, 0x4C1800A9, fields, -1);
+        static DB2Meta instance(1957212, -1, 5, 4, 0x40F5F817, fields, 4);
         return &instance;
     }
 };
@@ -14750,7 +14825,7 @@ struct WorldStateExpressionMeta
         {
             { FT_STRING_NOT_LOCALIZED, 1, true },
         };
-        static DB2Meta instance(1332558, -1, 1, 1, 0x340F8A17, fields, -1);
+        static DB2Meta instance(1332558, -1, 1, 1, 0xCB64D021, fields, -1);
         return &instance;
     }
 };
@@ -14806,7 +14881,7 @@ struct ZoneIntroMusicTableMeta
             { FT_BYTE, 1, false },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(1310251, -1, 4, 4, 0x6FE3ADE9, fields, -1);
+        static DB2Meta instance(1310251, -1, 4, 4, 0x042F6C99, fields, -1);
         return &instance;
     }
 };
@@ -14825,7 +14900,7 @@ struct ZoneLightMeta
             { FT_FLOAT, 1, true },
             { FT_SHORT, 1, false },
         };
-        static DB2Meta instance(1310253, -1, 7, 7, 0x1065A739, fields, -1);
+        static DB2Meta instance(1310253, -1, 8, 8, 0x1DF851D5, fields, -1);
         return &instance;
     }
 };
@@ -14838,9 +14913,9 @@ struct ZoneLightPointMeta
         {
             { FT_FLOAT, 2, true },
             { FT_BYTE, 1, false },
-            { FT_SHORT, 1, false },
+            { FT_INT, 1, true },
         };
-        static DB2Meta instance(1310256, -1, 3, 2, 0x83F1CC18, fields, 2);
+        static DB2Meta instance(1310256, -1, 3, 2, 0xA9A4F9A7, fields, 2);
         return &instance;
     }
 };
@@ -14856,7 +14931,7 @@ struct ZoneMusicMeta
             { FT_INT, 2, false },
             { FT_INT, 2, false },
         };
-        static DB2Meta instance(1310254, -1, 4, 4, 0xFE595EDE, fields, -1);
+        static DB2Meta instance(1310254, -1, 4, 4, 0x491CF01E, fields, -1);
         return &instance;
     }
 };
