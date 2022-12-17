@@ -69,6 +69,7 @@ bool Garrison::LoadFromDB(PreparedQueryResult garrison, PreparedQueryResult blue
             time_t timeBuilt = fields[2].GetInt64();
             bool active = fields[3].GetBool();
 
+
             Plot* plot = GetPlot(plotInstanceId);
             if (!plot)
                 continue;
@@ -76,7 +77,7 @@ bool Garrison::LoadFromDB(PreparedQueryResult garrison, PreparedQueryResult blue
             if (!sGarrBuildingStore.LookupEntry(buildingId))
                 continue;
 
-            plot->BuildingInfo.PacketInfo.emplace();
+            plot->BuildingInfo.PacketInfo = boost::in_place();
             plot->BuildingInfo.PacketInfo->GarrPlotInstanceID = plotInstanceId;
             plot->BuildingInfo.PacketInfo->GarrBuildingID = buildingId;
             plot->BuildingInfo.PacketInfo->TimeBuilt = timeBuilt;
@@ -110,11 +111,12 @@ bool Garrison::LoadFromDB(PreparedQueryResult garrison, PreparedQueryResult blue
             follower.PacketInfo.CurrentBuildingID = fields[7].GetUInt32();
             follower.PacketInfo.CurrentMissionID = fields[8].GetUInt32();
             follower.PacketInfo.FollowerStatus = fields[9].GetUInt32();
+
             if (!sGarrBuildingStore.LookupEntry(follower.PacketInfo.CurrentBuildingID))
                 follower.PacketInfo.CurrentBuildingID = 0;
 
-            //if (!sGarrMissionStore.LookupEntry(follower.PacketInfo.CurrentMissionID))
-            //    follower.PacketInfo.CurrentMissionID = 0;
+            if (!sGarrMissionStore.LookupEntry(follower.PacketInfo.CurrentMissionID))
+                follower.PacketInfo.CurrentMissionID = 0;
 
         } while (followers->NextRow());
 
@@ -420,7 +422,7 @@ void Garrison::PlaceBuilding(uint32 garrPlotInstanceId, uint32 garrBuildingId)
             _owner->SendDirectMessage(buildingRemoved.Write());
         }
 
-        _owner->UpdateCriteria(CriteriaType::PlaceGarrisonBuilding, garrBuildingId);
+        _owner->UpdateCriteria(CRITERIA_TYPE_PLACE_GARRISON_BUILDING, garrBuildingId);
     }
 
     _owner->SendDirectMessage(placeBuildingResult.Write());
@@ -493,8 +495,6 @@ void Garrison::ActivateBuilding(uint32 garrPlotInstanceId)
             WorldPackets::Garrison::GarrisonBuildingActivated buildingActivated;
             buildingActivated.GarrPlotInstanceID = garrPlotInstanceId;
             _owner->SendDirectMessage(buildingActivated.Write());
-
-            _owner->UpdateCriteria(CriteriaType::ActivateAnyGarrisonBuilding, plot->BuildingInfo.PacketInfo->GarrBuildingID);
         }
     }
 }
@@ -529,7 +529,7 @@ void Garrison::AddFollower(uint32 garrFollowerId)
     addFollowerResult.Follower = follower.PacketInfo;
     _owner->SendDirectMessage(addFollowerResult.Write());
 
-    _owner->UpdateCriteria(CriteriaType::RecruitGarrisonFollower, follower.PacketInfo.DbID);
+    _owner->UpdateCriteria(CRITERIA_TYPE_RECRUIT_GARRISON_FOLLOWER, follower.PacketInfo.DbID);
 }
 
 Garrison::Follower const* Garrison::GetFollower(uint64 dbId) const
@@ -557,7 +557,7 @@ void Garrison::SendInfo()
         Plot& plot = p.second;
         garrison.Plots.push_back(&plot.PacketInfo);
         if (plot.BuildingInfo.PacketInfo)
-            garrison.Buildings.push_back(&*plot.BuildingInfo.PacketInfo);
+            garrison.Buildings.push_back(plot.BuildingInfo.PacketInfo.get_ptr());
     }
 
     for (auto const& p : _followers)
@@ -814,7 +814,7 @@ void Garrison::Plot::ClearBuildingInfo(GarrisonType garrisonType, Player* owner)
     plotPlaced.PlotInfo = &PacketInfo;
     owner->SendDirectMessage(plotPlaced.Write());
 
-    BuildingInfo.PacketInfo.reset();
+    BuildingInfo.PacketInfo = boost::none;
 }
 
 void Garrison::Plot::SetBuildingInfo(WorldPackets::Garrison::GarrisonBuildingInfo const& buildingInfo, Player* owner)

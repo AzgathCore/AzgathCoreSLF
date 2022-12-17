@@ -104,7 +104,7 @@ WorldPacket const* WorldPackets::Pet::PetNameInvalid::Write()
 
     _worldPacket << uint8(RenameData.NewName.length());
 
-    _worldPacket.WriteBit(RenameData.DeclinedNames.has_value());
+    _worldPacket.WriteBit(RenameData.DeclinedNames.is_initialized());
 
     if (RenameData.DeclinedNames)
     {
@@ -128,7 +128,7 @@ void WorldPackets::Pet::PetRename::Read()
 
     if (_worldPacket.ReadBit())
     {
-        RenameData.DeclinedNames.emplace();
+        RenameData.DeclinedNames = boost::in_place();
         int32 count[MAX_DECLINED_NAME_CASES];
         for (int32 i = 0; i < MAX_DECLINED_NAME_CASES; i++)
             count[i] = _worldPacket.ReadBits(7);
@@ -205,13 +205,6 @@ WorldPacket const* WorldPackets::Pet::PetActionSound::Write()
 {
     _worldPacket << UnitGUID;
     _worldPacket << int32(Action);
-
-    return &_worldPacket;
-}
-
-WorldPacket const* WorldPackets::Pet::PetTameFailure::Write()
-{
-    _worldPacket << uint8(Result);
 
     return &_worldPacket;
 }

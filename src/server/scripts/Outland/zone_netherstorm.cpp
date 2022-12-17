@@ -24,14 +24,19 @@ EndScriptData */
 
 /* ContentData
 npc_commander_dawnforge
+npc_bessy
+npc_maxx_a_million
+go_captain_tyralius_prison
 EndContentData */
 
 #include "ScriptMgr.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
 
 /*######
 ## npc_commander_dawnforge
@@ -226,7 +231,7 @@ public:
                 //Phase 4 Pathaleon spawns up to phase 9
             case 4:
                 //spawn pathaleon's image
-                me->SummonCreature(CreatureEntry[2], 2325.851563f, 2799.534668f, 133.084229f, 6.038996f, TEMPSUMMON_TIMED_DESPAWN, 90s);
+                me->SummonCreature(CreatureEntry[2], 2325.851563f, 2799.534668f, 133.084229f, 6.038996f, TEMPSUMMON_TIMED_DESPAWN, 90000);
                 ++Phase;
                 Phase_Timer = 500;
                 break;
@@ -312,7 +317,7 @@ class at_commander_dawnforge : public AreaTriggerScript
 public:
     at_commander_dawnforge() : AreaTriggerScript("at_commander_dawnforge") { }
 
-    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/) override
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/, bool /*entered*/) override
     {
         //if player lost aura or not have at all, we should not try start event.
         if (!player->HasAura(SPELL_SUNFURY_DISGUISE))
@@ -403,6 +408,11 @@ public:
                 PlayerGUID = who->GetGUID();
         }
 
+        //void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) override
+        //{
+        //    DoCast(me, SPELL_DE_MATERIALIZE);
+        //}
+
         void UpdateAI(uint32 diff) override
         {
             if (!Materialize)
@@ -460,74 +470,288 @@ public:
 };
 
 /*######
-## Quest 10857: Teleport This!
+## npc_bessy
 ######*/
-
-enum DetonateTeleporter
+enum BessyData
 {
-    SPELL_TELEPORTER_KILL_CREDIT_1   = 38982,    // 22348
-    SPELL_TELEPORTER_KILL_CREDIT_2   = 38983,    // 22351
-    SPELL_TELEPORTER_KILL_CREDIT_3   = 38984,    // 22350
-    NPC_WESTERN_TELEPORTER_CREDIT    = 22348,
-    NPC_EASTERN_TELEPORTER_CREDIT    = 22351,
-    NPC_CENTRAL_TELEPORTER_CREDIT    = 22350
+    Q_ALMABTRIEB    = 10337,
+    N_THADELL       = 20464,
+    SPAWN_FIRST     = 20512,
+    SPAWN_SECOND    = 19881,
+    SAY_THADELL_1   = 0,
+    SAY_THADELL_2   = 1,
 };
 
-// 38920 - Detonate Teleporter
-class spell_detonate_teleporter : public SpellScript
+class npc_bessy : public CreatureScript
 {
-    PrepareSpellScript(spell_detonate_teleporter);
+public:
+    npc_bessy() : CreatureScript("npc_bessy") { }
 
-    bool Load() override
+    struct npc_bessyAI : public EscortAI
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
-    }
+        npc_bessyAI(Creature* creature) : EscortAI(creature) { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo(
+        void JustDied(Unit* /*killer*/) override
         {
-            SPELL_TELEPORTER_KILL_CREDIT_1,
-            SPELL_TELEPORTER_KILL_CREDIT_2,
-            SPELL_TELEPORTER_KILL_CREDIT_3
-        });
-    }
+            if (Player* player = GetPlayerForEscort())
+                player->FailQuest(Q_ALMABTRIEB);
+        }
 
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        if (Creature* creature = GetHitCreature())
+        void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override
         {
-            if (Unit* charmer = GetCaster()->GetCharmerOrOwner())
+            Player* player = GetPlayerForEscort();
+            if (!player)
+                return;
+
+            switch (waypointId)
             {
-                if (Player* player = charmer->ToPlayer())
-                {
-                    uint32 spellId = 0;
+                case 3: //first spawn
+                    me->SummonCreature(SPAWN_FIRST, 2449.67f, 2183.11f, 96.85f, 6.20f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    me->SummonCreature(SPAWN_FIRST, 2449.53f, 2184.43f, 96.36f, 6.27f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    me->SummonCreature(SPAWN_FIRST, 2449.85f, 2186.34f, 97.57f, 6.08f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    break;
+                case 7:
+                    me->SummonCreature(SPAWN_SECOND, 2309.64f, 2186.24f, 92.25f, 6.06f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    me->SummonCreature(SPAWN_SECOND, 2309.25f, 2183.46f, 91.75f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    break;
+                case 12:
+                    player->GroupEventHappens(Q_ALMABTRIEB, me);
+                    if (me->FindNearestCreature(N_THADELL, 30))
+                        Talk(SAY_THADELL_1);
+                    break;
+                case 13:
+                    if (me->FindNearestCreature(N_THADELL, 30))
+                        Talk(SAY_THADELL_2, player);
+                    break;
+            }
+        }
 
-                    switch (creature->GetEntry())
+        void JustSummoned(Creature* summoned) override
+        {
+            summoned->AI()->AttackStart(me);
+        }
+
+        void Reset() override
+        {
+            me->RestoreFaction();
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == Q_ALMABTRIEB)
+            {
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                Start(true, false, player->GetGUID());
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bessyAI(creature);
+    }
+};
+
+/*######
+## npc_maxx_a_million
+######*/
+
+enum MaxxAMillion
+{
+    QUEST_MARK_V_IS_ALIVE   = 10191,
+    GO_DRAENEI_MACHINE      = 183771
+};
+
+class npc_maxx_a_million_escort : public CreatureScript
+{
+public:
+    npc_maxx_a_million_escort() : CreatureScript("npc_maxx_a_million_escort") { }
+
+    struct npc_maxx_a_million_escortAI : public EscortAI
+    {
+        npc_maxx_a_million_escortAI(Creature* creature) : EscortAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            bTake = false;
+            uiTakeTimer = 3000;
+        }
+
+        bool bTake;
+        uint32 uiTakeTimer;
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override
+        {
+            Player* player = GetPlayerForEscort();
+            if (!player)
+                return;
+
+            switch (waypointId)
+            {
+                case 7:
+                case 17:
+                case 29:
+                    //Find Object and "work"
+                    if (GetClosestGameObjectWithEntry(me, GO_DRAENEI_MACHINE, INTERACTION_DISTANCE))
                     {
-                        case NPC_WESTERN_TELEPORTER_CREDIT:
-                            spellId = SPELL_TELEPORTER_KILL_CREDIT_1;
-                            break;
-                        case NPC_EASTERN_TELEPORTER_CREDIT:
-                            spellId = SPELL_TELEPORTER_KILL_CREDIT_2;
-                            break;
-                        case NPC_CENTRAL_TELEPORTER_CREDIT:
-                            spellId = SPELL_TELEPORTER_KILL_CREDIT_3;
-                            break;
-                        default:
-                            return;
+                        // take the GO -> animation
+                        me->HandleEmoteCommand(EMOTE_STATE_LOOT);
+                        SetEscortPaused(true);
+                        bTake = true;
                     }
+                    break;
+                case 36: //return and quest_complete
+                    player->CompleteQuest(QUEST_MARK_V_IS_ALIVE);
+                    break;
+            }
+        }
 
-                    player->CastSpell(player, spellId);
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (Player* player = GetPlayerForEscort())
+                player->FailQuest(QUEST_MARK_V_IS_ALIVE);
+        }
+
+        void UpdateAI(uint32 uiDiff) override
+        {
+            EscortAI::UpdateAI(uiDiff);
+
+            if (bTake)
+            {
+                if (uiTakeTimer < uiDiff)
+                {
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
+                    if (GameObject* go = GetClosestGameObjectWithEntry(me, GO_DRAENEI_MACHINE, INTERACTION_DISTANCE))
+                    {
+                        SetEscortPaused(false);
+                        bTake = false;
+                        uiTakeTimer = 3000;
+                        go->Delete();
+                    }
+                }
+                else
+                    uiTakeTimer -= uiDiff;
+            }
+            DoMeleeAttackIfReady();
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_MARK_V_IS_ALIVE)
+            {
+                me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
+                Start(false, false, player->GetGUID());
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_maxx_a_million_escortAI(creature);
+    }
+};
+
+/*######
+## go_captain_tyralius_prison
+######*/
+
+enum CaptainTyralius
+{
+    NPC_CAPTAIN_TYRALIUS    = 20787,
+    NPC_ETHEREUM_PRISONER   = 20825,
+    SPELL_TELEPORT_VISUAL   = 51347,
+    SAY_FREE                = 0,
+    ACTION_FREED            = 0,
+    EVENT_TELEPORT          = 1
+};
+
+class go_captain_tyralius_prison : public GameObjectScript
+{
+    public:
+        go_captain_tyralius_prison() : GameObjectScript("go_captain_tyralius_prison") { }
+
+        struct go_captain_tyralius_prisonAI : public GameObjectAI
+        {
+            go_captain_tyralius_prisonAI(GameObject* go) : GameObjectAI(go) { }
+
+            void Reset() override
+            {
+                me->SummonCreature(NPC_CAPTAIN_TYRALIUS, me->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+                me->SummonCreature(NPC_ETHEREUM_PRISONER, me->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+            }
+
+            bool GossipHello(Player* player) override
+            {
+                me->SetRespawnTime(60);
+                me->SetLootState(GO_JUST_DEACTIVATED);
+
+                if (Creature* tyralius = me->FindNearestCreature(NPC_CAPTAIN_TYRALIUS, 1.0f))
+                {
+                    player->KilledMonsterCredit(NPC_CAPTAIN_TYRALIUS);
+                    tyralius->AI()->DoAction(ACTION_FREED);
+                }
+
+                if (Creature* prisoner = me->FindNearestCreature(NPC_ETHEREUM_PRISONER, 1.0f))
+                    prisoner->DespawnOrUnsummon(0);
+
+                return true;
+            }
+        };
+
+        GameObjectAI* GetAI(GameObject* go) const override
+        {
+            return new go_captain_tyralius_prisonAI(go);
+        }
+};
+
+class npc_captain_tyralius : public CreatureScript
+{
+public:
+    npc_captain_tyralius() : CreatureScript("npc_captain_tyralius") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_captain_tyraliusAI(creature);
+    }
+
+    struct npc_captain_tyraliusAI : public ScriptedAI
+    {
+        npc_captain_tyraliusAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void DoAction(int32 /*action*/) override
+        {
+            Talk(SAY_FREE);
+            _events.ScheduleEvent(EVENT_TELEPORT, Seconds(5));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_TELEPORT:
+                        DoCastSelf(SPELL_TELEPORT_VISUAL);
+                        me->DespawnOrUnsummon(Seconds(2));
+                        break;
                 }
             }
         }
-    }
 
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_detonate_teleporter::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
+    private:
+        EventMap _events;
+    };
 };
 
 void AddSC_netherstorm()
@@ -535,5 +759,8 @@ void AddSC_netherstorm()
     new npc_commander_dawnforge();
     new at_commander_dawnforge();
     new npc_phase_hunter();
-    RegisterSpellScript(spell_detonate_teleporter);
+    new npc_bessy();
+    new npc_maxx_a_million_escort();
+    new go_captain_tyralius_prison();
+    new npc_captain_tyralius();
 }

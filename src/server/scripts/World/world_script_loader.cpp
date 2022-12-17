@@ -22,6 +22,7 @@
 void AddSC_areatrigger_scripts();
 void AddSC_conversation_scripts();
 void AddSC_emerald_dragons();
+void AddSC_generic_creature();
 void AddSC_go_scripts();
 void AddSC_npc_guard();
 void AddSC_item_scripts();
@@ -31,7 +32,6 @@ void AddSC_npcs_special();
 void AddSC_achievement_scripts();
 void AddSC_action_ip_logger();
 void AddSC_scene_scripts();
-void AddSC_xp_boost();
 // player
 void AddSC_chat_log();
 void AddSC_duel_reset();
@@ -43,6 +43,7 @@ void AddWorldScripts()
     AddSC_areatrigger_scripts();
     AddSC_conversation_scripts();
     AddSC_emerald_dragons();
+    AddSC_generic_creature();
     AddSC_go_scripts();
     AddSC_npc_guard();
     AddSC_item_scripts();
@@ -58,6 +59,4 @@ void AddWorldScripts()
     if (sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
         AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
     AddSC_duel_reset();
-    if (sWorld->getIntConfig(CONFIG_XP_BOOST_DAYMASK) != 0)
-        AddSC_xp_boost();
 }

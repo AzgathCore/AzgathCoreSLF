@@ -18,13 +18,6 @@
 #include "PhaseShift.h"
 #include "Containers.h"
 
-PhaseShift::PhaseShift() = default;
-PhaseShift::PhaseShift(PhaseShift const& right) = default;
-PhaseShift::PhaseShift(PhaseShift&& right)  noexcept = default;
-PhaseShift& PhaseShift::operator=(PhaseShift const& right) = default;
-PhaseShift& PhaseShift::operator=(PhaseShift&& right) noexcept = default;
-PhaseShift::~PhaseShift() = default;
-
 bool PhaseShift::AddPhase(uint32 phaseId, PhaseFlags flags, std::vector<Condition*> const* areaConditions, int32 references /*= 1*/)
 {
     auto insertResult = Phases.emplace(phaseId, flags, nullptr);
@@ -131,8 +124,8 @@ bool PhaseShift::CanSee(PhaseShift const& other) const
 
     auto checkInversePhaseShift = [excludePhasesWithFlag](PhaseShift const& phaseShift, PhaseShift const& excludedPhaseShift)
     {
-        if (phaseShift.Flags.HasFlag(PhaseShiftFlags::Unphased) && excludedPhaseShift.Flags.HasFlag(PhaseShiftFlags::InverseUnphased))
-            return false;
+        if (phaseShift.Flags.HasFlag(PhaseShiftFlags::Unphased) && !excludedPhaseShift.Flags.HasFlag(PhaseShiftFlags::InverseUnphased))
+            return true;
 
         for (PhaseRef const& phase : phaseShift.Phases)
         {
@@ -140,10 +133,11 @@ bool PhaseShift::CanSee(PhaseShift const& other) const
                 continue;
 
             auto itr2 = std::find(excludedPhaseShift.Phases.begin(), excludedPhaseShift.Phases.end(), phase);
-            if (itr2 != excludedPhaseShift.Phases.end() && !itr2->Flags.HasFlag(excludePhasesWithFlag))
-                return false;
+            if (itr2 == excludedPhaseShift.Phases.end() || itr2->Flags.HasFlag(excludePhasesWithFlag))
+                return true;
         }
-        return true;
+
+        return false;
     };
 
     if (other.Flags.HasFlag(PhaseShiftFlags::Inverse))
@@ -192,12 +186,4 @@ void PhaseShift::UpdatePersonalGuid()
 {
     if (!PersonalReferences)
         PersonalGuid.Clear();
-}
-
-bool PhaseShift::HasPersonalPhase() const
-{
-    for (PhaseRef const& phaseRef : GetPhases())
-        if (phaseRef.IsPersonal())
-            return true;
-    return false;
 }

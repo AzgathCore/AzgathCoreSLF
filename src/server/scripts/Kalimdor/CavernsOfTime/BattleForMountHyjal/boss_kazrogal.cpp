@@ -82,13 +82,13 @@ public:
             Initialize();
 
             if (IsEvent)
-                instance->SetBossState(DATA_KAZROGAL, NOT_STARTED);
+                instance->SetData(DATA_KAZROGALEVENT, NOT_STARTED);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             if (IsEvent)
-                instance->SetBossState(DATA_KAZROGAL, IN_PROGRESS);
+                instance->SetData(DATA_KAZROGALEVENT, IN_PROGRESS);
             Talk(SAY_ONAGGRO);
         }
 
@@ -111,7 +111,7 @@ public:
         {
             hyjal_trashAI::JustDied(killer);
             if (IsEvent)
-                instance->SetBossState(DATA_KAZROGAL, DONE);
+                instance->SetData(DATA_KAZROGALEVENT, DONE);
             DoPlaySoundToSet(me, SOUND_ONDEATH);
         }
 
@@ -181,7 +181,6 @@ class MarkTargetFilter
         }
 };
 
-// 31447 - Mark of Kaz'rogal
 class spell_mark_of_kazrogal : public SpellScriptLoader
 {
     public:

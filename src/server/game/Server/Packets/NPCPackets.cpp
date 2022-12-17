@@ -77,11 +77,10 @@ WorldPacket const* GossipMessage::Write()
         _worldPacket << uint8(options.OptionNPC);
         _worldPacket << int8(options.OptionFlags);
         _worldPacket << int32(options.OptionCost);
-        _worldPacket << uint32(options.OptionLanguage);
         _worldPacket.WriteBits(options.Text.size(), 12);
         _worldPacket.WriteBits(options.Confirm.size(), 12);
         _worldPacket.WriteBits(AsUnderlyingType(options.Status), 2);
-        _worldPacket.WriteBit(options.SpellID.has_value());
+        _worldPacket.WriteBit(options.SpellID.is_initialized());
         _worldPacket.FlushBits();
 
         _worldPacket << options.Treasure;
@@ -171,14 +170,6 @@ void GossipSelectOption::Read()
     PromotionCode = _worldPacket.ReadString(length);
 }
 
-WorldPacket const* GossipComplete::Write()
-{
-    _worldPacket.WriteBit(SuppressSound);
-    _worldPacket.FlushBits();
-
-    return &_worldPacket;
-}
-
 WorldPacket const* PlayerTabardVendorActivate::Write()
 {
     _worldPacket << Vendor;
@@ -192,7 +183,7 @@ WorldPacket const* GossipPOI::Write()
     _worldPacket << Pos;
     _worldPacket << int32(Icon);
     _worldPacket << int32(Importance);
-    _worldPacket << int32(WMOGroupID);
+    _worldPacket << int32(Unknown905);
     _worldPacket.WriteBits(Flags, 14);
     _worldPacket.WriteBits(Name.length(), 6);
     _worldPacket.FlushBits();
@@ -234,11 +225,12 @@ void RequestStabledPets::Read()
     _worldPacket >> StableMaster;
 }
 
-void SetPetSlot::Read()
+WorldPacket const* OpenAlliedRaceDetails::Write()
 {
-    _worldPacket >> PetNumber;
-    _worldPacket >> DestSlot;
-    _worldPacket >> StableMaster;
+    _worldPacket << Guid;
+    _worldPacket << RaceId;
+
+    return &_worldPacket;
 }
 }
 }

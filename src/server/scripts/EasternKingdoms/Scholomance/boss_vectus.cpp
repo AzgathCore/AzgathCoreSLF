@@ -55,17 +55,17 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_FIRE_SHIELD, 2s);
-            events.ScheduleEvent(EVENT_BLAST_WAVE, 14s);
+            events.ScheduleEvent(EVENT_FIRE_SHIELD, 2000);
+            events.ScheduleEvent(EVENT_BLAST_WAVE, 14000);
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage) override
         {
             if (me->HealthBelowPctDamaged(25, damage))
             {
                 DoCast(me, SPELL_FRENZY);
                 Talk(EMOTE_FRENZY);
-                events.ScheduleEvent(EVENT_FRENZY, 24s);
+                events.ScheduleEvent(EVENT_FRENZY, 24000);
             }
         }
 
@@ -85,16 +85,16 @@ public:
                 {
                     case EVENT_FIRE_SHIELD:
                         DoCast(me, SPELL_FIRE_SHIELD);
-                        events.ScheduleEvent(EVENT_FIRE_SHIELD, 90s);
+                        events.ScheduleEvent(EVENT_FIRE_SHIELD, 90000);
                         break;
                     case EVENT_BLAST_WAVE:
                         DoCast(me, SPELL_BLAST_WAVE);
-                        events.ScheduleEvent(EVENT_BLAST_WAVE, 12s);
+                        events.ScheduleEvent(EVENT_BLAST_WAVE, 12000);
                         break;
                     case EVENT_FRENZY:
                         DoCast(me, SPELL_FRENZY);
                         Talk(EMOTE_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, 24s);
+                        events.ScheduleEvent(EVENT_FRENZY, 24000);
                         break;
                     default:
                         break;

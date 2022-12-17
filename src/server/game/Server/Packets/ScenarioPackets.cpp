@@ -46,7 +46,6 @@ WorldPacket const* WorldPackets::Scenario::ScenarioState::Write()
     _worldPacket << uint32(BonusObjectives.size());
     _worldPacket << uint32(PickedSteps.size());
     _worldPacket << uint32(Spells.size());
-    _worldPacket << PlayerGUID;
 
     for (uint32 i = 0; i < PickedSteps.size(); ++i)
         _worldPacket << uint32(PickedSteps[i]);
@@ -60,8 +59,12 @@ WorldPacket const* WorldPackets::Scenario::ScenarioState::Write()
    for (WorldPackets::Scenario::BonusObjectiveData const& bonusObjective : BonusObjectives)
        _worldPacket << bonusObjective;
 
-   for (WorldPackets::Scenario::ScenarioSpellUpdate const& spell : Spells)
-       _worldPacket << spell;
+   for (auto const& obj : Spells)
+   {
+       _worldPacket << obj.SpellID;
+       _worldPacket.WriteBit(obj.Usable);
+       _worldPacket.FlushBits();
+   }
 
     return &_worldPacket;
 }

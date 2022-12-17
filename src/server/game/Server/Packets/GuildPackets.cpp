@@ -29,7 +29,8 @@ WorldPackets::Guild::QueryGuildInfoResponse::QueryGuildInfoResponse()
 WorldPacket const* WorldPackets::Guild::QueryGuildInfoResponse::Write()
 {
     _worldPacket << GuildGuid;
-    _worldPacket.WriteBit(Info.has_value());
+    _worldPacket << PlayerGuid;
+    _worldPacket.WriteBit(Info.is_initialized());
     _worldPacket.FlushBits();
 
     if (Info)
@@ -117,13 +118,7 @@ void WorldPackets::Guild::DeclineGuildInvites::Read()
 void WorldPackets::Guild::GuildInviteByName::Read()
 {
     uint32 nameLen = _worldPacket.ReadBits(9);
-    if (_worldPacket.ReadBit())
-        Unused910.emplace();
-
     Name = _worldPacket.ReadString(nameLen);
-
-    if (Unused910)
-        _worldPacket >> *Unused910;
 }
 
 WorldPacket const* WorldPackets::Guild::GuildInvite::Write()
@@ -178,8 +173,6 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Guild::GuildRosterMemberD
     data << uint8(rosterMemberData.Level);
     data << uint8(rosterMemberData.ClassID);
     data << uint8(rosterMemberData.Gender);
-    data << uint64(rosterMemberData.GuildClubMemberID);
-    data << uint8(rosterMemberData.RaceID);
 
     data.WriteBits(rosterMemberData.Name.length(), 6);
     data.WriteBits(rosterMemberData.Note.length(), 8);
@@ -187,8 +180,6 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Guild::GuildRosterMemberD
     data.WriteBit(rosterMemberData.Authenticated);
     data.WriteBit(rosterMemberData.SorEligible);
     data.FlushBits();
-
-    data << rosterMemberData.DungeonScore;
 
     data.WriteString(rosterMemberData.Name);
     data.WriteString(rosterMemberData.Note);
@@ -650,153 +641,6 @@ WorldPacket const* WorldPackets::Guild::GuildBankQueryResults::Write()
     return &_worldPacket;
 }
 
-void WorldPackets::Guild::AutoGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> ContainerItemSlot;
-
-    if (_worldPacket.ReadBit())
-        ContainerSlot.emplace();
-
-    if (ContainerSlot)
-        _worldPacket >> *ContainerSlot;
-}
-
-void WorldPackets::Guild::StoreGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> ContainerItemSlot;
-
-    if (_worldPacket.ReadBit())
-        ContainerSlot.emplace();
-
-    if (ContainerSlot)
-        _worldPacket >> *ContainerSlot;
-}
-
-void WorldPackets::Guild::SwapItemWithGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> ContainerItemSlot;
-
-    if (_worldPacket.ReadBit())
-        ContainerSlot.emplace();
-
-    if (ContainerSlot)
-        _worldPacket >> *ContainerSlot;
-}
-
-void WorldPackets::Guild::SwapGuildBankItemWithGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab[0];
-    _worldPacket >> BankSlot[0];
-    _worldPacket >> BankTab[1];
-    _worldPacket >> BankSlot[1];
-}
-
-void WorldPackets::Guild::MoveGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> BankTab1;
-    _worldPacket >> BankSlot1;
-}
-
-void WorldPackets::Guild::MergeItemWithGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> ContainerItemSlot;
-    _worldPacket >> StackCount;
-
-    if (_worldPacket.ReadBit())
-        ContainerSlot.emplace();
-
-    if (ContainerSlot)
-        _worldPacket >> *ContainerSlot;
-}
-
-void WorldPackets::Guild::SplitItemToGuildBank::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> ContainerItemSlot;
-    _worldPacket >> StackCount;
-
-    if (_worldPacket.ReadBit())
-        ContainerSlot.emplace();
-
-    if (ContainerSlot)
-        _worldPacket >> *ContainerSlot;
-}
-
-void WorldPackets::Guild::MergeGuildBankItemWithItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> ContainerItemSlot;
-    _worldPacket >> StackCount;
-
-    if (_worldPacket.ReadBit())
-        ContainerSlot.emplace();
-
-    if (ContainerSlot)
-        _worldPacket >> *ContainerSlot;
-}
-
-void WorldPackets::Guild::SplitGuildBankItemToInventory::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> ContainerItemSlot;
-    _worldPacket >> StackCount;
-
-    if (_worldPacket.ReadBit())
-        ContainerSlot.emplace();
-
-    if (ContainerSlot)
-        _worldPacket >> *ContainerSlot;
-}
-
-void WorldPackets::Guild::AutoStoreGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-}
-
-void WorldPackets::Guild::MergeGuildBankItemWithGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> BankTab1;
-    _worldPacket >> BankSlot1;
-    _worldPacket >> StackCount;
-}
-
-void WorldPackets::Guild::SplitGuildBankItem::Read()
-{
-    _worldPacket >> Banker;
-    _worldPacket >> BankTab;
-    _worldPacket >> BankSlot;
-    _worldPacket >> BankTab1;
-    _worldPacket >> BankSlot1;
-    _worldPacket >> StackCount;
-}
-
 void WorldPackets::Guild::GuildBankLogQuery::Read()
 {
     _worldPacket >> Tab;
@@ -806,7 +650,7 @@ WorldPacket const* WorldPackets::Guild::GuildBankLogQueryResults::Write()
 {
     _worldPacket << int32(Tab);
     _worldPacket << uint32(Entry.size());
-    _worldPacket.WriteBit(WeeklyBonusMoney.has_value());
+    _worldPacket.WriteBit(WeeklyBonusMoney.is_initialized());
     _worldPacket.FlushBits();
 
     for (GuildBankLogEntry const& logEntry : Entry)
@@ -815,22 +659,22 @@ WorldPacket const* WorldPackets::Guild::GuildBankLogQueryResults::Write()
         _worldPacket << uint32(logEntry.TimeOffset);
         _worldPacket << int8(logEntry.EntryType);
 
-        _worldPacket.WriteBit(logEntry.Money.has_value());
-        _worldPacket.WriteBit(logEntry.ItemID.has_value());
-        _worldPacket.WriteBit(logEntry.Count.has_value());
-        _worldPacket.WriteBit(logEntry.OtherTab.has_value());
+        _worldPacket.WriteBit(logEntry.Money.is_initialized());
+        _worldPacket.WriteBit(logEntry.ItemID.is_initialized());
+        _worldPacket.WriteBit(logEntry.Count.is_initialized());
+        _worldPacket.WriteBit(logEntry.OtherTab.is_initialized());
         _worldPacket.FlushBits();
 
-        if (logEntry.Money.has_value())
+        if (logEntry.Money.is_initialized())
             _worldPacket << uint64(*logEntry.Money);
 
-        if (logEntry.ItemID.has_value())
+        if (logEntry.ItemID.is_initialized())
             _worldPacket << int32(*logEntry.ItemID);
 
-        if (logEntry.Count.has_value())
+        if (logEntry.Count.is_initialized())
             _worldPacket << int32(*logEntry.Count);
 
-        if (logEntry.OtherTab.has_value())
+        if (logEntry.OtherTab.is_initialized())
             _worldPacket << int8(*logEntry.OtherTab);
     }
 
@@ -884,7 +728,7 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Guild::GuildNewsEvent con
     for (ObjectGuid memberGuid : newsEvent.MemberList)
         data << memberGuid;
 
-    data.WriteBit(newsEvent.Item.has_value());
+    data.WriteBit(newsEvent.Item.is_initialized());
     data.FlushBits();
 
     if (newsEvent.Item)
@@ -964,6 +808,163 @@ WorldPacket const* WorldPackets::Guild::GuildNameChanged::Write()
     _worldPacket.WriteBits(GuildName.length(), 7);
     _worldPacket.FlushBits();
     _worldPacket.WriteString(GuildName);
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Guild::DepositGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> ContainerItemSlot;
+
+    if (_worldPacket.ReadBit())
+        ContainerSlot = boost::in_place();
+
+    if (ContainerSlot)
+        _worldPacket >> *ContainerSlot;
+}
+
+void WorldPackets::Guild::StoreGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> ContainerItemSlot;
+
+    if (_worldPacket.ReadBit())
+        ContainerSlot = boost::in_place();
+
+    if (ContainerSlot)
+        _worldPacket >> *ContainerSlot;
+}
+
+void WorldPackets::Guild::SwapItemWithGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> ContainerItemSlot;
+
+    if (_worldPacket.ReadBit())
+        ContainerSlot = boost::in_place();
+
+    if (ContainerSlot)
+        _worldPacket >> *ContainerSlot;
+}
+
+void WorldPackets::Guild::SwapGuildBankItemWithGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab[0];
+    _worldPacket >> BankSlot[0];
+    _worldPacket >> BankTab[1];
+    _worldPacket >> BankSlot[1];
+}
+
+void WorldPackets::Guild::MoveGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> BankTab1;
+    _worldPacket >> BankSlot1;
+}
+
+void WorldPackets::Guild::MergeItemWithGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> ContainerItemSlot;
+    _worldPacket >> StackCount;
+
+    if (_worldPacket.ReadBit())
+        ContainerSlot = boost::in_place();
+
+    if (ContainerSlot)
+        _worldPacket >> *ContainerSlot;
+}
+
+void WorldPackets::Guild::SplitItemToGuildBank::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> ContainerItemSlot;
+    _worldPacket >> StackCount;
+
+    if (_worldPacket.ReadBit())
+        ContainerSlot = boost::in_place();
+
+    if (ContainerSlot)
+        _worldPacket >> *ContainerSlot;
+}
+
+void WorldPackets::Guild::MergeGuildBankItemWithItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> ContainerItemSlot;
+    _worldPacket >> StackCount;
+
+    if (_worldPacket.ReadBit())
+        ContainerSlot = boost::in_place();
+
+    if (ContainerSlot)
+        _worldPacket >> *ContainerSlot;
+}
+
+void WorldPackets::Guild::SplitGuildBankItemToInventory::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> ContainerItemSlot;
+    _worldPacket >> StackCount;
+
+    if (_worldPacket.ReadBit())
+        ContainerSlot = boost::in_place();
+
+    if (ContainerSlot)
+        _worldPacket >> *ContainerSlot;
+}
+
+void WorldPackets::Guild::AutoStoreGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+}
+
+void WorldPackets::Guild::MergeGuildBankItemWithGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> BankTab1;
+    _worldPacket >> BankSlot1;
+    _worldPacket >> StackCount;
+}
+
+void WorldPackets::Guild::SplitGuildBankItem::Read()
+{
+    _worldPacket >> Banker;
+    _worldPacket >> BankTab;
+    _worldPacket >> BankSlot;
+    _worldPacket >> BankTab1;
+    _worldPacket >> BankSlot1;
+    _worldPacket >> StackCount;
+}
+
+WorldPacket const* WorldPackets::Guild::GuildChallengeCompleted::Write()
+{
+    _worldPacket << ChallengeType;
+    _worldPacket << CurrentCount;
+    _worldPacket << MaxCount;
+    _worldPacket << GoldAwarded;
 
     return &_worldPacket;
 }

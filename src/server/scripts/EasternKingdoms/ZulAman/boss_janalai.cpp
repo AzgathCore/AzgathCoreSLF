@@ -53,10 +53,10 @@ class boss_janalai : public CreatureScript
                 _Reset();
             }
 
-            void JustEngagedWith(Unit* who) override
+            void JustEngagedWith(Unit* /*who*/) override
             {
                 Talk(SAY_AGGRO);
-                BossAI::JustEngagedWith(who);
+                _JustEngagedWith();
             }
 
             void JustDied(Unit* /*killer*/) override

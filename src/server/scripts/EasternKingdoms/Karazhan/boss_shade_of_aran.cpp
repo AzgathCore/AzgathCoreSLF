@@ -25,6 +25,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "karazhan.h"
 #include "InstanceScript.h"
+#include "GameObject.h"
 #include "Item.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
@@ -316,7 +317,7 @@ public:
             {
                 if (!me->IsNonMeleeSpellCast(false))
                 {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
                     if (!target)
                         return;
 
@@ -358,7 +359,7 @@ public:
                         DoCast(me, SPELL_AOE_CS);
                         break;
                     case 1:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                             DoCast(target, SPELL_CHAINSOFICE);
                         break;
                 }
@@ -418,7 +419,7 @@ public:
                     case SUPER_BLIZZARD:
                         Talk(SAY_BLIZZARD);
 
-                        if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25s))
+                        if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
                         {
                             pSpawn->SetFaction(me->GetFaction());
                             pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
@@ -435,7 +436,7 @@ public:
 
                 for (uint32 i = 0; i < 4; ++i)
                 {
-                    if (Creature* unit = me->SummonCreature(CREATURE_WATER_ELEMENTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90s))
+                    if (Creature* unit = me->SummonCreature(CREATURE_WATER_ELEMENTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
                         unit->Attack(me->GetVictim(), true);
                         unit->SetFaction(me->GetFaction());
@@ -449,7 +450,7 @@ public:
             {
                 for (uint32 i = 0; i < 5; ++i)
                 {
-                    if (Creature* unit = me->SummonCreature(CREATURE_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5s))
+                    if (Creature* unit = me->SummonCreature(CREATURE_SHADOW_OF_ARAN, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                     {
                         unit->Attack(me->GetVictim(), true);
                         unit->SetFaction(me->GetFaction());
@@ -478,8 +479,7 @@ public:
                         Unit* unit = ObjectAccessor::GetUnit(*me, FlameWreathTarget[i]);
                         if (unit && !unit->IsWithinDist2d(FWTargPosX[i], FWTargPosY[i], 3))
                         {
-                            unit->CastSpell(unit, 20476, CastSpellExtraArgs(TRIGGERED_FULL_MASK)
-                                .SetOriginalCaster(me->GetGUID()));
+                            unit->CastSpell(unit, 20476, me->GetGUID());
                             unit->CastSpell(unit, 11027, true);
                             FlameWreathTarget[i].Clear();
                         }
@@ -492,29 +492,29 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*pAttacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*pAttacker*/, uint32 &damage) override
         {
             if (!DrinkInturrupted && Drinking && damage)
                 DrinkInturrupted = true;
         }
 
-        void SpellHit(WorldObject* /*caster*/, SpellInfo const* spellInfo) override
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
         {
-            //We only care about interrupt effects and only if they are durring a spell currently being cast
-            if (!spellInfo->HasEffect(SPELL_EFFECT_INTERRUPT_CAST) || !me->IsNonMeleeSpellCast(false))
-                return;
-
-            //Interrupt effect
-            me->InterruptNonMeleeSpells(false);
-
-            //Normally we would set the cooldown equal to the spell duration
-            //but we do not have access to the DurationStore
-
-            switch (CurrentNormalSpell)
+            // We only care about interrupt effects and only if they are durring a spell currently being cast
+            if (spellInfo->HasEffect(SPELL_EFFECT_INTERRUPT_CAST) && me->IsNonMeleeSpellCast(false))
             {
-                case SPELL_ARCMISSLE: ArcaneCooldown = 5000; break;
-                case SPELL_FIREBALL: FireCooldown = 5000; break;
-                case SPELL_FROSTBOLT: FrostCooldown = 5000; break;
+                // Interrupt effect
+                me->InterruptNonMeleeSpells(false);
+
+                // Normally we would set the cooldown equal to the spell duration
+                // but we do not have access to the DurationStore
+
+                switch (CurrentNormalSpell)
+                {
+                    case SPELL_ARCMISSLE: ArcaneCooldown = 5000; break;
+                    case SPELL_FIREBALL: FireCooldown = 5000; break;
+                    case SPELL_FROSTBOLT: FrostCooldown = 5000; break;
+                }
             }
         }
 
@@ -536,9 +536,9 @@ public:
 
                 SeenAtiesh = true;
                 Talk(SAY_ATIESH);
-                me->SetFacingTo(me->GetAbsoluteAngle(player));
+                me->SetFacingTo(me->GetAngle(player));
                 me->ClearUnitState(UNIT_STATE_MOVING);
-                me->GetMotionMaster()->MoveDistract(7 * IN_MILLISECONDS, me->GetAbsoluteAngle(who));
+                me->GetMotionMaster()->MoveDistract(7 * IN_MILLISECONDS);
                 break;
             }
         }

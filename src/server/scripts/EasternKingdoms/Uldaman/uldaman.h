@@ -50,6 +50,4 @@ inline AI* GetUldamanAI(T* obj)
     return GetInstanceAI<AI>(obj, UldamanScriptName);
 }
 
-#define RegisterUldamanCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetUldamanAI)
-
 #endif

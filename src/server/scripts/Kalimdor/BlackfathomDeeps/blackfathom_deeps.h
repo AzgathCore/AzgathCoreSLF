@@ -21,7 +21,7 @@
 #include "CreatureAIImpl.h"
 
 #define BFDScriptName "instance_blackfathom_deeps"
-#define DataHeader "BFDv1"
+#define DataHeader "BFD"
 
 uint32 const EncounterCount = 3;
 
@@ -75,8 +75,5 @@ inline AI* GetBlackfathomDeepsAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, BFDScriptName);
 }
-
-#define RegisterBlackfathomDeepsCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackfathomDeepsAI)
-#define RegisterBlackfathomDeepsGameObjectAI(ai_name) RegisterGameObjectAIWithFactory(ai_name, GetBlackfathomDeepsAI)
 
 #endif // BFD_H_

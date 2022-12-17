@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 AzgathCore
+ * This file is part of 
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -183,12 +183,12 @@ namespace Trinity
             {
                 float xpMod = 1.0f;
 
-                gain = BaseGain(player->GetLevel(), u->GetLevelForTarget(player));
+                gain = BaseGain(player->getLevel(), u->GetLevelForTarget(player));
 
                 if (gain && creature)
                 {
                     // Players get only 10% xp for killing creatures of lower expansion levels than himself
-                    if ((uint32(creature->GetCreatureTemplate()->GetHealthScalingExpansion()) < GetExpansionForLevel(player->GetLevel())))
+                    if ((uint32(creature->GetCreatureTemplate()->GetHealthScalingExpansion()) < GetExpansionForLevel(player->getLevel())))
                         gain = uint32(round(gain / 10.0f));
 
                     if (creature->isElite())

@@ -20,8 +20,11 @@
 
 #include "GridNotifiers.h"
 #include "Corpse.h"
+#include "CreatureAI.h"
 #include "Player.h"
+#include "SpellAuras.h"
 #include "UpdateData.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 
 template<class T>
@@ -319,29 +322,6 @@ void Trinity::WorldObjectSearcher<Check>::Visit(AreaTriggerMapType &m)
 }
 
 template<class Check>
-void Trinity::WorldObjectSearcher<Check>::Visit(SceneObjectMapType &m)
-{
-    if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_SCENEOBJECT))
-        return;
-
-    // already found
-    if (i_object)
-        return;
-
-    for (SceneObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-    {
-        if (!itr->GetSource()->IsInPhase(_searcher))
-            continue;
-
-        if (i_check(itr->GetSource()))
-        {
-            i_object = itr->GetSource();
-            return;
-        }
-    }
-}
-
-template<class Check>
 void Trinity::WorldObjectSearcher<Check>::Visit(ConversationMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CONVERSATION))
@@ -461,22 +441,6 @@ void Trinity::WorldObjectLastSearcher<Check>::Visit(AreaTriggerMapType &m)
 }
 
 template<class Check>
-void Trinity::WorldObjectLastSearcher<Check>::Visit(SceneObjectMapType &m)
-{
-    if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_SCENEOBJECT))
-        return;
-
-    for (SceneObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-    {
-        if (!itr->GetSource()->IsInPhase(_searcher))
-            continue;
-
-        if (i_check(itr->GetSource()))
-            i_object = itr->GetSource();
-    }
-}
-
-template<class Check>
 void Trinity::WorldObjectLastSearcher<Check>::Visit(ConversationMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CONVERSATION))
@@ -554,17 +518,6 @@ void Trinity::WorldObjectListSearcher<Check>::Visit(AreaTriggerMapType &m)
         return;
 
     for (AreaTriggerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-        if (i_check(itr->GetSource()))
-            Insert(itr->GetSource());
-}
-
-template<class Check>
-void Trinity::WorldObjectListSearcher<Check>::Visit(SceneObjectMapType &m)
-{
-    if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_SCENEOBJECT))
-        return;
-
-    for (SceneObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         if (i_check(itr->GetSource()))
             Insert(itr->GetSource());
 }

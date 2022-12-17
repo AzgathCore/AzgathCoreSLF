@@ -21,7 +21,7 @@
 #include "CreatureAIImpl.h"
 
 #define ScholomanceScriptName "instance_scholomance"
-#define DataHeader "SC_old"
+#define DataHeader "SC"
 
 uint32 const EncounterCount             = 8;
 

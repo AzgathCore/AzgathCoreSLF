@@ -134,7 +134,6 @@ namespace WorldPackets
             void Read() override;
 
             std::string Name;
-            ObjectGuid AccountGUID;
         };
 
         class DelIgnore final : public ClientPacket
@@ -145,24 +144,6 @@ namespace WorldPackets
             void Read() override;
 
             QualifiedGUID Player;
-        };
-
-        class SocialContractRequest final : public ClientPacket
-        {
-        public:
-            SocialContractRequest(WorldPacket&& packet) : ClientPacket(CMSG_SOCIAL_CONTRACT_REQUEST, std::move(packet)) { }
-
-            void Read() override { }
-        };
-
-        class SocialContractRequestResponse final : public ServerPacket
-        {
-        public:
-            SocialContractRequestResponse() : ServerPacket(SMSG_SOCIAL_CONTRACT_REQUEST_RESPONSE, 1) { }
-
-            WorldPacket const* Write() override;
-
-            bool ShowSocialContract = false;
         };
     }
 }

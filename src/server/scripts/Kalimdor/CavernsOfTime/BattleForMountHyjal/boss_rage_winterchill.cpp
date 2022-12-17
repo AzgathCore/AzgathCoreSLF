@@ -77,13 +77,13 @@ public:
             Initialize();
 
             if (IsEvent)
-                instance->SetBossState(DATA_RAGEWINTERCHILL, NOT_STARTED);
+                instance->SetData(DATA_RAGEWINTERCHILLEVENT, NOT_STARTED);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             if (IsEvent)
-                instance->SetBossState(DATA_RAGEWINTERCHILL, IN_PROGRESS);
+                instance->SetData(DATA_RAGEWINTERCHILLEVENT, IN_PROGRESS);
             Talk(SAY_ONAGGRO);
         }
 
@@ -106,7 +106,7 @@ public:
         {
             hyjal_trashAI::JustDied(killer);
             if (IsEvent)
-                instance->SetBossState(DATA_RAGEWINTERCHILL, DONE);
+                instance->SetData(DATA_RAGEWINTERCHILLEVENT, DONE);
             Talk(SAY_ONDEATH);
         }
 
@@ -155,13 +155,14 @@ public:
             } else NovaTimer -= diff;
             if (IceboltTimer <= diff)
             {
-                DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_ICEBOLT);
+                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true), SPELL_ICEBOLT);
                 IceboltTimer = 11000 + rand32() % 20000;
             } else IceboltTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
+
 };
 
 void AddSC_boss_rage_winterchill()

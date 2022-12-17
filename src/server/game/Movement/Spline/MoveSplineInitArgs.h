@@ -19,13 +19,10 @@
 #define TRINITYSERVER_MOVESPLINEINIT_ARGS_H
 
 #include "MoveSplineFlag.h"
-#include "MovementTypedefs.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
 
 class Unit;
-
-enum class AnimTier : uint8;
 
 namespace Movement
 {
@@ -56,13 +53,12 @@ namespace Movement
     struct AnimTierTransition
     {
         uint32 TierTransitionId = 0;
-        ::AnimTier AnimTier = ::AnimTier(0);
+        uint8 AnimTier = 0;
     };
 
     struct MoveSplineInitArgs
     {
         explicit MoveSplineInitArgs(size_t path_capacity = 16);
-        MoveSplineInitArgs(MoveSplineInitArgs&& args) noexcept;
         ~MoveSplineInitArgs();
 
         PointsArray path;
@@ -71,7 +67,6 @@ namespace Movement
         int32 path_Idx_offset;
         float velocity;
         float parabolic_amplitude;
-        float vertical_acceleration;
         float time_perc;
         uint32 splineId;
         float initialOrientation;

@@ -51,13 +51,8 @@ enum Yells
     SAY_DEATH           = 7
 };
 
-enum Gossip
-{
-    GOSSIP_START_EVENT1_MID = 10614,  //  I'm ready to start challenge.
-    GOSSIP_START_EVENT1_OID = 0,
-    GOSSIP_START_EVENT2_MID = 10614,  //  I'm ready for the next challenge.
-    GOSSIP_START_EVENT2_OID = 1
-};
+#define GOSSIP_START_EVENT1     "I'm ready to start challenge."
+#define GOSSIP_START_EVENT2     "I'm ready for the next challenge."
 
 #define ORIENTATION             4.714f
 
@@ -92,8 +87,8 @@ public:
             uiTimer = 0;
 
             me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->AddUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->AddNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
             SetGrandChampionsForEncounter();
             SetArgentChampion();
@@ -353,20 +348,20 @@ public:
         {
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
-            if (instance->GetBossState(BOSS_BLACK_KNIGHT) == NOT_STARTED)
+            if (instance->GetData(BOSS_BLACK_KNIGHT) == NOT_STARTED)
             {
-                if (instance->GetBossState(BOSS_ARGENT_CHALLENGE_E) == NOT_STARTED && instance->GetBossState(BOSS_ARGENT_CHALLENGE_P) == NOT_STARTED)
+                if (instance->GetData(BOSS_ARGENT_CHALLENGE_E) == NOT_STARTED && instance->GetData(BOSS_ARGENT_CHALLENGE_P) == NOT_STARTED)
                 {
-                    if (instance->GetBossState(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
+                    if (instance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
                         SetData(DATA_START, 0);
 
-                    if (instance->GetBossState(BOSS_GRAND_CHAMPIONS) == DONE)
+                    if (instance->GetData(BOSS_GRAND_CHAMPIONS) == DONE)
                         DoStartArgentChampionEncounter();
                 }
 
-               if ((instance->GetBossState(BOSS_GRAND_CHAMPIONS) == DONE &&
-                   instance->GetBossState(BOSS_ARGENT_CHALLENGE_E) == DONE) ||
-                   instance->GetBossState(BOSS_ARGENT_CHALLENGE_P) == DONE)
+               if ((instance->GetData(BOSS_GRAND_CHAMPIONS) == DONE &&
+                   instance->GetData(BOSS_ARGENT_CHALLENGE_E) == DONE) ||
+                   instance->GetData(BOSS_ARGENT_CHALLENGE_P) == DONE)
                     me->SummonCreature(VEHICLE_BLACK_KNIGHT, 769.834f, 651.915f, 447.035f, 0);
             }
         }
@@ -429,9 +424,9 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            if (instance->GetBossState(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
+            if (instance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED)
             {
-                summon->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                summon->AddUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 summon->SetReactState(REACT_PASSIVE);
             }
         }
@@ -455,34 +450,27 @@ public:
             }
         }
 
-        bool OnGossipHello(Player* player) override
+        bool GossipHello(Player* player) override
         {
-            if (((instance->GetBossState(BOSS_GRAND_CHAMPIONS) == DONE &&
-                    instance->GetBossState(BOSS_BLACK_KNIGHT) == DONE &&
-                    instance->GetBossState(BOSS_ARGENT_CHALLENGE_E) == DONE) ||
-                    instance->GetBossState(BOSS_ARGENT_CHALLENGE_P) == DONE))
+            if (((instance->GetData(BOSS_GRAND_CHAMPIONS) == DONE &&
+                    instance->GetData(BOSS_BLACK_KNIGHT) == DONE &&
+                    instance->GetData(BOSS_ARGENT_CHALLENGE_E) == DONE) ||
+                    instance->GetData(BOSS_ARGENT_CHALLENGE_P) == DONE))
                 return false;
 
-            if (instance->GetBossState(BOSS_GRAND_CHAMPIONS) == NOT_STARTED &&
-                instance->GetBossState(BOSS_ARGENT_CHALLENGE_E) == NOT_STARTED &&
-                instance->GetBossState(BOSS_ARGENT_CHALLENGE_P) == NOT_STARTED &&
-                instance->GetBossState(BOSS_BLACK_KNIGHT) == NOT_STARTED)
-            {
-                InitGossipMenuFor(player, GOSSIP_START_EVENT1_MID);
-                AddGossipItemFor(player, GOSSIP_START_EVENT1_MID, GOSSIP_START_EVENT1_OID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, player->GetGossipTextId(GOSSIP_START_EVENT1_MID, me), me->GetGUID());
-            }
+            if (instance->GetData(BOSS_GRAND_CHAMPIONS) == NOT_STARTED &&
+                instance->GetData(BOSS_ARGENT_CHALLENGE_E) == NOT_STARTED &&
+                instance->GetData(BOSS_ARGENT_CHALLENGE_P) == NOT_STARTED &&
+                instance->GetData(BOSS_BLACK_KNIGHT) == NOT_STARTED)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             else
-            {
-                InitGossipMenuFor(player, GOSSIP_START_EVENT2_MID);
-                AddGossipItemFor(player, GOSSIP_START_EVENT2_MID, GOSSIP_START_EVENT2_OID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, player->GetGossipTextId(GOSSIP_START_EVENT2_MID, me), me->GetGUID());
-            }
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
+            SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return true;
         }
 
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool GossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);

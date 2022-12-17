@@ -63,6 +63,4 @@ inline AI* GetForgeOfSoulsAI(T* obj)
     return GetInstanceAI<AI>(obj, FoSScriptName);
 }
 
-#define RegisterForgeOfSoulsCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetForgeOfSoulsAI)
-
 #endif // FORGE_OF_SOULS_H_

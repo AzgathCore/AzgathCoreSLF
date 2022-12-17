@@ -37,10 +37,9 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            int32 MythicPlusDisplaySeasonID = 0;
-            int32 MythicPlusMilestoneSeasonID = 0;
-            int32 PreviousArenaSeason = 0;
-            int32 CurrentArenaSeason = 0;
+            int32 MythicPlusSeasonID = 0;
+            int32 PreviousSeason = 0;
+            int32 CurrentSeason = 0;
             int32 PvpSeasonID = 0;
             int32 ConquestWeeklyProgressCurrencyID = 0;
             bool WeeklyRewardChestsEnabled = false;
@@ -97,8 +96,6 @@ namespace WorldPackets
         {
             struct RatingData
             {
-                RatingData() { } // work around clang bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101227
-
                 int32 Prematch[2] = { };
                 int32 Postmatch[2] = { };
                 int32 PrematchMMR[2] = { };
@@ -106,8 +103,6 @@ namespace WorldPackets
 
             struct HonorData
             {
-                HonorData() { } // work around clang bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101227
-
                 uint32 HonorKills = 0;
                 uint32 Deaths = 0;
                 uint32 ContributionPoints = 0;
@@ -142,7 +137,6 @@ namespace WorldPackets
                 int32 Class = 0;
                 int32 CreatureID = 0;
                 int32 HonorLevel = 0;
-                int32 Role = 0;
             };
 
             std::vector<PVPMatchPlayerStatistics> Statistics;
@@ -223,7 +217,6 @@ namespace WorldPackets
             bool SuspendedQueue = false;
             bool EligibleForMatchmaking = false;
             uint32 WaitTime = 0;
-            int32 Unused920 = 0;
         };
 
         class BattlefieldStatusFailed final : public ServerPacket
@@ -455,10 +448,7 @@ namespace WorldPackets
                 int32 BestSeasonRating = 0;
                 int32 PvpTierID = 0;
                 int32 Unused3 = 0;
-                int32 WeeklyBestWinPvpTierID = 0;
-                int32 Unused4 = 0;
-                int32 Rank = 0;
-                bool Disqualified = false;
+                bool Unused4 = false;
             } Bracket[6];
         };
 
@@ -496,46 +486,117 @@ namespace WorldPackets
             uint8 Winner = 0;
             WorldPackets::Duration<Seconds> Duration;
             Optional<PVPMatchStatistics> LogData;
-            uint32 SoloShuffleStatus = 0;
         };
 
-        enum class BattlegroundCapturePointState : uint8
+        class BattlemasterJoinBrawl final : public ClientPacket
         {
-            Neutral             = 1,
-            ContestedHorde      = 2,
-            ContestedAlliance   = 3,
-            HordeCaptured       = 4,
-            AllianceCaptured    = 5
+        public:
+            BattlemasterJoinBrawl(WorldPacket&& packet) : ClientPacket(CMSG_BATTLEMASTER_JOIN_BRAWL, std::move(packet)) { }
+
+            void Read() override;
+
+            uint8 RolesMask = 0;
         };
 
-        struct BattlegroundCapturePointInfo
+        class WargameRequestSuccessfullySentToOpponent final : public ServerPacket
+        {
+        public:
+            WargameRequestSuccessfullySentToOpponent() : ServerPacket(SMSG_WARGAME_REQUEST_SUCCESSFULLY_SENT_TO_OPPONENT, 6) { }
+
+            WorldPacket const* Write() override;
+
+            Optional<uint32> UnkInt2;
+            Optional<uint32> UnkInt3;
+            uint32 UnkInt = 0;
+        };
+
+        class SendRequestScheduledPVPInfoResponse final : public ServerPacket
+        {
+        public:
+            SendRequestScheduledPVPInfoResponse() : ServerPacket(SMSG_REQUEST_SCHEDULED_PVP_INFO_RESPONSE) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 BrawlType = 0;
+            int32 TimeToEnd = 0;
+            bool IsActive = false;
+        };
+
+        class AcceptWargameInvite final : public ClientPacket
+        {
+        public:
+            AcceptWargameInvite(WorldPacket&& packet) : ClientPacket(CMSG_ACCEPT_WARGAME_INVITE, std::move(packet)) { }
+
+            void Read() override;
+
+            ObjectGuid OpposingPartyMember;
+            uint64 QueueID = 0;
+            bool Accept = false;
+        };
+
+        class BattlemasterJoinArenaSkirmish final : public ClientPacket
+        {
+        public:
+            BattlemasterJoinArenaSkirmish(WorldPacket&& packet) : ClientPacket(CMSG_BATTLEMASTER_JOIN_SKIRMISH, std::move(packet)) { }
+
+            void Read() override;
+        };
+
+        class MythicPlusSeasonData final : public ServerPacket
+        {
+        public:
+            MythicPlusSeasonData() : ServerPacket(SMSG_MYTHIC_PLUS_SEASON_DATA, 4 + 4 + 4 + 4 + 4 + 1) { }
+
+            WorldPacket const* Write() override;
+
+            int32 MythicPlusSeasonID = 0;
+            int32 PreviousSeason = 0;
+            int32 CurrentSeason = 0;
+            int32 PvpSeasonID = 0;
+            int32 ConquestWeeklyProgressCurrencyID = 0;
+            bool WeeklyRewardChestsEnabled = false;
+        };
+
+
+        struct BattlegroundCapturePointInfoData
         {
             ObjectGuid Guid;
             TaggedPosition<Position::XY> Pos;
-            BattlegroundCapturePointState State = BattlegroundCapturePointState::Neutral;
-            Timestamp<> CaptureTime;
-            Duration<Milliseconds, uint32> CaptureTotalDuration;
+            uint32 CaptureTime = 0;
+            uint32 CaptureTotalDuration = 0;
+            int8 NodeState = NODE_STATE_NONE;
         };
 
-        class UpdateCapturePoint final : public ServerPacket
+        class MapObjectivesInit final : public ServerPacket
         {
         public:
-            UpdateCapturePoint() : ServerPacket(SMSG_UPDATE_CAPTURE_POINT) { }
+            MapObjectivesInit() : ServerPacket(SMSG_MAP_OBJECTIVES_INIT, 25) { }
 
             WorldPacket const* Write() override;
 
-            BattlegroundCapturePointInfo CapturePointInfo;
+            std::vector<BattlegroundCapturePointInfoData> CapturePointInfo;
         };
 
-        class CapturePointRemoved final : public ServerPacket
+        class RequestConquestFormulaConstants final : public ClientPacket
         {
         public:
-            CapturePointRemoved() : ServerPacket(SMSG_CAPTURE_POINT_REMOVED) { }
-            CapturePointRemoved(ObjectGuid capturePointGUID) : ServerPacket(SMSG_CAPTURE_POINT_REMOVED), CapturePointGUID(capturePointGUID) { }
+            RequestConquestFormulaConstants(WorldPacket&& packet) : ClientPacket(CMSG_REQUEST_CONQUEST_FORMULA_CONSTANTS, std::move(packet)) { }
+
+            void Read() override { }
+        };
+
+        class ConquestFormulaContants final : public ServerPacket
+        {
+        public:
+            ConquestFormulaContants() : ServerPacket(SMSG_CONQUEST_FORMULA_CONSTANTS, 20) { }
 
             WorldPacket const* Write() override;
 
-            ObjectGuid CapturePointGUID;
+            uint32 PvpMinCPPerWeek;
+            uint32 PvpMaxCPPerWeek;
+            float PvpCPBaseCoefficient;
+            float PvpCPExpCoefficient;
+            float PvpCPNumerato;
         };
     }
 }

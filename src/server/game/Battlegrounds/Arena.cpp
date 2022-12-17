@@ -24,6 +24,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "World.h"
+#include "WorldStatePackets.h"
 #include "WorldSession.h"
 
 Arena::Arena(BattlegroundTemplate const* battlegroundTemplate) : Battleground(battlegroundTemplate)
@@ -41,21 +42,19 @@ Arena::Arena(BattlegroundTemplate const* battlegroundTemplate) : Battleground(ba
 
 void Arena::AddPlayer(Player* player)
 {
-    bool const isInBattleground = IsPlayerInBattleground(player->GetGUID());
     Battleground::AddPlayer(player);
-    if (!isInBattleground)
-        PlayerScores[player->GetGUID()] = new ArenaScore(player->GetGUID(), player->GetBGTeam());
+    PlayerScores[player->GetGUID()] = new ArenaScore(player->GetGUID(), player->GetBGTeam());
 
     if (player->GetBGTeam() == ALLIANCE)        // gold
     {
-        if (player->GetEffectiveTeam() == HORDE)
+        if (player->GetTeam() == HORDE)
             player->CastSpell(player, SPELL_HORDE_GOLD_FLAG, true);
         else
             player->CastSpell(player, SPELL_ALLIANCE_GOLD_FLAG, true);
     }
     else                                        // green
     {
-        if (player->GetEffectiveTeam() == HORDE)
+        if (player->GetTeam() == HORDE)
             player->CastSpell(player, SPELL_HORDE_GREEN_FLAG, true);
         else
             player->CastSpell(player, SPELL_ALLIANCE_GREEN_FLAG, true);
@@ -71,6 +70,12 @@ void Arena::RemovePlayer(Player* /*player*/, ObjectGuid /*guid*/, uint32 /*team*
 
     UpdateArenaWorldState();
     CheckWinConditions();
+}
+
+void Arena::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
+{
+    packet.Worldstates.emplace_back(uint32(ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN), int32(GetAlivePlayersCountByTeam(HORDE)));
+    packet.Worldstates.emplace_back(uint32(ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD), int32(GetAlivePlayersCountByTeam(ALLIANCE)));
 }
 
 void Arena::UpdateArenaWorldState()
@@ -96,9 +101,9 @@ void Arena::BuildPvPLogDataPacket(WorldPackets::Battleground::PVPMatchStatistics
 
     if (isRated())
     {
-        pvpLogData.Ratings.emplace();
+        pvpLogData.Ratings = boost::in_place();
 
-        for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+        for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
         {
             pvpLogData.Ratings->Postmatch[i] = _arenaTeamScores[i].PostMatchRating;
             pvpLogData.Ratings->Prematch[i] = _arenaTeamScores[i].PreMatchRating;
@@ -186,8 +191,8 @@ void Arena::EndBattleground(uint32 winner)
 
                 // bg team that the client expects is different to TeamId
                 // alliance 1, horde 0
-                uint8 winnerTeam = winner == ALLIANCE ? PVP_TEAM_ALLIANCE : PVP_TEAM_HORDE;
-                uint8 loserTeam = winner == ALLIANCE ? PVP_TEAM_HORDE : PVP_TEAM_ALLIANCE;
+                uint8 winnerTeam = winner == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
+                uint8 loserTeam = winner == ALLIANCE ? BG_TEAM_HORDE : BG_TEAM_ALLIANCE;
 
                 _arenaTeamScores[winnerTeam].Assign(winnerTeamRating, winnerTeamRating + winnerChange, winnerMatchmakerRating, GetArenaMatchmakerRating(winner));
                 _arenaTeamScores[loserTeam].Assign(loserTeamRating, loserTeamRating + loserChange, loserMatchmakerRating, GetArenaMatchmakerRating(GetOtherTeam(winner)));
@@ -207,8 +212,8 @@ void Arena::EndBattleground(uint32 winner)
             // Deduct 16 points from each teams arena-rating if there are no winners after 45+2 minutes
             else
             {
-                _arenaTeamScores[PVP_TEAM_ALLIANCE].Assign(winnerTeamRating, winnerTeamRating + ARENA_TIMELIMIT_POINTS_LOSS, winnerMatchmakerRating, GetArenaMatchmakerRating(ALLIANCE));
-                _arenaTeamScores[PVP_TEAM_HORDE].Assign(loserTeamRating, loserTeamRating + ARENA_TIMELIMIT_POINTS_LOSS, loserMatchmakerRating, GetArenaMatchmakerRating(HORDE));
+                _arenaTeamScores[BG_TEAM_ALLIANCE].Assign(winnerTeamRating, winnerTeamRating + ARENA_TIMELIMIT_POINTS_LOSS, winnerMatchmakerRating, GetArenaMatchmakerRating(ALLIANCE));
+                _arenaTeamScores[BG_TEAM_HORDE].Assign(loserTeamRating, loserTeamRating + ARENA_TIMELIMIT_POINTS_LOSS, loserMatchmakerRating, GetArenaMatchmakerRating(HORDE));
 
                 winnerArenaTeam->FinishGame(ARENA_TIMELIMIT_POINTS_LOSS);
                 loserArenaTeam->FinishGame(ARENA_TIMELIMIT_POINTS_LOSS);
@@ -244,8 +249,8 @@ void Arena::EndBattleground(uint32 winner)
                 {
                     // update achievement BEFORE personal rating update
                     uint32 rating = player->GetArenaPersonalRating(winnerArenaTeam->GetSlot());
-                    player->UpdateCriteria(CriteriaType::WinAnyRankedArena, rating ? rating : 1);
-                    player->UpdateCriteria(CriteriaType::WinArena, GetMapId());
+                    player->UpdateCriteria(CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
+                    player->UpdateCriteria(CRITERIA_TYPE_WIN_ARENA, GetMapId());
 
                     // Last standing - Rated 5v5 arena & be solely alive player
                     if (GetArenaType() == ARENA_TYPE_5v5 && aliveWinners == 1 && player->IsAlive())
@@ -256,7 +261,7 @@ void Arena::EndBattleground(uint32 winner)
                         guildAwarded = true;
                         if (ObjectGuid::LowType guildId = GetBgMap()->GetOwnerGuildId(player->GetBGTeam()))
                             if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-                                guild->UpdateCriteria(CriteriaType::WinAnyRankedArena, std::max<uint32>(winnerArenaTeam->GetRating(), 1), 0, 0, nullptr, player);
+                                guild->UpdateCriteria(CRITERIA_TYPE_WIN_RATED_ARENA, std::max<uint32>(winnerArenaTeam->GetRating(), 1), 0, 0, nullptr, player);
                     }
 
                     winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
@@ -269,7 +274,7 @@ void Arena::EndBattleground(uint32 winner)
                     loserArenaTeam->MemberLost(player, winnerMatchmakerRating, loserMatchmakerChange);
 
                     // Arena lost => reset the win_rated_arena having the "no_lose" condition
-                    player->ResetCriteria(CriteriaFailEvent::LoseRankedArenaMatchWithTeamSize, 0);
+                    player->ResetCriteria(CRITERIA_CONDITION_NO_LOSE, 0);
                 }
             }
 

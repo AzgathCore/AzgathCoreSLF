@@ -23,7 +23,6 @@
 #include "DBCEnums.h"
 #include "ItemEnchantmentMgr.h"
 
-#include <shared_mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -32,13 +31,17 @@ class Player;
 struct Loot;
 struct LootItem;
 
+namespace boost
+{
+    class shared_mutex;
+}
+
 struct StoredLootItem
 {
     explicit StoredLootItem(LootItem const& lootItem);
 
     uint32 ItemId;
     uint32 Count;
-    uint32 ItemIndex;
     bool FollowRules;
     bool FFA;
     bool Blocked;
@@ -57,11 +60,11 @@ class StoredLootContainer
 
         explicit StoredLootContainer(uint64 containerId) : _containerId(containerId), _money(0) { }
 
-        void AddLootItem(LootItem const& lootItem, CharacterDatabaseTransaction trans);
-        void AddMoney(uint32 money, CharacterDatabaseTransaction trans);
+        void AddLootItem(LootItem const& lootItem, CharacterDatabaseTransaction& trans);
+        void AddMoney(uint32 money, CharacterDatabaseTransaction& trans);
 
         void RemoveMoney();
-        void RemoveItem(uint32 itemId, uint32 count, uint32 itemIndex);
+        void RemoveItem(uint32 itemId, uint32 count);
 
         uint32 GetContainer() const { return _containerId; }
         uint32 GetMoney() const { return _money; }
@@ -77,14 +80,14 @@ class LootItemStorage
 {
     public:
         static LootItemStorage* instance();
-        static std::shared_mutex* GetLock();
+        static boost::shared_mutex* GetLock();
 
         void LoadStorageFromDB();
         bool LoadStoredLoot(Item* item, Player* player);
         void RemoveStoredMoneyForContainer(uint64 containerId);
         void RemoveStoredLootForContainer(uint64 containerId);
-        void RemoveStoredLootItemForContainer(uint64 containerId, uint32 itemId, uint32 count, uint32 itemIndex);
-        void AddNewStoredLoot(uint64 containerId, Loot* loot, Player* player);
+        void RemoveStoredLootItemForContainer(uint64 containerId, uint32 itemId, uint32 count);
+        void AddNewStoredLoot(Loot* loot, Player* player);
 
     private:
         LootItemStorage() { }

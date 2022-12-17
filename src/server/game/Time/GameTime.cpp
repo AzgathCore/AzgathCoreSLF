@@ -23,11 +23,11 @@ namespace GameTime
 {
     time_t const StartTime = time(nullptr);
 
-    time_t GameTime = time(nullptr);
+    time_t GameTime = 0;
     uint32 GameMSTime = 0;
 
-    SystemTimePoint GameTimeSystemPoint = SystemTimePoint::min();
-    TimePoint GameTimeSteadyPoint = TimePoint::min();
+    std::chrono::system_clock::time_point GameTimeSystemPoint = std::chrono::system_clock::time_point::min();
+    std::chrono::steady_clock::time_point GameTimeSteadyPoint = std::chrono::steady_clock::time_point::min();
 
     tm DateTime;
 
@@ -46,32 +46,32 @@ namespace GameTime
         return GameMSTime;
     }
 
-    SystemTimePoint GetSystemTime()
+    std::chrono::system_clock::time_point GetGameTimeSystemPoint()
     {
         return GameTimeSystemPoint;
     }
 
-    TimePoint Now()
+    std::chrono::steady_clock::time_point GetGameTimeSteadyPoint()
     {
         return GameTimeSteadyPoint;
     }
 
     template<typename Clock>
-    typename Clock::time_point GetTime()
+    typename Clock::time_point GetGameTimePoint()
     {
         static_assert(!std::is_same<Clock, Clock>::value, "Missing specialization for GetGameTimePoint");
     }
 
     template<>
-    TC_GAME_API SystemTimePoint GetTime<std::chrono::system_clock>()
+    TC_GAME_API std::chrono::system_clock::time_point GetGameTimePoint<std::chrono::system_clock>()
     {
-        return GetSystemTime();
+        return GetGameTimeSystemPoint();
     }
 
     template<>
-    TC_GAME_API TimePoint GetTime<std::chrono::steady_clock>()
+    TC_GAME_API std::chrono::steady_clock::time_point GetGameTimePoint<std::chrono::steady_clock>()
     {
-        return Now();
+        return GetGameTimeSteadyPoint();
     }
 
     uint32 GetUptime()

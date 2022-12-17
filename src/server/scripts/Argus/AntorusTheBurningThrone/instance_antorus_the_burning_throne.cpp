@@ -19,6 +19,7 @@
 #include "antorus_the_burning_throne.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "GameObject.h"
 #include "InstanceScript.h"
 #include "Map.h"
 
@@ -37,25 +38,10 @@ DoorData const doorData[] =
     { 0,                            0,                          DOOR_TYPE_ROOM }  // END
 };
 
-DungeonEncounterData const encounters[] =
-{
-    { DATA_GAROTHI_WORLDBREAKER, {{ 2076 }} },
-    { DATA_FELHOUNDS_OF_SAGERAS, {{ 2074 }} },
-    { DATA_ANTORAN_HIGH_COMMAND, {{ 2070 }} },
-    { DATA_PORTAL_KEEPER_HASABEL, {{ 2064 }} },
-    { DATA_EONAR_THE_LIFE_BINDER, {{ 2075 }} },
-    { DATA_IMONAR_THE_SOULHUNTER, {{ 2082 }} },
-    { DATA_KINGAROTH, {{ 2088 }} },
-    { DATA_VARIMATHRAS, {{ 2069 }} },
-    { DATA_THE_COVEN_OF_SHIVARRA, {{ 2073 }} },
-    { DATA_AGGRAMAR, {{ 2063 }} },
-    { DATA_ARGUS_THE_UNMAKER, {{ 2092 }} }
-};
-
-class instance_antorus_the_burning_throne : public InstanceMapScript
+class instance_antorus_the_burning_throne: public InstanceMapScript
 {
     public:
-        instance_antorus_the_burning_throne() : InstanceMapScript(ABTScriptName, 1712) { }
+        instance_antorus_the_burning_throne() : InstanceMapScript(ABTScriptName, 757) { }
 
         struct instance_antorus_the_burning_throne_InstanceMapScript: public InstanceScript
         {
@@ -65,7 +51,6 @@ class instance_antorus_the_burning_throne : public InstanceMapScript
                 SetBossNumber(EncounterCount);
                 LoadObjectData(creatureData, nullptr);
                 LoadDoorData(doorData);
-                LoadDungeonEncounterData(encounters);
             }
 
             void OnCreatureCreate(Creature* creature) override
@@ -84,7 +69,7 @@ class instance_antorus_the_burning_throne : public InstanceMapScript
             }
         };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const override
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
             return new instance_antorus_the_burning_throne_InstanceMapScript(map);
         }

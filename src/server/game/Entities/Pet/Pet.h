@@ -51,7 +51,6 @@ class TC_GAME_API Pet : public Guardian
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        float GetNativeObjectScale() const override;
         void SetDisplayId(uint32 modelId, float displayScale = 1.f) override;
 
         PetType getPetType() const { return m_petType; }
@@ -61,17 +60,15 @@ class TC_GAME_API Pet : public Guardian
 
         bool IsPermanentPetFor(Player* owner) const;        // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
-        bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 Entry, uint32 pet_number);
+        bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 Entry);
         bool CreateBaseAtCreature(Creature* creature);
         bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
         bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map);
-        static std::pair<PetStable::PetInfo const*, PetSaveMode> GetLoadPetInfo(PetStable const& stable, uint32 petEntry, uint32 petnumber, Optional<PetSaveMode> slot);
-        bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, Optional<PetSaveMode> forcedSlot = {});
+        bool LoadPetFromDB(Player* owner, uint32 petentry = 0, uint32 petnumber = 0, bool current = false);
         bool IsLoading() const override { return m_loading;}
         void SavePetToDB(PetSaveMode mode);
-        void FillPetInfo(PetStable::PetInfo* petInfo) const;
         void Remove(PetSaveMode mode, bool returnreagent = false);
-        static void DeleteFromDB(uint32 petNumber);
+        static void DeleteFromDB(uint32 guidlow);
 
         void setDeathState(DeathState s) override;                   // overwrite virtual Creature::setDeathState and Unit::setDeathState
         void Update(uint32 diff) override;                           // overwrite virtual Creature::Update and Unit::Update
@@ -114,10 +111,11 @@ class TC_GAME_API Pet : public Guardian
         void CastPetAura(PetAura const* aura);
         bool IsPetAura(Aura const* aura);
 
-        void _LoadAuras(PreparedQueryResult auraResult, PreparedQueryResult effectResult, uint32 timediff);
-        void _SaveAuras(CharacterDatabaseTransaction trans);
-        void _LoadSpells(PreparedQueryResult result);
-        void _SaveSpells(CharacterDatabaseTransaction trans);
+        void _LoadSpellCooldowns();
+        void _LoadAuras(uint32 timediff);
+        void _SaveAuras(CharacterDatabaseTransaction& trans);
+        void _LoadSpells();
+        void _SaveSpells(CharacterDatabaseTransaction& trans);
 
         bool addSpell(uint32 spellId, ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
         bool learnSpell(uint32 spell_id);
@@ -135,7 +133,7 @@ class TC_GAME_API Pet : public Guardian
 
         void InitPetCreateSpells();
 
-        uint16 GetSpecialization() const { return m_petSpecialization; }
+        uint16 GetSpecialization() { return m_petSpecialization; }
         void SetSpecialization(uint16 spec);
         void LearnSpecializationSpells();
         void RemoveSpecializationSpells(bool clearActionBar);
@@ -144,13 +142,11 @@ class TC_GAME_API Pet : public Guardian
         void SetGroupUpdateFlag(uint32 flag);
         void ResetGroupUpdateFlag();
 
-        DeclinedName const* GetDeclinedNames() const { return m_declinedname.get(); }
+        DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
 
         bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
 
         Player* GetOwner() const;
-
-        std::string GetDebugInfo() const override;
 
     protected:
         PetType m_petType;
@@ -159,12 +155,16 @@ class TC_GAME_API Pet : public Guardian
         uint32  m_focusRegenTimer;
         uint32  m_groupUpdateMask;
 
-        std::unique_ptr<DeclinedName> m_declinedname;
+        DeclinedName *m_declinedname;
 
         uint16 m_petSpecialization;
 
     private:
         void SaveToDB(uint32, std::vector<Difficulty> const&) override              // override of Creature::SaveToDB     - must not be called
+        {
+            ABORT();
+        }
+        void DeleteFromDB() override                                 // override of Creature::DeleteFromDB - must not be called
         {
             ABORT();
         }

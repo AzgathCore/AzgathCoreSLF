@@ -82,7 +82,7 @@ struct BattlegroundScore
         virtual uint32 GetAttr5() const { return 0; }
 
         ObjectGuid PlayerGuid;
-        uint8 TeamId; // PvPTeamId
+        uint8 TeamId; // BattlegroundTeamId
 
         // Default score, present in every type
         uint32 KillingBlows;

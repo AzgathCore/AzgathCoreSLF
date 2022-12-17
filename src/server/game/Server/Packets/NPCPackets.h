@@ -24,7 +24,6 @@
 #include "Position.h"
 #include <array>
 
-enum class GossipOptionNpc : uint8;
 enum class GossipOptionStatus : uint8;
 enum class GossipOptionRewardType : uint8;
 
@@ -64,10 +63,9 @@ namespace WorldPackets
         struct ClientGossipOptions
         {
             int32 ClientOption  = 0;
-            GossipOptionNpc OptionNPC = GossipOptionNpc(0);
+            uint8 OptionNPC     = 0;
             uint8 OptionFlags   = 0;
             int32 OptionCost    = 0;
-            uint32 OptionLanguage = 0;
             GossipOptionStatus Status = GossipOptionStatus(0);
             std::string Text;
             std::string Confirm;
@@ -120,9 +118,7 @@ namespace WorldPackets
         public:
             GossipComplete() : ServerPacket(SMSG_GOSSIP_COMPLETE, 0) { }
 
-            WorldPacket const* Write() override;
-
-            bool SuppressSound = false;
+            WorldPacket const* Write() override { return &_worldPacket; }
         };
 
         struct VendorItem
@@ -207,10 +203,10 @@ namespace WorldPackets
 
             int32 ID            = 0;
             uint32 Flags        = 0;
-            TaggedPosition<Position::XYZ> Pos;
+            TaggedPosition<Position::XY> Pos;
             int32 Icon          = 0;
             int32 Importance    = 0;
-            int32 WMOGroupID    = 0;
+            int32 Unknown905    = 0;
             std::string Name;
         };
 
@@ -268,16 +264,15 @@ namespace WorldPackets
             ObjectGuid StableMaster;
         };
 
-        class SetPetSlot final : public ClientPacket
+        class OpenAlliedRaceDetails final : public ServerPacket
         {
         public:
-            SetPetSlot(WorldPacket&& packet) : ClientPacket(CMSG_SET_PET_SLOT, std::move(packet)) { }
+            OpenAlliedRaceDetails() : ServerPacket(SMSG_ALLIED_RACE_DETAILS, 12) { }
 
-            void Read() override;
+            WorldPacket const* Write() override;
 
-            ObjectGuid StableMaster;
-            uint32 PetNumber = 0;
-            uint8 DestSlot = 0;
+            ObjectGuid Guid;
+            uint32 RaceId = 0;
         };
     }
 }

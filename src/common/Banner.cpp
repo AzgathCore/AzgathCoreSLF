@@ -21,8 +21,8 @@
 
 void Trinity::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
 {
-    log(Trinity::StringFormat("%s (%s)", GitRevision::GetFullVersion(), applicationName).c_str()                  );
-    log("<Ctrl-C> to stop.\n                                                                    ");
+    log(Trinity::StringFormat("%s (%s)", GitRevision::GetFullVersion(), applicationName).c_str());
+    log("<Ctrl-C> to stop.\n");
     log("   █████╗ ███████╗ ██████╗  █████╗ ████████╗██╗  ██╗");
     log("  ██╔══██╗╚══███╔╝██╔════╝ ██╔══██╗╚══██╔══╝██║  ██║");
     log("  ███████║  ███╔╝ ██║  ███╗███████║   ██║   ███████║");
@@ -35,8 +35,8 @@ void Trinity::Banner::Show(char const* applicationName, void(*log)(char const* t
     log("                          ██║     ██║   ██║██╔══██╗██╔══╝  ");
     log("                          ╚██████╗╚██████╔╝██║  ██║███████╗");
     log("                           ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝"); 
-    log("  	  AzgathCore 9.2.7  -  Github.com/AzgathCore/AzgathCoreSL_F\n");
-
+    log("  	  AzgathCore 9.2.7  -  Github.com/AzgathCore/AzgathCoreSLF\n");
+  
 
     if (logExtraInfo)
         logExtraInfo();

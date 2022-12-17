@@ -25,8 +25,6 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ScriptedEscortAI.h"
-#include "SpellInfo.h"
-#include "SpellScript.h"
 #include "trial_of_the_champion.h"
 
 enum Spells
@@ -197,7 +195,7 @@ public:
                         {
                             if (uiDeathRespiteTimer <= uiDiff)
                             {
-                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                                 {
                                     if (target->IsAlive())
                                         DoCast(target, SPELL_DEATH_RESPITE);
@@ -225,7 +223,7 @@ public:
                             }
                             if (uiDesecration <= uiDiff)
                             {
-                                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                                 {
                                     if (target->IsAlive())
                                         DoCast(target, SPELL_DESECRATION);
@@ -252,7 +250,7 @@ public:
                     } else uiDeathBiteTimer -= uiDiff;
                     if (uiMarkedDeathTimer <= uiDiff)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
                             if (target->IsAlive())
                                 DoCast(target, SPELL_MARKED_DEATH);
@@ -267,7 +265,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage) override
         {
             if (uiDamage > me->GetHealth() && uiPhase <= PHASE_SKELETON)
             {
@@ -292,7 +290,7 @@ public:
         {
             DoCast(me, SPELL_KILL_CREDIT);
 
-            instance->SetBossState(BOSS_BLACK_KNIGHT, DONE);
+            instance->SetData(BOSS_BLACK_KNIGHT, DONE);
         }
     };
 
@@ -333,7 +331,7 @@ public:
 
             if (uiAttackTimer <= uiDiff)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
                 {
                     if (target->IsAlive())
                         DoCast(target, (SPELL_LEAP));
@@ -378,54 +376,9 @@ public:
     }
 };
 
-// 67751 - Ghoul Explode
-class spell_black_knight_ghoul_explode : public SpellScript
-{
-    PrepareSpellScript(spell_black_knight_ghoul_explode);
-
-    bool Validate(SpellInfo const* spellInfo) override
-    {
-        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
-    }
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        GetHitUnit()->CastSpell(GetHitUnit(), uint32(GetEffectInfo(EFFECT_0).CalcValue()));
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_explode::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
-// 67754 - Ghoul Explode
-// 67889 - Ghoul Explode
-class spell_black_knight_ghoul_explode_risen_ghoul : public SpellScript
-{
-    PrepareSpellScript(spell_black_knight_ghoul_explode_risen_ghoul);
-
-    bool Validate(SpellInfo const* spellInfo) override
-    {
-        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_1).CalcValue()) });
-    }
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()));
-    }
-
-    void Register() override
-    {
-        OnEffectHit += SpellEffectFn(spell_black_knight_ghoul_explode_risen_ghoul::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
 void AddSC_boss_black_knight()
 {
     new boss_black_knight();
     new npc_risen_ghoul();
     new npc_black_knight_skeletal_gryphon();
-    RegisterSpellScript(spell_black_knight_ghoul_explode);
-    RegisterSpellScript(spell_black_knight_ghoul_explode_risen_ghoul);
 }

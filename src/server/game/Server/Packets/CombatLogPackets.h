@@ -68,13 +68,25 @@ namespace WorldPackets
         class SpellExecuteLog final : public CombatLogServerPacket
         {
         public:
+            struct SpellLogEffect
+            {
+                int32 Effect = 0;
+
+                std::vector<SpellLogEffectPowerDrainParams> PowerDrainTargets;
+                std::vector<SpellLogEffectExtraAttacksParams> ExtraAttacksTargets;
+                std::vector<SpellLogEffectDurabilityDamageParams> DurabilityDamageTargets;
+                std::vector<SpellLogEffectGenericVictimParams> GenericVictimTargets;
+                std::vector<SpellLogEffectTradeSkillItemParams> TradeSkillTargets;
+                std::vector<SpellLogEffectFeedPetParams> FeedPetTargets;
+            };
+
             SpellExecuteLog() : CombatLogServerPacket(SMSG_SPELL_EXECUTE_LOG, 16 + 4 + 4 + 1) { }
 
             WorldPacket const* Write() override;
 
             ObjectGuid Caster;
             int32 SpellID = 0;
-            std::vector<SpellLogEffect> const* Effects = nullptr;
+            std::vector<SpellLogEffect> Effects;
         };
 
         class SpellHealLog final : public CombatLogServerPacket
@@ -328,23 +340,6 @@ namespace WorldPackets
             int32 Absorbed = 0;
             int32 OriginalDamage = 0;
             bool Unk = false;
-        };
-
-        class SpellHealAbsorbLog final : public ServerPacket
-        {
-        public:
-            SpellHealAbsorbLog() : ServerPacket(SMSG_SPELL_HEAL_ABSORB_LOG, 100) { }
-
-            WorldPacket const* Write() override;
-
-            ObjectGuid Healer;
-            ObjectGuid Target;
-            ObjectGuid AbsorbCaster;
-            int32 AbsorbSpellID = 0;
-            int32 AbsorbedSpellID = 0;
-            int32 Absorbed = 0;
-            int32 OriginalHeal = 0;
-            Optional<Spells::ContentTuningParams> ContentTuning;
         };
     }
 }

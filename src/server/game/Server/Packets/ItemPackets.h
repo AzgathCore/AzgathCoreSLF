@@ -22,6 +22,7 @@
 #include "DBCEnums.h"
 #include "ItemDefines.h"
 #include "ItemPacketsCommon.h"
+#include "PacketUtilities.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include <array>

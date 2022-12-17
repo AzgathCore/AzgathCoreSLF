@@ -21,26 +21,27 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "Map.h"
+#include "MotionMaster.h"
 #include "ScriptedCreature.h"
+#include <sstream>
 
 #define TIMER_TOMBOFTHESEVEN    15000
 #define MAX_ENCOUNTER           6
-constexpr uint8 TOMB_OF_SEVEN_BOSS_NUM = 7;
 
 enum Creatures
 {
-    NPC_EMPEROR              = 9019,
-    NPC_PHALANX              = 9502,
-    NPC_ANGERREL             = 9035,
-    NPC_DOPEREL              = 9040,
-    NPC_HATEREL              = 9034,
-    NPC_VILEREL              = 9036,
-    NPC_SEETHREL             = 9038,
-    NPC_GLOOMREL             = 9037,
-    NPC_DOOMREL              = 9039,
-    NPC_MAGMUS               = 9938,
-    NPC_MOIRA                = 8929,
-    NPC_COREN                = 23872,
+    NPC_EMPEROR             = 9019,
+    NPC_PHALANX             = 9502,
+    NPC_ANGERREL            = 9035,
+    NPC_DOPEREL             = 9040,
+    NPC_HATEREL             = 9034,
+    NPC_VILEREL             = 9036,
+    NPC_SEETHREL            = 9038,
+    NPC_GLOOMREL            = 9037,
+    NPC_DOOMREL             = 9039,
+    NPC_MAGMUS              = 9938,
+    NPC_MOIRA               = 8929,
+    NPC_COREN               = 23872
 };
 
 enum GameObjects
@@ -83,13 +84,16 @@ public:
         instance_blackrock_depths_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
-            SetBossNumber(MAX_ENCOUNTER);
+            memset(&encounter, 0, sizeof(encounter));
 
             BarAleCount = 0;
             GhostKillCount = 0;
             TombTimer = TIMER_TOMBOFTHESEVEN;
             TombEventCounter = 0;
         }
+
+        uint32 encounter[MAX_ENCOUNTER];
+        std::string str_data;
 
         ObjectGuid EmperorGUID;
         ObjectGuid PhalanxGUID;
@@ -121,7 +125,7 @@ public:
 
         uint32 BarAleCount;
         uint32 GhostKillCount;
-        ObjectGuid TombBossGUIDs[TOMB_OF_SEVEN_BOSS_NUM];
+        ObjectGuid TombBossGUIDs[7];
         ObjectGuid TombEventStarterGUID;
         uint32 TombTimer;
         uint32 TombEventCounter;
@@ -167,7 +171,7 @@ public:
                 case GO_TOMB_ENTER: GoTombEnterGUID = go->GetGUID(); break;
                 case GO_TOMB_EXIT:
                     GoTombExitGUID = go->GetGUID();
-                    if (GhostKillCount >= TOMB_OF_SEVEN_BOSS_NUM)
+                    if (GhostKillCount >= 7)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     else
                         HandleGameObject(ObjectGuid::Empty, false, go);
@@ -206,29 +210,43 @@ public:
             switch (type)
             {
                 case TYPE_RING_OF_LAW:
-                    SetBossState(0, EncounterState(data));
+                    encounter[0] = data;
                     break;
                 case TYPE_VAULT:
-                    SetBossState(1, EncounterState(data));
+                    encounter[1] = data;
                     break;
                 case TYPE_BAR:
                     if (data == SPECIAL)
                         ++BarAleCount;
                     else
-                        SetBossState(2, EncounterState(data));
+                        encounter[2] = data;
                     break;
                 case TYPE_TOMB_OF_SEVEN:
-                    SetBossState(3, EncounterState(data));
+                    encounter[3] = data;
                     break;
                 case TYPE_LYCEUM:
-                    SetBossState(4, EncounterState(data));
+                    encounter[4] = data;
                     break;
                 case TYPE_IRON_HALL:
-                    SetBossState(5, EncounterState(data));
+                    encounter[5] = data;
                     break;
                 case DATA_GHOSTKILL:
                     GhostKillCount += data;
                     break;
+            }
+
+            if (data == DONE || GhostKillCount >= 7)
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::ostringstream saveStream;
+                saveStream << encounter[0] << ' ' << encounter[1] << ' ' << encounter[2] << ' '
+                    << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount;
+
+                str_data = saveStream.str();
+
+                SaveToDB();
+                OUT_SAVE_INST_DATA_COMPLETE;
             }
         }
 
@@ -237,20 +255,20 @@ public:
             switch (type)
             {
                 case TYPE_RING_OF_LAW:
-                    return GetBossState(0);
+                    return encounter[0];
                 case TYPE_VAULT:
-                    return GetBossState(1);
+                    return encounter[1];
                 case TYPE_BAR:
-                    if (GetBossState(2) == IN_PROGRESS && BarAleCount == 3)
+                    if (encounter[2] == IN_PROGRESS && BarAleCount == 3)
                         return SPECIAL;
                     else
-                        return GetBossState(2);
+                        return encounter[2];
                 case TYPE_TOMB_OF_SEVEN:
-                    return GetBossState(3);
+                    return encounter[3];
                 case TYPE_LYCEUM:
-                    return GetBossState(4);
+                    return encounter[4];
                 case TYPE_IRON_HALL:
-                    return GetBossState(5);
+                    return encounter[5];
                 case DATA_GHOSTKILL:
                     return GhostKillCount;
             }
@@ -301,9 +319,39 @@ public:
             return ObjectGuid::Empty;
         }
 
+        std::string GetSaveData() override
+        {
+            return str_data;
+        }
+
+        void Load(char const* in) override
+        {
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            std::istringstream loadStream(in);
+            loadStream >> encounter[0] >> encounter[1] >> encounter[2] >> encounter[3]
+            >> encounter[4] >> encounter[5] >> GhostKillCount;
+
+            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                if (encounter[i] == IN_PROGRESS)
+                    encounter[i] = NOT_STARTED;
+            if (GhostKillCount > 0 && GhostKillCount < 7)
+                GhostKillCount = 0;//reset tomb of seven event
+            if (GhostKillCount >= 7)
+                GhostKillCount = 7;
+
+            OUT_LOAD_INST_DATA_COMPLETE;
+        }
+
         void TombOfSevenEvent()
         {
-            if (GhostKillCount < TOMB_OF_SEVEN_BOSS_NUM && !TombBossGUIDs[TombEventCounter].IsEmpty())
+            if (GhostKillCount < 7 && !TombBossGUIDs[TombEventCounter].IsEmpty())
             {
                 if (Creature* boss = instance->GetCreature(TombBossGUIDs[TombEventCounter]))
                 {
@@ -319,14 +367,21 @@ public:
         {
             HandleGameObject(GoTombExitGUID, false);//event reseted, close exit door
             HandleGameObject(GoTombEnterGUID, true);//event reseted, open entrance door
-            for (uint8 i = 0; i < TOMB_OF_SEVEN_BOSS_NUM; ++i)
+            for (uint8 i = 0; i < 7; ++i)
             {
                 if (Creature* boss = instance->GetCreature(TombBossGUIDs[i]))
                 {
                     if (!boss->IsAlive())
+                    {//do not call EnterEvadeMode(), it will create infinit loops
                         boss->Respawn();
-                    else
-                        boss->SetFaction(FACTION_FRIENDLY);
+                        boss->RemoveAllAuras();
+                        boss->GetThreatManager().ClearAllThreat();
+                        boss->CombatStop(true);
+                        boss->LoadCreaturesAddon();
+                        boss->GetMotionMaster()->MoveTargetedHome();
+                        boss->SetLootRecipient(nullptr);
+                    }
+                    boss->SetFaction(FACTION_FRIENDLY);
                 }
             }
             GhostKillCount = 0;
@@ -345,7 +400,7 @@ public:
 
         void TombOfSevenEnd()
         {
-            DoRespawnGameObject(GoChestGUID, 24h);
+            DoRespawnGameObject(GoChestGUID, DAY);
             HandleGameObject(GoTombExitGUID, true);//event done, open exit door
             HandleGameObject(GoTombEnterGUID, true);//event done, open entrance door
             TombEventStarterGUID.Clear();
@@ -353,19 +408,15 @@ public:
         }
         void Update(uint32 diff) override
         {
-            if (!TombEventStarterGUID.IsEmpty() && GhostKillCount < TOMB_OF_SEVEN_BOSS_NUM)
+            if (!TombEventStarterGUID.IsEmpty() && GhostKillCount < 7)
             {
                 if (TombTimer <= diff)
                 {
                     TombTimer = TIMER_TOMBOFTHESEVEN;
-                    if (TombEventCounter < TOMB_OF_SEVEN_BOSS_NUM)
-                    {
-                        TombOfSevenEvent();
-                        ++TombEventCounter;
-                    }
-
+                    ++TombEventCounter;
+                    TombOfSevenEvent();
                     // Check Killed bosses
-                    for (uint8 i = 0; i < TOMB_OF_SEVEN_BOSS_NUM; ++i)
+                    for (uint8 i = 0; i < 7; ++i)
                     {
                         if (Creature* boss = instance->GetCreature(TombBossGUIDs[i]))
                         {
@@ -377,7 +428,7 @@ public:
                     }
                 } else TombTimer -= diff;
             }
-            if (GhostKillCount >= TOMB_OF_SEVEN_BOSS_NUM && !TombEventStarterGUID.IsEmpty())
+            if (GhostKillCount >= 7 && !TombEventStarterGUID.IsEmpty())
                 TombOfSevenEnd();
         }
     };

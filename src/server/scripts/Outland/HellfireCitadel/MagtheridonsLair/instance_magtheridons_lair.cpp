@@ -64,11 +64,6 @@ static MLDataTypes const collapseObjectDatas[] =
     DATA_MAGTHERIDON_COLUMN_5,
 };
 
-DungeonEncounterData const encounters[] =
-{
-    { DATA_MAGTHERIDON, {{ 651 }} }
-};
-
 class instance_magtheridons_lair : public InstanceMapScript
 {
     public:
@@ -83,7 +78,6 @@ class instance_magtheridons_lair : public InstanceMapScript
                 LoadDoorData(doorData);
                 LoadBossBoundaries(boundaries);
                 LoadObjectData(creatureData, gameObjectData);
-                LoadDungeonEncounterData(encounters);
             }
 
             void OnGameObjectCreate(GameObject* go) override
@@ -113,7 +107,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                                 if (value == ACTION_ENABLE)
                                     cube->RemoveFlag(GO_FLAG_NOT_SELECTABLE);
                                 else
-                                    cube->SetFlag(GO_FLAG_NOT_SELECTABLE);
+                                    cube->AddFlag(GO_FLAG_NOT_SELECTABLE);
                             }
                         break;
                     case DATA_COLLAPSE:
@@ -129,7 +123,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                         for (ObjectGuid warderGuid : warderGUIDS)
                             if (Creature* warder = instance->GetCreature(warderGuid))
                                 if (warder->IsAlive())
-                                    warder->AI()->DoZoneInCombat();
+                                    warder->SetInCombatWithZone();
                         break;
                     default:
                         break;

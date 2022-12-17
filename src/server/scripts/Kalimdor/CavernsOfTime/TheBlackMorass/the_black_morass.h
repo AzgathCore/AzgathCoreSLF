@@ -73,6 +73,4 @@ inline AI* GetBlackMorassAI(T* obj)
     return GetInstanceAI<AI>(obj, TBMScriptName);
 }
 
-#define RegisterBlackMorassCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackMorassAI)
-
 #endif

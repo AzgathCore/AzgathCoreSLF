@@ -19,25 +19,30 @@
 #define TRINITY_COMBATAI_H
 
 #include "CreatureAI.h"
-#include "EventMap.h"
 
 class Creature;
 
 class TC_GAME_API AggressorAI : public CreatureAI
 {
     public:
-        using CreatureAI::CreatureAI;
+        explicit AggressorAI(Creature* c) : CreatureAI(c) { }
 
         void UpdateAI(uint32) override;
         static int32 Permissible(Creature const* creature);
 };
 
-typedef std::vector<uint32> SpellVector;
+typedef std::vector<uint32> SpellVct;
 
 class TC_GAME_API CombatAI : public CreatureAI
 {
     public:
-        using CreatureAI::CreatureAI;
+        explicit CombatAI(Creature* c) : CreatureAI(c) { }
+
+        enum CombatAIEnum
+        {
+            EVENT_UPDATE_VICTIM = 5000,
+            POINT_ID_COMBAT_MOVEMENT = 5000,
+        };
 
         void InitializeAI() override;
         void Reset() override;
@@ -45,43 +50,45 @@ class TC_GAME_API CombatAI : public CreatureAI
         void JustDied(Unit* killer) override;
         void UpdateAI(uint32 diff) override;
         void SpellInterrupted(uint32 spellId, uint32 unTimeMs) override;
+        void MoveCombat(Position destination);
 
         static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 
     protected:
-        EventMap _events;
-        SpellVector _spells;
+        EventMap events;
+        SpellVct spells;
+        Optional<Position> combatMoveDest;
 };
 
 class TC_GAME_API CasterAI : public CombatAI
 {
     public:
-        explicit CasterAI(Creature* creature, uint32 scriptId = {}) : CombatAI(creature, scriptId) { _attackDistance = MELEE_RANGE; }
+        explicit CasterAI(Creature* c) : CombatAI(c) { m_attackDist = MELEE_RANGE; }
         void InitializeAI() override;
-        void AttackStart(Unit* victim) override { AttackStartCaster(victim, _attackDistance); }
+        void AttackStart(Unit* victim) override { AttackStartCaster(victim, m_attackDist); }
         void UpdateAI(uint32 diff) override;
         void JustEngagedWith(Unit* /*who*/) override;
     private:
-        float _attackDistance;
+        float m_attackDist;
 };
 
 struct TC_GAME_API ArcherAI : public CreatureAI
 {
     public:
-        explicit ArcherAI(Creature* creature, uint32 scriptId = {});
+        explicit ArcherAI(Creature* c);
         void AttackStart(Unit* who) override;
         void UpdateAI(uint32 diff) override;
 
         static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 
     protected:
-        float _minimumRange;
+        float m_minRange;
 };
 
 struct TC_GAME_API TurretAI : public CreatureAI
 {
     public:
-        explicit TurretAI(Creature* creature, uint32 scriptId = {});
+        explicit TurretAI(Creature* c);
         bool CanAIAttack(Unit const* who) const override;
         void AttackStart(Unit* who) override;
         void UpdateAI(uint32 diff) override;
@@ -89,7 +96,7 @@ struct TC_GAME_API TurretAI : public CreatureAI
         static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 
     protected:
-        float _minimumRange;
+        float m_minRange;
 };
 
 #define VEHICLE_CONDITION_CHECK_TIME 1000
@@ -98,23 +105,33 @@ struct TC_GAME_API TurretAI : public CreatureAI
 struct TC_GAME_API VehicleAI : public CreatureAI
 {
     public:
-        explicit VehicleAI(Creature* creature, uint32 scriptId = {});
+        explicit VehicleAI(Creature* creature);
 
         void UpdateAI(uint32 diff) override;
         void MoveInLineOfSight(Unit*) override { }
         void AttackStart(Unit*) override { }
-        void OnCharmed(bool isNew) override;
+        void OnCharmed(bool apply) override;
 
         static int32 Permissible(Creature const* creature);
 
     private:
         void LoadConditions();
         void CheckConditions(uint32 diff);
+        bool m_HasConditions;
+        uint32 m_ConditionsTimer;
+        bool m_DoDismiss;
+        uint32 m_DismissTimer;
+};
 
-        bool _hasConditions;
-        uint32 _conditionsTimer;
-        bool _dismiss;
-        uint32 _dismissTimer;
+struct TC_GAME_API  BattlePetAI : public CreatureAI
+{
+public:
+    explicit BattlePetAI(Creature* c) : CreatureAI(c) {}
+
+    void InitializeAI();
+    void UpdateAI(uint32);
+    static int Permissible(const Creature*);
+    void MovementInform(uint32 moveType, uint32 data);
 };
 
 #endif

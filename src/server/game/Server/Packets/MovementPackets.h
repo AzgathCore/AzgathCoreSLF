@@ -19,7 +19,6 @@
 #define MovementPackets_h__
 
 #include "Packet.h"
-#include "CombatLogPacketsCommon.h"
 #include "Object.h"
 #include "Optional.h"
 
@@ -105,7 +104,8 @@ namespace WorldPackets
             struct Inner
             {
                 int32 Unknown_1 = 0;
-                Spells::SpellCastVisual Visual;
+                int32 Unknown_2 = 0;
+                int32 Unknown_3 = 0;
                 uint32 Unknown_4 = 0;
             };
 
@@ -168,17 +168,6 @@ namespace WorldPackets
             TaggedPosition<Position::XYZ> Pos;
         };
 
-        class FlightSplineSync final : public ServerPacket
-        {
-        public:
-            FlightSplineSync() : ServerPacket(SMSG_FLIGHT_SPLINE_SYNC, 16 + 4) { }
-
-            WorldPacket const* Write() override;
-
-            ObjectGuid Guid;
-            float SplineDist = 0.0f;
-        };
-
         class MoveSplineSetSpeed : public ServerPacket
         {
         public:
@@ -234,14 +223,14 @@ namespace WorldPackets
             uint32 SequenceIndex = 0; ///< Unit movement packet index, incremented each time
         };
 
-        struct ShipTransferPending
-        {
-            uint32 ID = 0;              ///< gameobject_template.entry of the transport the player is teleporting on
-            int32 OriginMapID = -1;     ///< Map id the player is currently on (before teleport)
-        };
-
         class TransferPending final : public ServerPacket
         {
+            struct ShipTransferPending
+            {
+                uint32 ID = 0;              ///< gameobject_template.entry of the transport the player is teleporting on
+                int32 OriginMapID = -1;     ///< Map id the player is currently on (before teleport)
+            };
+
         public:
             TransferPending() : ServerPacket(SMSG_TRANSFER_PENDING, 16) { }
 
@@ -557,17 +546,6 @@ namespace WorldPackets
             uint32 TimeSkipped = 0;
         };
 
-        class MoveSkipTime final : public ServerPacket
-        {
-        public:
-            MoveSkipTime() : ServerPacket(SMSG_MOVE_SKIP_TIME, 16 + 4) { }
-
-            WorldPacket const* Write() override;
-
-            ObjectGuid MoverGUID;
-            uint32 TimeSkipped = 0;
-        };
-
         class SummonResponse final : public ClientPacket
         {
         public:
@@ -682,8 +660,6 @@ namespace WorldPackets
                 Optional<CollisionHeightInfo> CollisionHeight;
                 Optional<MovementForce> MovementForce_;
                 Optional<ObjectGuid> MovementForceGUID;
-                Optional<ObjectGuid> MovementInertiaGUID;
-                Optional<uint32> MovementInertiaLifetimeMs;
             };
 
             MoveSetCompoundState() : ServerPacket(SMSG_MOVE_SET_COMPOUND_STATE, 4 + 1) { }
@@ -694,14 +670,55 @@ namespace WorldPackets
             std::vector<MoveStateChange> StateChanges;
         };
 
-        class MoveInitActiveMoverComplete final : public ClientPacket
+        class AbortNewWorld final : public ServerPacket
         {
         public:
-            MoveInitActiveMoverComplete(WorldPacket&& packet) : ClientPacket(CMSG_MOVE_INIT_ACTIVE_MOVER_COMPLETE, std::move(packet)) { }
+            AbortNewWorld() : ServerPacket(SMSG_ABORT_NEW_WORLD, 0) { }
+
+            WorldPacket const* Write() override { return &_worldPacket; }
+        };
+
+        class AdjustSplineDuration final : public ServerPacket
+        {
+        public:
+            AdjustSplineDuration() : ServerPacket(SMSG_ADJUST_SPLINE_DURATION, 16 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Unit;
+            float Scale = 0.0f;
+        };
+
+        class MoveSkipTime final : public ServerPacket
+        {
+        public:
+            MoveSkipTime() : ServerPacket(SMSG_MOVE_SKIP_TIME, 16 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid MoverGUID;
+            uint32 SkippedTime = 0;
+        };
+
+        class TimeSyncResponseFailed final : public ClientPacket
+        {
+        public:
+            TimeSyncResponseFailed(WorldPacket&& packet) : ClientPacket(CMSG_TIME_SYNC_RESPONSE_FAILED, std::move(packet)) { }
 
             void Read() override;
 
-            uint32 Ticks = 0;
+            uint32 SequenceIndex = 0;
+        };
+
+        class TimeSyncResponseDropped final : public ClientPacket
+        {
+        public:
+            TimeSyncResponseDropped(WorldPacket&& packet) : ClientPacket(CMSG_TIME_SYNC_RESPONSE_DROPPED, std::move(packet)) { }
+
+            void Read() override;
+
+            uint32 SequenceIndexFirst = 0;
+            uint32 SequenceIndexLast = 0;
         };
     }
 

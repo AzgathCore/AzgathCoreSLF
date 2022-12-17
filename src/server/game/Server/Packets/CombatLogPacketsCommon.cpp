@@ -30,7 +30,7 @@ namespace Spells
 void SpellCastLogData::Initialize(Unit const* unit)
 {
     Health = unit->GetHealth();
-    AttackPower = unit->GetTotalAttackPowerValue(unit->GetClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK);
+    AttackPower = unit->GetTotalAttackPowerValue(unit->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK);
     SpellPower = unit->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
     Armor = unit->GetArmor();
     PowerData.emplace_back(int32(unit->GetPowerType()), unit->GetPower(unit->GetPowerType()), int32(0));
@@ -38,24 +38,21 @@ void SpellCastLogData::Initialize(Unit const* unit)
 
 void SpellCastLogData::Initialize(Spell const* spell)
 {
-    if (Unit const* unitCaster = spell->GetCaster()->ToUnit())
+    Health = spell->GetCaster()->GetHealth();
+    AttackPower = spell->GetCaster()->GetTotalAttackPowerValue(spell->GetCaster()->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK);
+    SpellPower = spell->GetCaster()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+    Armor = spell->GetCaster()->GetArmor();
+    Powers primaryPowerType = spell->GetCaster()->GetPowerType();
+    bool primaryPowerAdded = false;
+    for (SpellPowerCost const& cost : spell->GetPowerCost())
     {
-        Health = unitCaster->GetHealth();
-        AttackPower = unitCaster->GetTotalAttackPowerValue(unitCaster->GetClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK);
-        SpellPower = unitCaster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-        Armor = unitCaster->GetArmor();
-        Powers primaryPowerType = unitCaster->GetPowerType();
-        bool primaryPowerAdded = false;
-        for (SpellPowerCost const& cost : spell->GetPowerCost())
-        {
-            PowerData.emplace_back(int32(cost.Power), unitCaster->GetPower(Powers(cost.Power)), int32(cost.Amount));
-            if (cost.Power == primaryPowerType)
-                primaryPowerAdded = true;
-        }
-
-        if (!primaryPowerAdded)
-            PowerData.insert(PowerData.begin(), SpellLogPowerData(int32(primaryPowerType), unitCaster->GetPower(primaryPowerType), 0));
+        PowerData.emplace_back(int32(cost.Power), spell->GetCaster()->GetPower(Powers(cost.Power)), int32(cost.Amount));
+        if (cost.Power == primaryPowerType)
+            primaryPowerAdded = true;
     }
+
+    if (!primaryPowerAdded)
+        PowerData.insert(PowerData.begin(), SpellLogPowerData(int32(primaryPowerType), spell->GetCaster()->GetPower(primaryPowerType), 0));
 }
 
 template<class T, class U>
@@ -75,10 +72,11 @@ bool ContentTuningParams::GenerateDataForUnits<Creature, Player>(Creature* attac
     PlayerItemLevel = target->GetAverageItemLevel();
     TargetItemLevel = 0;
     ScalingHealthItemLevelCurveID = target->m_unitData->ScalingHealthItemLevelCurveID;
-    TargetLevel = target->GetLevel();
+    TargetLevel = target->getLevel();
     Expansion = creatureTemplate->HealthScalingExpansion;
+    TargetMinScalingLevel = uint8(creatureScaling->MinLevel);
+    TargetMaxScalingLevel = uint8(creatureScaling->MaxLevel);
     TargetScalingLevelDelta = int8(attacker->m_unitData->ScalingLevelDelta);
-    TargetContentTuningID = creatureScaling->ContentTuningID;
     return true;
 }
 
@@ -93,10 +91,11 @@ bool ContentTuningParams::GenerateDataForUnits<Player, Creature>(Player* attacke
     PlayerItemLevel = attacker->GetAverageItemLevel();
     TargetItemLevel = 0;
     ScalingHealthItemLevelCurveID = target->m_unitData->ScalingHealthItemLevelCurveID;
-    TargetLevel = target->GetLevel();
+    TargetLevel = target->getLevel();
     Expansion = creatureTemplate->HealthScalingExpansion;
+    TargetMinScalingLevel = uint8(creatureScaling->MinLevel);
+    TargetMaxScalingLevel = uint8(creatureScaling->MaxLevel);
     TargetScalingLevelDelta = int8(target->m_unitData->ScalingLevelDelta);
-    TargetContentTuningID = creatureScaling->ContentTuningID;
     return true;
 }
 
@@ -110,10 +109,11 @@ bool ContentTuningParams::GenerateDataForUnits<Creature, Creature>(Creature* att
     Type = TYPE_CREATURE_TO_CREATURE_DAMAGE;
     PlayerLevelDelta = 0;
     PlayerItemLevel = 0;
-    TargetLevel = target->GetLevel();
+    TargetLevel = target->getLevel();
     Expansion = creatureTemplate->HealthScalingExpansion;
+    TargetMinScalingLevel = uint8(creatureScaling->MinLevel);
+    TargetMaxScalingLevel = uint8(creatureScaling->MaxLevel);
     TargetScalingLevelDelta = int8(accessor->m_unitData->ScalingLevelDelta);
-    TargetContentTuningID = creatureScaling->ContentTuningID;
     return true;
 }
 
@@ -174,11 +174,10 @@ ByteBuffer& operator<<(ByteBuffer& data, ContentTuningParams const& contentTunin
     data << uint16(contentTuningParams.ScalingHealthItemLevelCurveID);
     data << uint8(contentTuningParams.TargetLevel);
     data << uint8(contentTuningParams.Expansion);
+    data << uint8(contentTuningParams.TargetMinScalingLevel);
+    data << uint8(contentTuningParams.TargetMaxScalingLevel);
     data << int8(contentTuningParams.TargetScalingLevelDelta);
     data << uint32(contentTuningParams.Flags);
-    data << int32(contentTuningParams.PlayerContentTuningID);
-    data << int32(contentTuningParams.TargetContentTuningID);
-    data << int32(contentTuningParams.Unused927);
     data.WriteBits(contentTuningParams.Type, 4);
     data.FlushBits();
     return data;

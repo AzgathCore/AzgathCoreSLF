@@ -20,7 +20,6 @@
 #include "Field.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "StringConvert.h"
 #include "World.h"
 
 namespace UF
@@ -84,7 +83,7 @@ EnumCharactersResult::CharacterInfo::CharacterInfo(Field* fields)
     ExperienceLevel   = fields[5].GetUInt8();
     ZoneID            = int32(fields[6].GetUInt16());
     MapID             = int32(fields[7].GetUInt16());
-    PreloadPos        = Position(fields[8].GetFloat(), fields[9].GetFloat(), fields[10].GetFloat());
+    PreloadPos        = Position(fields[8].GetFloat(), fields[8].GetFloat(), fields[10].GetFloat());
 
     if (ObjectGuid::LowType guildId = fields[11].GetUInt64())
         GuildGUID = ObjectGuid::Create<HighGuid::Guild>(guildId);
@@ -133,7 +132,7 @@ EnumCharactersResult::CharacterInfo::CharacterInfo(Field* fields)
     ProfessionIds[0] = 0;
     ProfessionIds[1] = 0;
 
-    std::vector<std::string_view> equipment = Trinity::Tokenize(fields[17].GetStringView(), ' ', false);
+    Tokenizer equipment(fields[17].GetString(), ' ');
     ListPosition = fields[19].GetUInt8();
     LastPlayedTime = fields[20].GetInt64();
     if (ChrSpecializationEntry const* spec = sDB2Manager.GetChrSpecializationByIndex(ClassID, fields[21].GetUInt8()))
@@ -143,12 +142,11 @@ EnumCharactersResult::CharacterInfo::CharacterInfo(Field* fields)
 
     for (uint8 slot = 0; slot < INVENTORY_SLOT_BAG_END; ++slot)
     {
-        uint32 visualBase = slot * 5;
-        VisualItems[slot].InvType = Trinity::StringTo<uint8>(equipment[visualBase + 0]).value_or(0);
-        VisualItems[slot].DisplayID = Trinity::StringTo<uint32>(equipment[visualBase + 1]).value_or(0);
-        VisualItems[slot].DisplayEnchantID = Trinity::StringTo<uint32>(equipment[visualBase + 2]).value_or(0);
-        VisualItems[slot].Subclass = Trinity::StringTo<uint8>(equipment[visualBase + 3]).value_or(0);
-        VisualItems[slot].SecondaryItemModifiedAppearanceID = Trinity::StringTo<int32>(equipment[visualBase + 4]).value_or(0);
+        uint32 visualBase = slot * 4;
+        VisualItems[slot].InvType = Player::GetUInt32ValueFromArray(equipment, visualBase);
+        VisualItems[slot].DisplayID = Player::GetUInt32ValueFromArray(equipment, visualBase + 1);
+        VisualItems[slot].DisplayEnchantID = Player::GetUInt32ValueFromArray(equipment, visualBase + 2);
+        VisualItems[slot].Subclass = Player::GetUInt32ValueFromArray(equipment, visualBase + 3);
     }
 }
 
@@ -156,7 +154,7 @@ ByteBuffer& operator<<(ByteBuffer& data, EnumCharactersResult::CharacterInfo::Vi
 {
     data << uint32(visualItem.DisplayID);
     data << uint32(visualItem.DisplayEnchantID);
-    data << int32(visualItem.SecondaryItemModifiedAppearanceID);
+    data << int32(visualItem.ItemModifiedAppearanceID);
     data << uint8(visualItem.InvType);
     data << uint8(visualItem.Subclass);
 
@@ -254,7 +252,7 @@ WorldPacket const* EnumCharactersResult::Write()
     _worldPacket.WriteBit(IsNewPlayerRestrictionSkipped);
     _worldPacket.WriteBit(IsNewPlayerRestricted);
     _worldPacket.WriteBit(IsNewPlayer);
-    _worldPacket.WriteBit(DisabledClassesMask.has_value());
+    _worldPacket.WriteBit(DisabledClassesMask.is_initialized());
     _worldPacket.WriteBit(IsAlliedRacesCreationAllowed);
     _worldPacket << uint32(Characters.size());
     _worldPacket << int32(MaxCharacterLevel);
@@ -340,7 +338,7 @@ void CharacterRenameRequest::Read()
 WorldPacket const* CharacterRenameResult::Write()
 {
     _worldPacket << uint8(Result);
-    _worldPacket.WriteBit(Guid.has_value());
+    _worldPacket.WriteBit(Guid.is_initialized());
     _worldPacket.WriteBits(Name.length(), 6);
     _worldPacket.FlushBits();
 
@@ -389,7 +387,7 @@ WorldPacket const* CharFactionChangeResult::Write()
 {
     _worldPacket << uint8(Result);
     _worldPacket << Guid;
-    _worldPacket.WriteBit(Display.has_value());
+    _worldPacket.WriteBit(Display.is_initialized());
     _worldPacket.FlushBits();
 
     if (Display)
@@ -645,6 +643,82 @@ WorldPacket const * SetPlayerDeclinedNamesResult::Write()
     _worldPacket << Player;
 
     return &_worldPacket;
+}
+
+void WorldPackets::Character::EngineSurvey::Read()
+{
+    _worldPacket >> TotalPhysMemory;
+    _worldPacket >> GPUVideoMemory;
+    _worldPacket >> GPUSystemMemory;
+    _worldPacket >> GPUSharedMemory;
+    _worldPacket >> GPUVendorID;
+    _worldPacket >> GPUModelID;
+    _worldPacket >> ProcessorUnkUnk;
+    _worldPacket >> ProcessorFeatures;
+    _worldPacket >> ProcessorVendor;
+    _worldPacket >> GXDisplayResWidth;
+    _worldPacket >> GXDisplayResHeight;
+    _worldPacket >> SystemOSIndex;
+    _worldPacket >> GXUnk;
+    _worldPacket >> ProcessorNumberOfProcessors;
+    _worldPacket >> ProcessorNumberOfThreads;
+    _worldPacket >> UnkDword4C;
+    _worldPacket >> UnkDword50;
+    _worldPacket >> Farclip;
+    _worldPacket >> UnkWord58;
+    _worldPacket >> UnkWord5A;
+    _worldPacket >> HasHDPlayerModels;
+    _worldPacket >> Is64BitSystem;
+    _worldPacket >> UnkByte5E;
+    _worldPacket >> UnkByte5F;
+    _worldPacket >> UnkByte60;
+    _worldPacket >> UnkByte61;
+    _worldPacket >> UnkByte62;
+    _worldPacket >> UnkByte63;
+    _worldPacket >> UnkByte64;
+    _worldPacket >> UnkByte65;
+    _worldPacket >> UnkByte66;
+    _worldPacket >> UnkByte67;
+}
+
+WorldPacket const* WorldPackets::Character::XpGainEnabled::Write()
+{
+    _worldPacket.WriteBit(Enabled);
+    _worldPacket.FlushBits();
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Character::XPGainAborted::Write()
+{
+    _worldPacket << Victim;
+    _worldPacket << XpToAdd;
+    _worldPacket << XpGainReason;
+    _worldPacket << XpAbortReason;
+
+    return &_worldPacket;
+}
+
+WorldPacket const* NeutralPlayerFactionSelectResult::Write()
+{
+    _worldPacket << NewRaceID;
+    _worldPacket.WriteBit(Success);
+    _worldPacket.FlushBits();
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Character::KickReason::Write()
+{
+    _worldPacket << UnkInt;
+    _worldPacket << Reason;
+
+    return &_worldPacket;
+}
+
+void SetWarMode::Read()
+{
+    Enable = _worldPacket.ReadBit();
 }
 }
 }

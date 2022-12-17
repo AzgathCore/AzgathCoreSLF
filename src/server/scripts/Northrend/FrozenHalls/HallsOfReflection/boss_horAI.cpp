@@ -30,7 +30,7 @@ void boss_horAI::Reset()
     me->SetImmuneToAll(true);
     me->SetReactState(REACT_PASSIVE);
     if (instance->GetData(DATA_WAVE_COUNT) != NOT_STARTED)
-        instance->ProcessEvent(nullptr, EVENT_DO_WIPE, nullptr);
+        instance->ProcessEvent(nullptr, EVENT_DO_WIPE);
 }
 
 void boss_horAI::DoAction(int32 actionId)
@@ -40,7 +40,7 @@ void boss_horAI::DoAction(int32 actionId)
         case ACTION_ENTER_COMBAT: // called by InstanceScript when boss shall enter in combat.
             me->SetImmuneToAll(false);
             me->SetReactState(REACT_AGGRESSIVE);
-            DoZoneInCombat(me);
+            DoZoneInCombat(me, 150.0f);
             break;
         default:
             break;

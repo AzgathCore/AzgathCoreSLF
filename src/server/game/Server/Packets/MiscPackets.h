@@ -21,15 +21,18 @@
 #include "Packet.h"
 #include "CollectionMgr.h"
 #include "CUFProfile.h"
-#include "ItemPacketsCommon.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
+#include "ItemPackets.h"
 #include "PacketUtilities.h"
-#include "Player.h"
 #include "Position.h"
+#include "Unit.h"
+#include "Weather.h"
 #include "SharedDefines.h"
+#include "WorldSession.h"
 #include <array>
 #include <map>
+#include "InspectPackets.h"
 
 enum MountStatusFlags : uint8;
 enum UnitStandStateType : uint8;
@@ -185,8 +188,6 @@ namespace WorldPackets
 
             void Read() override;
 
-            TimePoint GetReceivedTime() const { return _worldPacket.GetReceivedTime(); }
-
             uint32 ClientTime = 0; // Client ticks in ms
             uint32 SequenceIndex = 0; // Same index as in request
         };
@@ -199,7 +200,6 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             uint32 CinematicID = 0;
-            ObjectGuid ConversationGuid;
         };
 
         class TriggerMovie final : public ServerPacket
@@ -262,7 +262,7 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             uint32 DifficultyID     = 0;
-            bool IsTournamentRealm  = false;
+            uint8 IsTournamentRealm = 0;
             bool XRealmPvpAlert     = false;
             bool BlockExitingLoadingScreen = false;     // when set to true, sending SMSG_UPDATE_OBJECT with CreateObject Self bit = true will not hide loading screen
                                                         // instead it will be done after this packet is sent again with false in this bit and SMSG_UPDATE_OBJECT Values for player
@@ -503,13 +503,13 @@ namespace WorldPackets
         class LevelUpInfo final : public ServerPacket
         {
         public:
-            LevelUpInfo() : ServerPacket(SMSG_LEVEL_UP_INFO, 60) { }
+            LevelUpInfo() : ServerPacket(SMSG_LEVEL_UP_INFO, 56) { }
 
             WorldPacket const* Write() override;
 
             int32 Level = 0;
             int32 HealthDelta = 0;
-            std::array<int32, MAX_POWERS_PER_CLASS> PowerDelta = { };
+            std::array<int32, 6> PowerDelta = { };
             std::array<int32, MAX_STATS> StatDelta = { };
             int32 NumNewTalents = 0;
             int32 NumNewPvpTalentSlots = 0;
@@ -803,16 +803,6 @@ namespace WorldPackets
             bool EnablePVP = false;
         };
 
-        class SetWarMode final : public ClientPacket
-        {
-        public:
-            SetWarMode(WorldPacket&& packet) : ClientPacket(CMSG_SET_WAR_MODE, std::move(packet)) { }
-
-            void Read() override;
-
-            bool Enable = false;
-        };
-
         class AccountHeirloomUpdate final : public ServerPacket
         {
         public:
@@ -833,7 +823,6 @@ namespace WorldPackets
             void Read() override;
 
             Array<int32, 2> SpellVisualKitIDs;
-            int32 SequenceVariation = 0;
         };
 
         class SpecialMountAnim final : public ServerPacket
@@ -845,7 +834,6 @@ namespace WorldPackets
 
             ObjectGuid UnitGUID;
             std::vector<int32> SpellVisualKitIDs;
-            int32 SequenceVariation = 0;
         };
 
         class CrossedInebriationThreshold final : public ServerPacket
@@ -931,70 +919,326 @@ namespace WorldPackets
         class StartTimer final : public ServerPacket
         {
         public:
-            enum TimerType : int32
-            {
-                Pvp             = 0,
-                ChallengeMode   = 1,
-                PlayerCountdown = 2
-            };
-
             StartTimer() : ServerPacket(SMSG_START_TIMER, 12) { }
+
+            enum TimeType : uint8
+            {
+                TIMER_TYPE_BATTLEGROUND = 0,
+                TIMER_TYPE_CHALLENGE = 1,
+            };
 
             WorldPacket const* Write() override;
 
-            Duration<Seconds> TotalTime;
+            uint32 Type = 0;
             Duration<Seconds> TimeLeft;
-            TimerType Type = Pvp;
+            Duration<Seconds> TotalTime;
         };
 
-        class ConversationLineStarted final : public ClientPacket
+        class DiscardedTimeSyncAcks final : public ClientPacket
         {
         public:
-            ConversationLineStarted(WorldPacket&& packet) : ClientPacket(CMSG_CONVERSATION_LINE_STARTED, std::move(packet)) { }
+            DiscardedTimeSyncAcks(WorldPacket&& packet) : ClientPacket(CMSG_DISCARDED_TIME_SYNC_ACKS, std::move(packet)) { }
 
             void Read() override;
 
-            ObjectGuid ConversationGUID;
-            uint32 LineID = 0;
+            uint32 MaxSequenceIndex = 0;
         };
 
-        class RequestLatestSplashScreen final : public ClientPacket
+        struct VignetteInstanceIDList
         {
-        public:
-            RequestLatestSplashScreen(WorldPacket&& packet) : ClientPacket(CMSG_REQUEST_LATEST_SPLASH_SCREEN, std::move(packet)) { }
-
-            void Read() override { }
+            GuidVector IDs;
         };
 
-        class SplashScreenShowLatest final : public ServerPacket
+        struct VignetteClientData
+        {
+            VignetteClientData(ObjectGuid guid, Position pos, int32 vignetteID, int32 areaID) : ObjGUID(guid), Pos(pos), VignetteID(vignetteID), AreaID(areaID) { }
+
+            ObjectGuid ObjGUID;
+            TaggedPosition<Position::XYZ> Pos;
+            int32 VignetteID = 0;
+            uint32 AreaID = 0;
+            uint32 Unk901_1 = 0;
+            uint32 Unk901_2 = 0;
+        };
+
+        struct VignetteClientDataSet
+        {
+            VignetteInstanceIDList IdList;
+            std::vector<VignetteClientData> Data;
+        };
+
+        class VignetteUpdate  final : public ServerPacket
         {
         public:
-            SplashScreenShowLatest() : ServerPacket(SMSG_SPLASH_SCREEN_SHOW_LATEST, 4) { }
+            VignetteUpdate() : ServerPacket(SMSG_VIGNETTE_UPDATE, 20 + 1) { }
+            VignetteUpdate(bool update) : ServerPacket(SMSG_VIGNETTE_UPDATE, 20 + 1), ForceUpdate(update) { }
 
             WorldPacket const* Write() override;
 
-            int32 UISplashScreenID = 0;
+            VignetteClientDataSet Updated;
+            VignetteClientDataSet Added;
+            VignetteInstanceIDList Removed;
+            bool ForceUpdate = false;
+            bool UnkBit901 = false;
         };
 
-        class DisplayToast final : public ServerPacket
+        class StopElapsedTimer final : public ServerPacket
         {
         public:
-            DisplayToast() : ServerPacket(SMSG_DISPLAY_TOAST) { }
+            StopElapsedTimer() : ServerPacket(SMSG_STOP_ELAPSED_TIMER, 5) { }
 
             WorldPacket const* Write() override;
 
-            uint64 Quantity = 0;
-            ::DisplayToastMethod DisplayToastMethod = ::DisplayToastMethod::DoNotDisplay;
-            bool Mailed = false;
-            DisplayToastType Type = DisplayToastType::Money;
-            uint32 QuestID = 0;
-            bool IsSecondaryResult = false;
-            Item::ItemInstance Item;
-            bool BonusRoll = false;
-            int32 LootSpec = 0;
-            ::Gender Gender = GENDER_NONE;
-            uint32 CurrencyID = 0;
+            int32 TimerID = 0;
+            bool KeepTimer = false;
         };
+
+        struct ElaspedTimer
+        {
+            ElaspedTimer() { }
+            ElaspedTimer(uint32 timerID, time_t currentDuration) : TimerID(timerID), CurrentDuration(currentDuration) { }
+
+            uint32 TimerID = 0;
+            time_t CurrentDuration = time_t(0);
+        };
+
+        class StartElapsedTimer final : public ServerPacket
+        {
+        public:
+            StartElapsedTimer() : ServerPacket(SMSG_START_ELAPSED_TIMER, 12) { }
+
+            WorldPacket const* Write() override;
+
+            ElaspedTimer Timer;
+        };
+
+        class FactionSelectUI final : public ServerPacket
+        {
+        public:
+            FactionSelectUI() : ServerPacket(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI, 0) { }
+
+            WorldPacket const* Write() override { return &_worldPacket; }
+        };
+
+        class SetTaskComplete final : public ServerPacket
+        {
+        public:
+            SetTaskComplete() : ServerPacket(SMSG_SET_TASK_COMPLETE, 4) { }
+
+            WorldPacket const* Write() override;
+
+            int32 TaskID = 0;
+        };
+
+        struct TaskProgress
+        {
+            std::vector<uint16> Counts;
+            time_t FailureTime = time(nullptr);
+            uint32 TaskID = 0;
+            uint32 Flags = 0;
+        };
+
+        class SetAllTaskProgress final : public ServerPacket
+        {
+        public:
+            SetAllTaskProgress() : ServerPacket(SMSG_SET_ALL_TASK_PROGRESS, 4) { }
+
+            WorldPacket const* Write() override;
+
+            std::vector<TaskProgress> Progress;
+        };
+
+        class UpdateTaskProgress final : public ServerPacket
+        {
+        public:
+            UpdateTaskProgress() : ServerPacket(SMSG_UPDATE_TASK_PROGRESS, 4) { }
+
+            WorldPacket const* Write() override;
+
+            std::vector<TaskProgress> Progress;
+        };
+
+        class StreamingMovie final : public ServerPacket
+        {
+        public:
+            StreamingMovie() : ServerPacket(SMSG_STREAMING_MOVIES, 4) { }
+
+            WorldPacket const* Write() override;
+
+            std::vector<int16> MovieIDs;
+        };
+
+        class SetMaxWeeklyQuantity final : public ServerPacket
+        {
+        public:
+            SetMaxWeeklyQuantity() : ServerPacket(SMSG_SET_MAX_WEEKLY_QUANTITY, 8) { }
+
+            WorldPacket const* Write() override;
+
+            uint32 Type = 0;
+            int32 MaxWeeklyQuantity = 0;
+        };
+
+        struct ReqResearchHistory
+        {
+            uint32 id = 0;
+            uint32 time = 0;
+            uint32 count = 0;
+        };
+
+        class ResearchSetupHistory final : public ServerPacket
+        {
+        public:
+
+            ResearchSetupHistory() : ServerPacket(SMSG_SETUP_RESEARCH_HISTORY) { }
+
+            WorldPacket const* Write() override;
+
+            WorldPackets::Misc::ReqResearchHistory researchHistory;
+            std::vector<ReqResearchHistory> ResearchHistory;
+        };
+
+        class PlayerSkinned final : public ServerPacket
+        {
+        public:
+            PlayerSkinned() : ServerPacket(SMSG_PLAYER_SKINNED, 1) { }
+
+            WorldPacket const* Write() override;
+
+            bool FreeRepop = false;
+        };
+
+        class ChromieTimeSelectExpansion final : public ClientPacket
+             {
+        public:
+            ChromieTimeSelectExpansion(WorldPacket && packet) : ClientPacket(CMSG_CHROMIE_TIME_SELECT_EXPANSION, std::move(packet)) { }
+            
+                void Read() override;
+            
+                ObjectGuid ObjGUID;
+                uint32 Expansion = 0;
+            };
+        
+            class ChromieTimeOpenNpc  final : public ServerPacket
+            {
+            public:
+                ChromieTimeOpenNpc() : ServerPacket(SMSG_CHROMIE_TIME_OPEN_NPC, 11) { }
+                
+                    WorldPacket const* Write() override;
+                
+                    ObjectGuid ObjGUID;
+            };
+        
+            class ChromieTimeSelectExpansionSuccess  final : public ServerPacket
+             {
+            public:
+                ChromieTimeSelectExpansionSuccess() : ServerPacket(SMSG_CHROMIE_TIME_SELECT_EXPANSION_SUCCESS) { }
+                
+                WorldPacket const* Write() override;
+             };
+
+            class MapObjEvents final : public ServerPacket
+            {
+            public:
+                MapObjEvents() : ServerPacket(SMSG_MAP_OBJ_EVENTS, 12) { }
+
+                WorldPacket const* Write() override;
+
+                uint32 UniqueID = 0;
+                uint32 DataSize = 0;
+                std::vector<uint8> Unk2;
+            };
+
+            struct ResearchHistory
+            {
+                int32 ProjectID = 0;
+                int32 CompletionCount = 0;
+                time_t FirstCompleted = time_t(0);
+            };
+
+            class ResearchComplete final : public ServerPacket
+            {
+            public:
+                ResearchComplete() : ServerPacket(SMSG_RESEARCH_COMPLETE, 12) { }
+
+                WorldPacket const* Write() override;
+
+                ResearchHistory Research;
+            };
+
+            class IslandOnQueue final : public ClientPacket
+            {
+            public:
+                IslandOnQueue(WorldPacket&& packet) : ClientPacket(CMSG_ISLAND_QUEUE, std::move(packet)) { }
+
+                void Read() override;
+
+                ObjectGuid QueueNPCGuid;
+                int32 ActivityID = 0;
+            };
+
+            class IslandOpenNpc final : public ServerPacket
+            {
+            public:
+                IslandOpenNpc(ObjectGuid guid) : ServerPacket(SMSG_ISLANDS_MISSION_NPC, 36), QueueNPCGuid(guid) { }
+
+                WorldPacket const* Write() override;
+
+                ObjectGuid QueueNPCGuid;
+            };
+
+            class IslandAzeriteXpGain final : public ServerPacket
+            {
+            public:
+                IslandAzeriteXpGain() : ServerPacket(SMSG_ISLAND_AZERITE_GAIN, 4 + 36 + 36 + 4) { }
+
+                WorldPacket const* Write() override;
+
+                int32 XpGain = 0;
+                ObjectGuid PlayerGuid;
+                ObjectGuid SourceGuid;
+                int32 SourceID = 0;
+            };
+
+            class IslandCompleted final : public ServerPacket
+            {
+            public:
+                IslandCompleted() : ServerPacket(SMSG_ISLAND_COMPLETE) { }
+
+                WorldPacket const* Write() override;
+
+                int32 MapID = 0;
+                int32 Winner = 0;
+                //uint32 GroupTeamSize = 0; DisplayInfos.size()
+
+                //WorldPackets::Inspect::PlayerModelDisplayInfo::Initialize(Player const* player)
+                std::vector<WorldPackets::Inspect::PlayerModelDisplayInfo> DisplayInfos;
+            };
+
+            class ShowTradeSkillResponse final : public ServerPacket
+            {
+            public:
+                ShowTradeSkillResponse() : ServerPacket(SMSG_SHOW_TRADE_SKILL_RESPONSE, 16 + 4 + 12) { }
+
+                WorldPacket const* Write() override;
+
+                ObjectGuid PlayerGUID;
+                uint32 SpellId = 0;
+                std::vector<int32> SkillLineIDs;
+                std::vector<int32> SkillRanks;
+                std::vector<int32> SkillMaxRanks;
+                std::vector<int32> KnownAbilitySpellIDs;
+            };
+
+            class DismountResult final : public ServerPacket
+            {
+            public:
+                DismountResult() : ServerPacket(SMSG_DISMOUNT_RESULT, 4) { }
+
+                WorldPacket const* Write() override;
+
+                uint32 Result = 0;
+            };
     }
 }
 

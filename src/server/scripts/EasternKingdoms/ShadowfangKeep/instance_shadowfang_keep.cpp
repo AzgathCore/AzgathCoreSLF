@@ -30,6 +30,7 @@ EndScriptData */
 #include "Map.h"
 #include "ScriptedCreature.h"
 #include "TemporarySummon.h"
+#include <sstream>
 
 #define MAX_ENCOUNTER              4
 
@@ -83,11 +84,14 @@ public:
         instance_shadowfang_keep_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
-            SetBossNumber(MAX_ENCOUNTER);
+            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
             uiPhase = 0;
             uiTimer = 0;
         }
+
+        uint32 m_auiEncounter[MAX_ENCOUNTER];
+        std::string str_data;
 
         ObjectGuid uiAshGUID;
         ObjectGuid uiAdaGUID;
@@ -116,17 +120,17 @@ public:
             {
                 case GO_COURTYARD_DOOR:
                     DoorCourtyardGUID = go->GetGUID();
-                    if (GetBossState(0) == DONE)
+                    if (m_auiEncounter[0] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_SORCERER_DOOR:
                     DoorSorcererGUID = go->GetGUID();
-                    if (GetBossState(2) == DONE)
+                    if (m_auiEncounter[2] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ARUGAL_DOOR:
                     DoorArugalGUID = go->GetGUID();
-                    if (GetBossState(3) == DONE)
+                    if (m_auiEncounter[3] == DONE)
                         HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
             }
@@ -151,12 +155,12 @@ public:
                 case TYPE_FREE_NPC:
                     if (data == DONE)
                         DoUseDoorOrButton(DoorCourtyardGUID);
-                    SetBossState(0, EncounterState(data));
+                    m_auiEncounter[0] = data;
                     break;
                 case TYPE_RETHILGORE:
                     if (data == DONE)
                         DoSpeech();
-                    SetBossState(1, EncounterState(data));
+                    m_auiEncounter[1] = data;
                     break;
                 case TYPE_FENRUS:
                     switch (data)
@@ -169,13 +173,26 @@ public:
                             DoUseDoorOrButton(DoorSorcererGUID);
                             break;
                     }
-                    SetBossState(2, EncounterState(data));
+                    m_auiEncounter[2] = data;
                     break;
                 case TYPE_NANDOS:
                     if (data == DONE)
                         DoUseDoorOrButton(DoorArugalGUID);
-                    SetBossState(3, EncounterState(data));
+                    m_auiEncounter[3] = data;
                     break;
+            }
+
+            if (data == DONE)
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::ostringstream saveStream;
+                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3];
+
+                str_data = saveStream.str();
+
+                SaveToDB();
+                OUT_SAVE_INST_DATA_COMPLETE;
             }
         }
 
@@ -184,15 +201,42 @@ public:
             switch (type)
             {
                 case TYPE_FREE_NPC:
-                    return GetBossState(0);
+                    return m_auiEncounter[0];
                 case TYPE_RETHILGORE:
-                    return GetBossState(1);
+                    return m_auiEncounter[1];
                 case TYPE_FENRUS:
-                    return GetBossState(2);
+                    return m_auiEncounter[2];
                 case TYPE_NANDOS:
-                    return GetBossState(3);
+                    return m_auiEncounter[3];
             }
             return 0;
+        }
+
+        std::string GetSaveData() override
+        {
+            return str_data;
+        }
+
+        void Load(char const* in) override
+        {
+            if (!in)
+            {
+                OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
+
+            OUT_LOAD_INST_DATA(in);
+
+            std::istringstream loadStream(in);
+            loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3];
+
+            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+            {
+                if (m_auiEncounter[i] == IN_PROGRESS)
+                    m_auiEncounter[i] = NOT_STARTED;
+            }
+
+            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
         void Update(uint32 uiDiff) override
@@ -213,7 +257,7 @@ public:
                     {
                         case 1:
                         {
-                            Creature* summon = pArchmage->SummonCreature(pArchmage->GetEntry(), SpawnLocation[4], TEMPSUMMON_TIMED_DESPAWN, 10s);
+                            Creature* summon = pArchmage->SummonCreature(pArchmage->GetEntry(), SpawnLocation[4], TEMPSUMMON_TIMED_DESPAWN, 10000);
                             summon->SetImmuneToPC(true);
                             summon->SetReactState(REACT_DEFENSIVE);
                             summon->CastSpell(summon, SPELL_ASHCROMBE_TELEPORT, true);
@@ -224,10 +268,10 @@ public:
                         }
                         case 2:
                         {
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1min);
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1min);
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1min);
-                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1min);
+                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                            pArchmage->SummonCreature(NPC_ARUGAL_VOIDWALKER, SpawnLocation[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
                             uiPhase = 0;
                             break;
                         }

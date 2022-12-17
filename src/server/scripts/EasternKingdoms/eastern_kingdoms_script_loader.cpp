@@ -183,26 +183,42 @@ void AddSC_boss_wushoolay();
 void AddSC_boss_zanzil();
 void AddSC_instance_zulgurub();
 //void AddSC_alterac_mountains();
-//void AddSC_arathi_highlands();
+void AddSC_arathi_highlands();
 void AddSC_blasted_lands();
 void AddSC_burning_steppes();
 void AddSC_dun_morogh();
 void AddSC_dun_morogh_area_coldridge_valley();
 void AddSC_duskwood();
-void AddSC_eastern_plaguelands();
-void AddSC_elwynn_forest();
-void AddSC_eversong_woods();
-//void AddSC_ghostlands();
+//void AddSC_eastern_plaguelands();
+void AddSC_ghostlands();
 void AddSC_hinterlands();
-void AddSC_isle_of_queldanas();
 void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
-//void AddSC_swamp_of_sorrows();
+void AddSC_swamp_of_sorrows();
 void AddSC_tirisfal_glades();
 void AddSC_tol_barad();
 void AddSC_undercity();
-//void AddSC_western_plaguelands();
+void AddSC_western_plaguelands();
+void AddSC_wetlands();
+void AddSC_zone_gilneas_duskhaven();            //Gilneas
+void AddSC_zone_gilneas_city1();
+void AddSC_zone_gilneas_city2();
+void AddSC_zone_gilneas_city3();
+void AddSC_boss_chogall();
+void AddSC_boss_ascendant_council();
+void AddSC_boss_halfus_wyrmbreaker();
+void AddSC_boss_sinestra();
+void AddSC_boss_theralion();
+void AddSC_instance_the_bastion_of_twilight();
+void AddSC_instance_blackwing_descent();        //Blackwing Descent
+void AddSC_boss_omnotron_defense_system();
+void AddSC_boss_magmaw();
+void AddSC_boss_chimaeron();
+void AddSC_boss_maloriak();
+void AddSC_boss_atramedes();
+void AddSC_boss_bd_nefarian();
+void AddSC_blackwing_descent();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -376,24 +392,40 @@ void AddEasternKingdomsScripts()
     AddSC_instance_zulgurub();
 
     //AddSC_alterac_mountains();
-    //AddSC_arathi_highlands();
+    AddSC_arathi_highlands();
     AddSC_blasted_lands();
     AddSC_burning_steppes();
     AddSC_dun_morogh();
     AddSC_dun_morogh_area_coldridge_valley();
     AddSC_duskwood();
-    AddSC_eastern_plaguelands();
-    AddSC_elwynn_forest();
-    AddSC_eversong_woods();
-    //AddSC_ghostlands();
+    //AddSC_eastern_plaguelands();
+    AddSC_ghostlands();
     AddSC_hinterlands();
-    AddSC_isle_of_queldanas();
     AddSC_redridge_mountains();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
-    //AddSC_swamp_of_sorrows();
+    AddSC_swamp_of_sorrows();
     AddSC_tirisfal_glades();
     AddSC_tol_barad();
     AddSC_undercity();
-    //AddSC_western_plaguelands();
+    AddSC_western_plaguelands();
+    AddSC_wetlands();
+    AddSC_zone_gilneas_duskhaven();             //Gilneas
+    AddSC_zone_gilneas_city1();
+    AddSC_zone_gilneas_city2();
+    AddSC_zone_gilneas_city3();
+    AddSC_boss_chogall();
+    AddSC_boss_ascendant_council();
+    AddSC_boss_halfus_wyrmbreaker();
+    AddSC_boss_sinestra();
+    AddSC_boss_theralion();
+    AddSC_instance_the_bastion_of_twilight();
+    AddSC_instance_blackwing_descent();         //Blackwing Descent
+    AddSC_boss_omnotron_defense_system();
+    AddSC_boss_magmaw();
+    AddSC_boss_chimaeron();
+    AddSC_boss_maloriak();
+    AddSC_boss_atramedes();
+    AddSC_boss_bd_nefarian();
+    AddSC_blackwing_descent();
 }

@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Scripts for spells with SPELLFAMILY_HUNTER, SPELLFAMILY_PET and SPELLFAMILY_GENERIC spells used by hunter players.
- * Ordered alphabetically using scriptname.
- * Scriptnames of files in this file should be prefixed with "spell_hun_".
- */
+ /*
+  * Scripts for spells with SPELLFAMILY_HUNTER, SPELLFAMILY_PET and SPELLFAMILY_GENERIC spells used by hunter players.
+  * Ordered alphabetically using scriptname.
+  * Scriptnames of files in this file should be prefixed with "spell_hun_".
+  */
 
 #include "ScriptMgr.h"
 #include "CellImpl.h"
@@ -27,604 +27,669 @@
 #include "Pet.h"
 #include "SpellAuraEffects.h"
 #include "SpellHistory.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 enum HunterSpells
 {
-    SPELL_HUNTER_A_MURDER_OF_CROWS_DAMAGE           = 131900,
-    SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_1         = 131637,
-    SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_2         = 131951,
-    SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_3         = 131952,
-    SPELL_HUNTER_ASPECT_CHEETAH_SLOW                = 186258,
-    SPELL_HUNTER_EXHILARATION                       = 109304,
-    SPELL_HUNTER_EXHILARATION_PET                   = 128594,
-    SPELL_HUNTER_EXHILARATION_R2                    = 231546,
-    SPELL_HUNTER_LONE_WOLF                          = 155228,
-    SPELL_HUNTER_MASTERS_CALL_TRIGGERED             = 62305,
-    SPELL_HUNTER_MISDIRECTION                       = 34477,
-    SPELL_HUNTER_MISDIRECTION_PROC                  = 35079,
-    SPELL_HUNTER_MULTI_SHOT_FOCUS                   = 213363,
-    SPELL_HUNTER_PET_LAST_STAND_TRIGGERED           = 53479,
+    SPELL_HUNTER_ASPECT_CHEETAH_SLOW = 186258,
+    SPELL_HUNTER_EXHILARATION = 109304,
+    SPELL_HUNTER_EXHILARATION_PET = 128594,
+    SPELL_HUNTER_EXHILARATION_R2 = 231546,
+    SPELL_HUNTER_LONE_WOLF = 155228,
+    SPELL_HUNTER_MASTERS_CALL_TRIGGERED = 62305,
+    SPELL_HUNTER_MISDIRECTION = 34477,
+    SPELL_HUNTER_MISDIRECTION_PROC = 35079,
+    SPELL_HUNTER_MULTI_SHOT_FOCUS = 213363,
+    SPELL_HUNTER_PET_LAST_STAND_TRIGGERED = 53479,
     SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED = 54114,
-    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF    = 55711,
-    SPELL_HUNTER_POSTHASTE_INCREASE_SPEED           = 118922,
-    SPELL_HUNTER_POSTHASTE_TALENT                   = 109215,
-    SPELL_HUNTER_STEADY_SHOT_FOCUS                  = 77443,
-    SPELL_HUNTER_T9_4P_GREATNESS                    = 68130,
-    SPELL_ROAR_OF_SACRIFICE_TRIGGERED               = 67481
+    SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF = 55711,
+    SPELL_HUNTER_STEADY_SHOT_FOCUS = 77443,
+    SPELL_HUNTER_T9_4P_GREATNESS = 68130,
+    SPELL_HUNTER_RAPID_FIRE_MISSILE = 257045,
+    SPELL_ROAR_OF_SACRIFICE_TRIGGERED = 67481
 };
 
 enum MiscSpells
 {
-    SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
-    SPELL_MAGE_TEMPORAL_DISPLACEMENT                = 80354,
-    SPELL_SHAMAN_EXHAUSTION                         = 57723,
-    SPELL_SHAMAN_SATED                              = 57724
-};
-
-// 131894 - A Murder of Crows
-class spell_hun_a_murder_of_crows : public AuraScript
-{
-    PrepareAuraScript(spell_hun_a_murder_of_crows);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo
-        ({
-            SPELL_HUNTER_A_MURDER_OF_CROWS_DAMAGE,
-            SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_1,
-            SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_2,
-            SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_3
-        });
-    }
-
-    void HandleDummyTick(AuraEffect const* /*aurEff*/)
-    {
-        Unit* target = GetTarget();
-
-        if (Unit* caster = GetCaster())
-            caster->CastSpell(target, SPELL_HUNTER_A_MURDER_OF_CROWS_DAMAGE, true);
-
-        target->CastSpell(target, SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_1, true);
-        target->CastSpell(target, SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_2, true);
-        target->CastSpell(target, SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_3, true);
-        target->CastSpell(target, SPELL_HUNTER_A_MURDER_OF_CROWS_VISUAL_3, true); // not a mistake, it is intended to cast twice
-    }
-
-    void RemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-            if (Unit* caster = GetCaster())
-                caster->GetSpellHistory()->ResetCooldown(GetId(), true);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hun_a_murder_of_crows::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        OnEffectRemove += AuraEffectRemoveFn(spell_hun_a_murder_of_crows::RemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
+    SPELL_DRAENEI_GIFT_OF_THE_NAARU = 59543,
+    SPELL_MAGE_TEMPORAL_DISPLACEMENT = 80354,
+    SPELL_SHAMAN_EXHAUSTION = 57723,
+    SPELL_SHAMAN_SATED = 57724
 };
 
 // 186257 - Aspect of the Cheetah
-class spell_hun_aspect_cheetah : public AuraScript
+class spell_hun_aspect_cheetah : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hun_aspect_cheetah);
+public:
+    spell_hun_aspect_cheetah() : SpellScriptLoader("spell_hun_aspect_cheetah") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_aspect_cheetah_AuraScript : public AuraScript
     {
-        return ValidateSpellInfo
-        ({
-            SPELL_HUNTER_ASPECT_CHEETAH_SLOW
-        });
-    }
+        PrepareAuraScript(spell_hun_aspect_cheetah_AuraScript);
 
-    void HandleOnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-            GetTarget()->CastSpell(GetTarget(), SPELL_HUNTER_ASPECT_CHEETAH_SLOW, true);
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo
+            ({
+                SPELL_HUNTER_ASPECT_CHEETAH_SLOW
+                });
+        }
 
-    void Register() override
+        void HandleOnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+                GetTarget()->CastSpell(GetTarget(), SPELL_HUNTER_ASPECT_CHEETAH_SLOW, true);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_hun_aspect_cheetah_AuraScript::HandleOnRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_hun_aspect_cheetah::HandleOnRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        return new spell_hun_aspect_cheetah_AuraScript();
     }
 };
 
 // 109304 - Exhilaration
-class spell_hun_exhilaration : public SpellScript
+class spell_hun_exhilaration : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_exhilaration);
+public:
+    spell_hun_exhilaration() : SpellScriptLoader("spell_hun_exhilaration") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_exhilaration_SpellScript : public SpellScript
     {
-        return ValidateSpellInfo({ SPELL_HUNTER_EXHILARATION_R2, SPELL_HUNTER_LONE_WOLF });
-    }
+        PrepareSpellScript(spell_hun_exhilaration_SpellScript);
 
-    void HandleOnHit()
-    {
-        if (GetCaster()->HasAura(SPELL_HUNTER_EXHILARATION_R2) && !GetCaster()->HasAura(SPELL_HUNTER_LONE_WOLF))
-            GetCaster()->CastSpell(nullptr, SPELL_HUNTER_EXHILARATION_PET, true);
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_EXHILARATION_R2, SPELL_HUNTER_LONE_WOLF });
+        }
 
-    void Register() override
+        void HandleOnHit()
+        {
+            if (GetCaster()->HasAura(SPELL_HUNTER_EXHILARATION_R2) && !GetCaster()->HasAura(SPELL_HUNTER_LONE_WOLF))
+                GetCaster()->CastSpell(nullptr, SPELL_HUNTER_EXHILARATION_PET, true);
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_hun_exhilaration_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnHit += SpellHitFn(spell_hun_exhilaration::HandleOnHit);
+        return new spell_hun_exhilaration_SpellScript();
     }
 };
 
 // 212658 - Hunting Party
-class spell_hun_hunting_party : public AuraScript
+class spell_hun_hunting_party : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hun_hunting_party);
+public:
+    spell_hun_hunting_party() : SpellScriptLoader("spell_hun_hunting_party") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_hunting_party_AuraScript : public AuraScript
     {
-        return ValidateSpellInfo(
+        PrepareAuraScript(spell_hun_hunting_party_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            SPELL_HUNTER_EXHILARATION,
-            SPELL_HUNTER_EXHILARATION_PET
-        });
-    }
+            return ValidateSpellInfo(
+                {
+                    SPELL_HUNTER_EXHILARATION,
+                    SPELL_HUNTER_EXHILARATION_PET
+                });
+        }
 
-    void HandleProc(AuraEffect* aurEff, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-        GetTarget()->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_EXHILARATION, -Seconds(aurEff->GetAmount()));
-        GetTarget()->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_EXHILARATION_PET, -Seconds(aurEff->GetAmount()));
-    }
+        void HandleProc(AuraEffect* aurEff, ProcEventInfo& /*eventInfo*/)
+        {
+            PreventDefaultAction();
+            GetTarget()->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_EXHILARATION, -Seconds(aurEff->GetAmount()));
+            GetTarget()->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_EXHILARATION_PET, -Seconds(aurEff->GetAmount()));
+        }
 
-    void Register() override
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_hun_hunting_party_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        OnEffectProc += AuraEffectProcFn(spell_hun_hunting_party::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        return new spell_hun_hunting_party_AuraScript();
     }
 };
 
 // 53478 - Last Stand Pet
-class spell_hun_last_stand_pet : public SpellScript
+class spell_hun_last_stand_pet : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_last_stand_pet);
+public:
+    spell_hun_last_stand_pet() : SpellScriptLoader("spell_hun_last_stand_pet") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_last_stand_pet_SpellScript : public SpellScript
     {
-        return ValidateSpellInfo({ SPELL_HUNTER_PET_LAST_STAND_TRIGGERED });
-    }
+        PrepareSpellScript(spell_hun_last_stand_pet_SpellScript);
 
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        Unit* caster = GetCaster();
-        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-        args.AddSpellBP0(caster->CountPctFromMaxHealth(30));
-        caster->CastSpell(caster, SPELL_HUNTER_PET_LAST_STAND_TRIGGERED, args);
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_PET_LAST_STAND_TRIGGERED });
+        }
 
-    void Register() override
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+            args.SpellValueOverrides.AddBP0(caster->CountPctFromMaxHealth(30));
+            caster->CastSpell(caster, SPELL_HUNTER_PET_LAST_STAND_TRIGGERED, args);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_hun_last_stand_pet_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_hun_last_stand_pet::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        return new spell_hun_last_stand_pet_SpellScript();
     }
 };
 
 // 53271 - Masters Call
-class spell_hun_masters_call : public SpellScript
+class spell_hun_masters_call : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_masters_call);
+public:
+    spell_hun_masters_call() : SpellScriptLoader("spell_hun_masters_call") { }
 
-    bool Validate(SpellInfo const* spellInfo) override
+    class spell_hun_masters_call_SpellScript : public SpellScript
     {
-        return !spellInfo->GetEffects().empty()
-            && ValidateSpellInfo({ SPELL_HUNTER_MASTERS_CALL_TRIGGERED, uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
-    }
+        PrepareSpellScript(spell_hun_masters_call_SpellScript);
 
-    bool Load() override
+        bool Validate(SpellInfo const* spellInfo) override
+        {
+            return spellInfo->GetEffect(EFFECT_0) && ValidateSpellInfo({ SPELL_HUNTER_MASTERS_CALL_TRIGGERED, uint32(spellInfo->GetEffect(EFFECT_0)->CalcValue()) });
+        }
+
+        bool Load() override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        SpellCastResult DoCheckCast()
+        {
+            Guardian* pet = GetCaster()->ToPlayer()->GetGuardianPet();
+            ASSERT(pet); // checked in Spell::CheckCast
+
+            if (!pet->IsPet() || !pet->IsAlive())
+                return SPELL_FAILED_NO_PET;
+
+            // Do a mini Spell::CheckCasterAuras on the pet, no other way of doing this
+            SpellCastResult result = SPELL_CAST_OK;
+            uint32 const unitflag = pet->m_unitData->Flags;
+            if (!pet->GetCharmerGUID().IsEmpty())
+                result = SPELL_FAILED_CHARMED;
+            else if (unitflag & UNIT_FLAG_STUNNED)
+                result = SPELL_FAILED_STUNNED;
+            else if (unitflag & UNIT_FLAG_FLEEING)
+                result = SPELL_FAILED_FLEEING;
+            else if (unitflag & UNIT_FLAG_CONFUSED)
+                result = SPELL_FAILED_CONFUSED;
+
+            if (result != SPELL_CAST_OK)
+                return result;
+
+            Unit* target = GetExplTargetUnit();
+            if (!target)
+                return SPELL_FAILED_BAD_TARGETS;
+
+            if (!pet->IsWithinLOSInMap(target))
+                return SPELL_FAILED_LINE_OF_SIGHT;
+
+            return SPELL_CAST_OK;
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->ToPlayer()->GetPet()->CastSpell(GetHitUnit(), GetEffectValue(), true);
+        }
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            GetHitUnit()->CastSpell(nullptr, SPELL_HUNTER_MASTERS_CALL_TRIGGERED, true);
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_hun_masters_call_SpellScript::DoCheckCast);
+
+            OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-    }
-
-    SpellCastResult DoCheckCast()
-    {
-        Guardian* pet = GetCaster()->ToPlayer()->GetGuardianPet();
-        ASSERT(pet); // checked in Spell::CheckCast
-
-        if (!pet->IsPet() || !pet->IsAlive())
-            return SPELL_FAILED_NO_PET;
-
-        // Do a mini Spell::CheckCasterAuras on the pet, no other way of doing this
-        SpellCastResult result = SPELL_CAST_OK;
-        uint32 const unitflag = pet->m_unitData->Flags;
-        if (!pet->GetCharmerGUID().IsEmpty())
-            result = SPELL_FAILED_CHARMED;
-        else if (unitflag & UNIT_FLAG_STUNNED)
-            result = SPELL_FAILED_STUNNED;
-        else if (unitflag & UNIT_FLAG_FLEEING)
-            result = SPELL_FAILED_FLEEING;
-        else if (unitflag & UNIT_FLAG_CONFUSED)
-            result = SPELL_FAILED_CONFUSED;
-
-        if (result != SPELL_CAST_OK)
-            return result;
-
-        Unit* target = GetExplTargetUnit();
-        if (!target)
-            return SPELL_FAILED_BAD_TARGETS;
-
-        if (!pet->IsWithinLOSInMap(target))
-            return SPELL_FAILED_LINE_OF_SIGHT;
-
-        return SPELL_CAST_OK;
-    }
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        GetCaster()->ToPlayer()->GetPet()->CastSpell(GetHitUnit(), GetEffectValue(), true);
-    }
-
-    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-    {
-        GetHitUnit()->CastSpell(nullptr, SPELL_HUNTER_MASTERS_CALL_TRIGGERED, true);
-    }
-
-    void Register() override
-    {
-        OnCheckCast += SpellCheckCastFn(spell_hun_masters_call::DoCheckCast);
-
-        OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        return new spell_hun_masters_call_SpellScript();
     }
 };
 
 // 34477 - Misdirection
-class spell_hun_misdirection : public AuraScript
+class spell_hun_misdirection : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hun_misdirection);
+public:
+    spell_hun_misdirection() : SpellScriptLoader("spell_hun_misdirection") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_misdirection_AuraScript : public AuraScript
     {
-        return ValidateSpellInfo({ SPELL_HUNTER_MISDIRECTION_PROC });
-    }
+        PrepareAuraScript(spell_hun_misdirection_AuraScript);
 
-    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_MISDIRECTION_PROC });
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT || GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_INTERRUPT)
+                return;
+
+            if (!GetTarget()->HasAura(SPELL_HUNTER_MISDIRECTION_PROC))
+                GetTarget()->GetThreatManager().UnregisterRedirectThreat(SPELL_HUNTER_MISDIRECTION);
+        }
+
+        void HandleProc(AuraEffect* aurEff, ProcEventInfo& /*eventInfo*/)
+        {
+            PreventDefaultAction();
+            GetTarget()->CastSpell(GetTarget(), SPELL_HUNTER_MISDIRECTION_PROC, aurEff);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_hun_misdirection_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectProc += AuraEffectProcFn(spell_hun_misdirection_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT || GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_INTERRUPT)
-            return;
-
-        if (!GetTarget()->HasAura(SPELL_HUNTER_MISDIRECTION_PROC))
-            GetTarget()->GetThreatManager().UnregisterRedirectThreat(SPELL_HUNTER_MISDIRECTION);
-    }
-
-    void HandleProc(AuraEffect* aurEff, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_HUNTER_MISDIRECTION_PROC, aurEff);
-    }
-
-    void Register() override
-    {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_hun_misdirection::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectProc += AuraEffectProcFn(spell_hun_misdirection::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        return new spell_hun_misdirection_AuraScript();
     }
 };
 
 // 35079 - Misdirection (Proc)
-class spell_hun_misdirection_proc : public AuraScript
+class spell_hun_misdirection_proc : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hun_misdirection_proc);
+public:
+    spell_hun_misdirection_proc() : SpellScriptLoader("spell_hun_misdirection_proc") { }
 
-    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    class spell_hun_misdirection_proc_AuraScript : public AuraScript
     {
-        GetTarget()->GetThreatManager().UnregisterRedirectThreat(SPELL_HUNTER_MISDIRECTION);
-    }
+        PrepareAuraScript(spell_hun_misdirection_proc_AuraScript);
 
-    void Register() override
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->GetThreatManager().UnregisterRedirectThreat(SPELL_HUNTER_MISDIRECTION);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_hun_misdirection_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_hun_misdirection_proc::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        return new spell_hun_misdirection_proc_AuraScript();
     }
 };
 
 // 2643 - Multi-Shot
-class spell_hun_multi_shot : public SpellScript
+class spell_hun_multi_shot : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_multi_shot);
+public:
+    spell_hun_multi_shot() : SpellScriptLoader("spell_hun_multi_shot") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_multi_shot_SpellScript : public SpellScript
     {
-        return ValidateSpellInfo({ SPELL_HUNTER_MULTI_SHOT_FOCUS });
-    }
+        PrepareSpellScript(spell_hun_multi_shot_SpellScript);
 
-    bool Load() override
-    {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_MULTI_SHOT_FOCUS });
+        }
 
-    void HandleOnHit()
-    {
-        // We need to check hunter's spec because it doesn't generate focus on other specs than MM
-        if (GetCaster()->ToPlayer()->GetPrimarySpecialization() == TALENT_SPEC_HUNTER_MARKSMAN)
-            GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_MULTI_SHOT_FOCUS, true);
-    }
+        bool Load() override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
 
-    void Register() override
+        void HandleOnHit()
+        {
+            // We need to check hunter's spec because it doesn't generate focus on other specs than MM
+            if (GetCaster()->ToPlayer()->GetPrimarySpecialization() == TALENT_SPEC_HUNTER_MARKSMAN)
+                GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_MULTI_SHOT_FOCUS, true);
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_hun_multi_shot_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnHit += SpellHitFn(spell_hun_multi_shot::HandleOnHit);
+        return new spell_hun_multi_shot_SpellScript();
     }
 };
 
 // 55709 - Pet Heart of the Phoenix
-class spell_hun_pet_heart_of_the_phoenix : public SpellScript
+class spell_hun_pet_heart_of_the_phoenix : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_pet_heart_of_the_phoenix);
+public:
+    spell_hun_pet_heart_of_the_phoenix() : SpellScriptLoader("spell_hun_pet_heart_of_the_phoenix") { }
 
-    bool Load() override
+    class spell_hun_pet_heart_of_the_phoenix_SpellScript : public SpellScript
     {
-        if (!GetCaster()->IsPet())
-            return false;
-        return true;
-    }
+        PrepareSpellScript(spell_hun_pet_heart_of_the_phoenix_SpellScript);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED, SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF });
-    }
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        Unit* caster = GetCaster();
-        if (Unit* owner = caster->GetOwner())
+        bool Load() override
         {
-            if (!caster->HasAura(SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF))
+            if (!GetCaster()->IsPet())
+                return false;
+            return true;
+        }
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED, SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF });
+        }
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (Unit* owner = caster->GetOwner())
             {
-                CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                args.AddSpellBP0(100);
-                owner->CastSpell(caster, SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED, args);
-                caster->CastSpell(caster, SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF, true);
+                if (!caster->HasAura(SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF))
+                {
+                    CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+                    args.SpellValueOverrides.AddBP0(100);
+                    owner->CastSpell(caster, SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED, args);
+                    caster->CastSpell(caster, SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF, true);
+                }
             }
         }
-    }
 
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_hun_pet_heart_of_the_phoenix::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
-// 781 - Disengage
-class spell_hun_posthaste : public SpellScript
-{
-    PrepareSpellScript(spell_hun_posthaste);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_HUNTER_POSTHASTE_TALENT, SPELL_HUNTER_POSTHASTE_INCREASE_SPEED });
-    }
-
-    void HandleAfterCast()
-    {
-        if (GetCaster()->HasAura(SPELL_HUNTER_POSTHASTE_TALENT))
+        void Register() override
         {
-            GetCaster()->RemoveMovementImpairingAuras(true);
-            GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_POSTHASTE_INCREASE_SPEED, GetSpell());
+            OnEffectHitTarget += SpellEffectFn(spell_hun_pet_heart_of_the_phoenix_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
-    }
+    };
 
-    void Register() override
+    SpellScript* GetSpellScript() const override
     {
-        AfterCast += SpellCastFn(spell_hun_posthaste::HandleAfterCast);
+        return new spell_hun_pet_heart_of_the_phoenix_SpellScript();
     }
 };
 
 // 53480 - Roar of Sacrifice
-class spell_hun_roar_of_sacrifice : public AuraScript
+class spell_hun_roar_of_sacrifice : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hun_roar_of_sacrifice);
+public:
+    spell_hun_roar_of_sacrifice() : SpellScriptLoader("spell_hun_roar_of_sacrifice") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_roar_of_sacrifice_AuraScript : public AuraScript
     {
-        return ValidateSpellInfo({ SPELL_ROAR_OF_SACRIFICE_TRIGGERED });
-    }
+        PrepareAuraScript(spell_hun_roar_of_sacrifice_AuraScript);
 
-    bool CheckProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_ROAR_OF_SACRIFICE_TRIGGERED });
+        }
+
+        bool CheckProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !(damageInfo->GetSchoolMask() & aurEff->GetMiscValue()))
+                return false;
+
+            if (!GetCaster())
+                return false;
+
+            return true;
+        }
+
+        void HandleProc(AuraEffect* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            CastSpellExtraArgs args(aurEff);
+            args.SpellValueOverrides.AddBP0(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()));
+            eventInfo.GetActor()->CastSpell(GetCaster(), SPELL_ROAR_OF_SACRIFICE_TRIGGERED, args);
+        }
+
+        void Register() override
+        {
+            DoCheckEffectProc += AuraCheckEffectProcFn(spell_hun_roar_of_sacrifice_AuraScript::CheckProc, EFFECT_1, SPELL_AURA_DUMMY);
+            OnEffectProc += AuraEffectProcFn(spell_hun_roar_of_sacrifice_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !(damageInfo->GetSchoolMask() & aurEff->GetMiscValue()))
-            return false;
-
-        if (!GetCaster())
-            return false;
-
-        return true;
-    }
-
-    void HandleProc(AuraEffect* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        CastSpellExtraArgs args(aurEff);
-        args.AddSpellBP0(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()));
-        eventInfo.GetActor()->CastSpell(GetCaster(), SPELL_ROAR_OF_SACRIFICE_TRIGGERED, args);
-    }
-
-    void Register() override
-    {
-        DoCheckEffectProc += AuraCheckEffectProcFn(spell_hun_roar_of_sacrifice::CheckProc, EFFECT_1, SPELL_AURA_DUMMY);
-        OnEffectProc += AuraEffectProcFn(spell_hun_roar_of_sacrifice::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        return new spell_hun_roar_of_sacrifice_AuraScript();
     }
 };
 
 // 37506 - Scatter Shot
-class spell_hun_scatter_shot : public SpellScript
+class spell_hun_scatter_shot : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_scatter_shot);
+public:
+    spell_hun_scatter_shot() : SpellScriptLoader("spell_hun_scatter_shot") { }
 
-    bool Load() override
+    class spell_hun_scatter_shot_SpellScript : public SpellScript
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-    }
+        PrepareSpellScript(spell_hun_scatter_shot_SpellScript);
 
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        Player* caster = GetCaster()->ToPlayer();
-        // break Auto Shot and autohit
-        caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-        caster->AttackStop();
-        caster->SendAttackSwingCancelAttack();
-    }
+        bool Load() override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
 
-    void Register() override
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Player* caster = GetCaster()->ToPlayer();
+            // break Auto Shot and autohit
+            caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+            caster->AttackStop();
+            caster->SendAttackSwingCancelAttack();
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_hun_scatter_shot_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_hun_scatter_shot::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        return new spell_hun_scatter_shot_SpellScript();
     }
 };
 
 // 56641 - Steady Shot
-class spell_hun_steady_shot : public SpellScript
+class spell_hun_steady_shot : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_steady_shot);
+public:
+    spell_hun_steady_shot() : SpellScriptLoader("spell_hun_steady_shot") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_steady_shot_SpellScript : public SpellScript
     {
-        return ValidateSpellInfo({ SPELL_HUNTER_STEADY_SHOT_FOCUS });
-    }
+        PrepareSpellScript(spell_hun_steady_shot_SpellScript);
 
-    bool Load() override
-    {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_STEADY_SHOT_FOCUS });
+        }
 
-    void HandleOnHit()
-    {
-        GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_STEADY_SHOT_FOCUS, true);
-    }
+        bool Load() override
+        {
+            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
 
-    void Register() override
+        void HandleOnHit()
+        {
+            GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_STEADY_SHOT_FOCUS, true);
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_hun_steady_shot_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnHit += SpellHitFn(spell_hun_steady_shot::HandleOnHit);
+        return new spell_hun_steady_shot_SpellScript();
     }
 };
 
 // 1515 - Tame Beast
-class spell_hun_tame_beast : public SpellScript
+class spell_hun_tame_beast : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_hun_tame_beast);
+public:
+    spell_hun_tame_beast() : SpellScriptLoader("spell_hun_tame_beast") { }
 
-    static constexpr uint32 CallPetSpellIds[MAX_ACTIVE_PETS] =
+    class spell_hun_tame_beast_SpellScript : public SpellScript
     {
-        883,
-        83242,
-        83243,
-        83244,
-        83245,
-    };
+        PrepareSpellScript(spell_hun_tame_beast_SpellScript);
 
-    SpellCastResult CheckCast()
-    {
-        Player* caster = GetCaster()->ToPlayer();
-        if (!caster)
-            return SPELL_FAILED_DONT_REPORT;
-
-        if (!GetExplTargetUnit())
-            return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
-
-        if (Creature* target = GetExplTargetUnit()->ToCreature())
+        SpellCastResult CheckCast()
         {
-            if (target->GetLevel() > caster->GetLevel())
-                return SPELL_FAILED_HIGHLEVEL;
+            Unit* caster = GetCaster();
+            if (caster->GetTypeId() != TYPEID_PLAYER)
+                return SPELL_FAILED_DONT_REPORT;
 
-            // use SMSG_PET_TAME_FAILURE?
-            if (!target->GetCreatureTemplate()->IsTameable(caster->CanTameExoticPets()))
-                return SPELL_FAILED_BAD_TARGETS;
+            if (!GetExplTargetUnit())
+                return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-            if (PetStable const* petStable = caster->GetPetStable())
+            if (Creature* target = GetExplTargetUnit()->ToCreature())
             {
-                if (petStable->CurrentPetIndex)
+                if (target->getLevel() > caster->getLevel())
+                    return SPELL_FAILED_HIGHLEVEL;
+
+                // use SMSG_PET_TAME_FAILURE?
+                if (!target->GetCreatureTemplate()->IsTameable(caster->ToPlayer()->CanTameExoticPets()))
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                if (!caster->GetPetGUID().IsEmpty())
                     return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
-                auto freeSlotItr = std::find_if(petStable->ActivePets.begin(), petStable->ActivePets.end(), [](Optional<PetStable::PetInfo> const& petInfo)
-                {
-                    return !petInfo.has_value();
-                });
-
-                if (freeSlotItr == petStable->ActivePets.end())
-                {
-                    caster->SendTameFailure(PetTameResult::TooMany);
-                    return SPELL_FAILED_DONT_REPORT;
-                }
-
-                // Check for known Call Pet X spells
-                std::size_t freeSlotIndex = std::distance(petStable->ActivePets.begin(), freeSlotItr);
-                if (!caster->HasSpell(CallPetSpellIds[freeSlotIndex]))
-                {
-                    caster->SendTameFailure(PetTameResult::TooMany);
-                    return SPELL_FAILED_DONT_REPORT;
-                }
+                if (!caster->GetCharmGUID().IsEmpty())
+                    return SPELL_FAILED_ALREADY_HAVE_CHARM;
             }
+            else
+                return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-            if (!caster->GetCharmedGUID().IsEmpty())
-                return SPELL_FAILED_ALREADY_HAVE_CHARM;
-
-            if (!target->GetOwnerGUID().IsEmpty())
-            {
-                caster->SendTameFailure(PetTameResult::CreatureAlreadyOwned);
-                return SPELL_FAILED_DONT_REPORT;
-            }
+            return SPELL_CAST_OK;
         }
-        else
-            return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-        return SPELL_CAST_OK;
-    }
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_hun_tame_beast_SpellScript::CheckCast);
+        }
+    };
 
-    void Register() override
+    SpellScript* GetSpellScript() const override
     {
-        OnCheckCast += SpellCheckCastFn(spell_hun_tame_beast::CheckCast);
+        return new spell_hun_tame_beast_SpellScript();
     }
 };
 
 // 67151 - Item - Hunter T9 4P Bonus (Steady Shot)
-class spell_hun_t9_4p_bonus : public AuraScript
+class spell_hun_t9_4p_bonus : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_hun_t9_4p_bonus);
+public:
+    spell_hun_t9_4p_bonus() : SpellScriptLoader("spell_hun_t9_4p_bonus") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_hun_t9_4p_bonus_AuraScript : public AuraScript
     {
-        return ValidateSpellInfo({ SPELL_HUNTER_T9_4P_GREATNESS });
+        PrepareAuraScript(spell_hun_t9_4p_bonus_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_HUNTER_T9_4P_GREATNESS });
+        }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (eventInfo.GetActor()->GetTypeId() == TYPEID_PLAYER && eventInfo.GetActor()->ToPlayer()->GetPet())
+                return true;
+            return false;
+        }
+
+        void HandleProc(AuraEffect* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            Unit* caster = eventInfo.GetActor();
+
+            caster->CastSpell(caster->ToPlayer()->GetPet(), SPELL_HUNTER_T9_4P_GREATNESS, aurEff);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_hun_t9_4p_bonus_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_hun_t9_4p_bonus_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_hun_t9_4p_bonus_AuraScript();
     }
+};
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+//257044
+class spell_hun_rapid_fire : public AuraScript
+{
+    PrepareAuraScript(spell_hun_rapid_fire);
+
+    void OnTick(const AuraEffect* aurEff)
     {
-        if (eventInfo.GetActor()->GetTypeId() == TYPEID_PLAYER && eventInfo.GetActor()->ToPlayer()->GetPet())
-            return true;
-        return false;
-    }
-
-    void HandleProc(AuraEffect* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        Unit* caster = eventInfo.GetActor();
-
-        caster->CastSpell(caster->ToPlayer()->GetPet(), SPELL_HUNTER_T9_4P_GREATNESS, aurEff);
+        if (Unit* target = GetTarget())
+            if (GetCaster())
+            {
+                GetCaster()->CastSpell(target, SPELL_HUNTER_RAPID_FIRE_MISSILE, true);
+                if (GetCaster()->GetPowerPct(POWER_FOCUS) != 100)
+                    GetCaster()->ModifyPower(POWER_FOCUS, +1);
+            }
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_hun_t9_4p_bonus::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_hun_t9_4p_bonus::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hun_rapid_fire::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
 void AddSC_hunter_spell_scripts()
 {
-    RegisterSpellScript(spell_hun_a_murder_of_crows);
-    RegisterSpellScript(spell_hun_aspect_cheetah);
-    RegisterSpellScript(spell_hun_exhilaration);
-    RegisterSpellScript(spell_hun_hunting_party);
-    RegisterSpellScript(spell_hun_last_stand_pet);
-    RegisterSpellScript(spell_hun_masters_call);
-    RegisterSpellScript(spell_hun_misdirection);
-    RegisterSpellScript(spell_hun_misdirection_proc);
-    RegisterSpellScript(spell_hun_multi_shot);
-    RegisterSpellScript(spell_hun_pet_heart_of_the_phoenix);
-    RegisterSpellScript(spell_hun_posthaste);
-    RegisterSpellScript(spell_hun_roar_of_sacrifice);
-    RegisterSpellScript(spell_hun_scatter_shot);
-    RegisterSpellScript(spell_hun_steady_shot);
-    RegisterSpellScript(spell_hun_tame_beast);
-    RegisterSpellScript(spell_hun_t9_4p_bonus);
+    new spell_hun_aspect_cheetah();
+    new spell_hun_exhilaration();
+    new spell_hun_hunting_party();
+    new spell_hun_last_stand_pet();
+    new spell_hun_masters_call();
+    new spell_hun_misdirection();
+    new spell_hun_misdirection_proc();
+    new spell_hun_multi_shot();
+    new spell_hun_pet_heart_of_the_phoenix();
+    new spell_hun_roar_of_sacrifice();
+    new spell_hun_scatter_shot();
+    new spell_hun_steady_shot();
+    new spell_hun_tame_beast();
+    new spell_hun_t9_4p_bonus();
+    RegisterAuraScript(spell_hun_rapid_fire);
 }

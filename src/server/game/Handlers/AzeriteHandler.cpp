@@ -176,7 +176,7 @@ void WorldSession::HandleAzeriteEmpoweredItemViewed(WorldPackets::Azerite::Azeri
     if (!item || !item->IsAzeriteEmpoweredItem())
         return;
 
-    item->SetItemFlag(ITEM_FIELD_FLAG_AZERITE_EMPOWERED_ITEM_VIEWED);
+    item->AddItemFlag(ITEM_FIELD_FLAG_AZERITE_EMPOWERED_ITEM_VIEWED);
     item->SetState(ITEM_CHANGED, _player);
 }
 
@@ -195,7 +195,7 @@ void WorldSession::HandleAzeriteEmpoweredItemSelectPower(WorldPackets::Azerite::
         return;
 
     // Validate tier
-    int32 actualTier = azeriteEmpoweredItem->GetTierForAzeritePower(Classes(_player->GetClass()), azeriteEmpoweredItemSelectPower.AzeritePowerID);
+    int32 actualTier = azeriteEmpoweredItem->GetTierForAzeritePower(Classes(_player->getClass()), azeriteEmpoweredItemSelectPower.AzeritePowerID);
     if (azeriteEmpoweredItemSelectPower.Tier > MAX_AZERITE_EMPOWERED_TIER || azeriteEmpoweredItemSelectPower.Tier != actualTier)
         return;
 
@@ -232,9 +232,4 @@ void WorldSession::HandleAzeriteEmpoweredItemSelectPower(WorldPackets::Azerite::
     }
 
     azeriteEmpoweredItem->SetState(ITEM_CHANGED, _player);
-}
-
-void WorldSession::SendAzeriteRespecNPC(ObjectGuid npc)
-{
-    SendPacket(WorldPackets::Azerite::AzeriteRespecNPC(npc).Write());
 }

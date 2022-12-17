@@ -36,11 +36,7 @@ enum SpellIds
 
     //Thrall spells
     SPELL_CHAIN_LIGHTNING     = 31330,
-    SPELL_SUMMON_DIRE_WOLF    = 31331,
-
-    //Tyrande spells
-    SPELL_TRUESHOT_AURA       = 31519,
-    SPELL_STARFALL            = 20687
+    SPELL_SUMMON_DIRE_WOLF    = 31331
 };
 
 struct Wave

@@ -112,7 +112,7 @@ enum Spells
     SPELL_WAKING_NIGHTMARE_H    = 67677
 };
 
-class OrientationCheck
+class OrientationCheck : public std::unary_function<Unit*, bool>
 {
     public:
         explicit OrientationCheck(Unit* _caster) : caster(_caster) { }
@@ -125,7 +125,6 @@ class OrientationCheck
         Unit* caster;
 };
 
-// 66862, 67681 - Radiance
 class spell_eadric_radiance : public SpellScriptLoader
 {
     public:
@@ -163,7 +162,7 @@ public:
             Initialize();
             instance = creature->GetInstanceScript();
             creature->SetReactState(REACT_PASSIVE);
-            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            creature->AddUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void Initialize()
@@ -190,7 +189,7 @@ public:
             Initialize();
         }
 
-        void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*done_by*/, uint32 &damage) override
         {
             if (damage >= me->GetHealth())
             {
@@ -206,7 +205,7 @@ public:
             if (MovementType != POINT_MOTION_TYPE)
                 return;
 
-            instance->SetBossState(BOSS_ARGENT_CHALLENGE_E, DONE);
+            instance->SetData(BOSS_ARGENT_CHALLENGE_E, DONE);
 
             me->DisappearAndDie();
         }
@@ -226,7 +225,7 @@ public:
             {
                 me->InterruptNonMeleeSpells(true);
 
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250, true))
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
                     if (target->IsAlive())
                     {
@@ -274,7 +273,7 @@ public:
             instance = creature->GetInstanceScript();
 
             creature->SetReactState(REACT_PASSIVE);
-            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            creature->AddUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->RestoreFaction();
         }
 
@@ -318,7 +317,7 @@ public:
                 me->RemoveAura(SPELL_SHIELD);
         }
 
-        void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        void DamageTaken(Unit* /*done_by*/, uint32 &damage) override
         {
             if (damage >= me->GetHealth())
             {
@@ -334,7 +333,7 @@ public:
             if (MovementType != POINT_MOTION_TYPE || Point != 0)
                 return;
 
-            instance->SetBossState(BOSS_ARGENT_CHALLENGE_P, DONE);
+            instance->SetData(BOSS_ARGENT_CHALLENGE_P, DONE);
 
             me->DisappearAndDie();
         }
@@ -352,7 +351,7 @@ public:
 
             if (uiHolyFireTimer <= uiDiff)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250, true))
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
                     if (target->IsAlive())
                         DoCast(target, SPELL_HOLY_FIRE);
@@ -365,7 +364,7 @@ public:
 
             if (uiHolySmiteTimer <= uiDiff)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250, true))
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
                     if (target->IsAlive())
                         DoCast(target, SPELL_SMITE);
@@ -458,7 +457,7 @@ public:
 
             if (uiOldWoundsTimer <= uiDiff)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 {
                     if (target->IsAlive())
                         DoCast(target, SPELL_OLD_WOUNDS);
@@ -474,7 +473,7 @@ public:
 
             if (uiShadowPastTimer <= uiDiff)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                 {
                     if (target->IsAlive())
                         DoCast(target, SPELL_SHADOWS_PAST);
@@ -488,7 +487,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (TempSummon* summ = me->ToTempSummon())
-                if (Unit* summoner = summ->GetSummonerUnit())
+                if (Unit* summoner = summ->GetSummoner())
                     if (summoner->IsAlive())
                         summoner->GetAI()->SetData(1, 0);
         }
@@ -669,8 +668,7 @@ class spell_paletress_summon_memory : public SpellScriptLoader
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                GetHitUnit()->CastSpell(GetHitUnit(), memorySpellId[urand(0, 24)], CastSpellExtraArgs(TRIGGERED_FULL_MASK)
-                    .SetOriginalCaster(GetCaster()->GetGUID()));
+                GetHitUnit()->CastSpell(GetHitUnit(), memorySpellId[urand(0, 24)], GetCaster()->GetGUID());
             }
 
             void Register() override

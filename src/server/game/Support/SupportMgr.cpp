@@ -23,6 +23,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Timer.h"
 #include "World.h"
@@ -161,7 +162,7 @@ std::string BugTicket::FormatViewMessageString(ChatHandler& handler, bool detail
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTNAME, GetPlayerName().c_str());
-    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGECREATE, (secsToTimeString(curTime - _createTime, TimeFormat::ShortText)).c_str());
+    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGECREATE, (secsToTimeString(curTime - _createTime, true, false)).c_str());
 
     if (!_assignedTo.IsEmpty())
         ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTASSIGNEDTO, GetAssignedToName().c_str());
@@ -175,18 +176,14 @@ std::string BugTicket::FormatViewMessageString(ChatHandler& handler, bool detail
     return ss.str();
 }
 
-ComplaintTicket::ComplaintTicket() : _reportType(ReportType::Chat), _majorCategory(ReportMajorCategory::InappropriateCommunication),
-    _minorCategoryFlags(ReportMinorCategory::TextChat)
-{
-}
+ComplaintTicket::ComplaintTicket() : _complaintType(GMTICKET_SUPPORT_COMPLAINT_TYPE_NONE) { }
 
-ComplaintTicket::ComplaintTicket(Player* player) : Ticket(player), _reportType(ReportType::Chat), _majorCategory(ReportMajorCategory::InappropriateCommunication),
-    _minorCategoryFlags(ReportMinorCategory::TextChat)
+ComplaintTicket::ComplaintTicket(Player* player) : Ticket(player), _complaintType(GMTICKET_SUPPORT_COMPLAINT_TYPE_NONE)
 {
     _id = sSupportMgr->GenerateComplaintId();
 }
 
-ComplaintTicket::~ComplaintTicket() = default;
+ComplaintTicket::~ComplaintTicket() { }
 
 void ComplaintTicket::LoadFromDB(Field* fields)
 {
@@ -201,9 +198,7 @@ void ComplaintTicket::LoadFromDB(Field* fields)
     _pos.m_positionZ        = fields[++idx].GetFloat();
     _pos.SetOrientation(fields[++idx].GetFloat());
     _targetCharacterGuid    = ObjectGuid::Create<HighGuid::Player>(fields[++idx].GetUInt64());
-    _reportType             = ReportType(fields[++idx].GetInt32());
-    _majorCategory          = ReportMajorCategory(fields[++idx].GetInt32());
-    _minorCategoryFlags     = ReportMinorCategory(fields[++idx].GetInt32());
+    _complaintType          = GMSupportComplaintType(fields[++idx].GetUInt8());
     int32 reportLineIndex = fields[++idx].GetInt32();
     if (reportLineIndex != -1)
         _chatLog.ReportLineIndex = reportLineIndex;
@@ -246,9 +241,7 @@ void ComplaintTicket::SaveToDB() const
     stmt->setFloat(++idx, _pos.GetPositionZ());
     stmt->setFloat(++idx, _pos.GetOrientation());
     stmt->setUInt64(++idx, _targetCharacterGuid.GetCounter());
-    stmt->setInt32(++idx, AsUnderlyingType(_reportType));
-    stmt->setInt32(++idx, AsUnderlyingType(_majorCategory));
-    stmt->setInt32(++idx, AsUnderlyingType(_minorCategoryFlags));
+    stmt->setUInt8(++idx, _complaintType);
     if (_chatLog.ReportLineIndex)
         stmt->setInt32(++idx, *_chatLog.ReportLineIndex);
     else
@@ -293,7 +286,7 @@ std::string ComplaintTicket::FormatViewMessageString(ChatHandler& handler, bool 
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTNAME, GetPlayerName().c_str());
-    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGECREATE, (secsToTimeString(curTime - _createTime, TimeFormat::ShortText)).c_str());
+    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGECREATE, (secsToTimeString(curTime - _createTime, true, false)).c_str());
 
     if (!_assignedTo.IsEmpty())
         ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTASSIGNEDTO, GetAssignedToName().c_str());
@@ -380,7 +373,7 @@ std::string SuggestionTicket::FormatViewMessageString(ChatHandler& handler, bool
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTNAME, GetPlayerName().c_str());
-    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGECREATE, (secsToTimeString(curTime - _createTime, TimeFormat::ShortText)).c_str());
+    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGECREATE, (secsToTimeString(curTime - _createTime, true, false)).c_str());
 
     if (!_assignedTo.IsEmpty())
         ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTASSIGNEDTO, GetAssignedToName().c_str());

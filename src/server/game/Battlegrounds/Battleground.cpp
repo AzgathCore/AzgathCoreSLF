@@ -23,16 +23,12 @@
 #include "Creature.h"
 #include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
-#include "DB2Stores.h"
 #include "Formulas.h"
-#include "GameEventSender.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "KillRewarder.h"
-#include "Language.h"
 #include "Log.h"
 #include "Map.h"
 #include "MiscPackets.h"
@@ -44,7 +40,7 @@
 #include "TemporarySummon.h"
 #include "Transport.h"
 #include "Util.h"
-#include "WorldStateMgr.h"
+#include "WorldStatePackets.h"
 #include <cstdarg>
 
 template<class Do>
@@ -68,7 +64,7 @@ Battleground::Battleground(BattlegroundTemplate const* battlegroundTemplate) : _
     m_InvitedAlliance   = 0;
     m_InvitedHorde      = 0;
     m_ArenaType         = 0;
-    _winnerTeamId       = PVP_TEAM_NEUTRAL;
+    _winnerTeamId       = BG_TEAM_NEUTRAL;
     m_StartTime         = 0;
     m_CountdownTimer    = 0;
     m_ResetStatTimer    = 0;
@@ -418,7 +414,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         Seconds countdownMaxForBGType = Seconds(isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX);
 
         WorldPackets::Misc::StartTimer startTimer;
-        startTimer.Type         = WorldPackets::Misc::StartTimer::Pvp;
+        startTimer.Type         = 0;
         startTimer.TimeLeft     = std::chrono::duration_cast<Seconds>(countdownMaxForBGType - Milliseconds(GetElapsedTime()));
         startTimer.TotalTime    = countdownMaxForBGType;
 
@@ -501,7 +497,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                             return !aura->IsPermanent()
                                 && aura->GetDuration() <= 30 * IN_MILLISECONDS
                                 && aurApp->IsPositive()
-                                && !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)
+                                && !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)
                                 && !aura->HasEffectType(SPELL_AURA_MOD_INVISIBILITY);
                         });
                     }
@@ -575,7 +571,7 @@ Player* Battleground::_GetPlayerForTeam(uint32 teamId, BattlegroundPlayerMap::co
     {
         uint32 team = itr->second.Team;
         if (!team)
-            team = player->GetEffectiveTeam();
+            team = player->GetTeam();
         if (team != teamId)
             player = nullptr;
     }
@@ -677,9 +673,6 @@ void Battleground::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
         if (!player)
             continue;
 
-        if (player->HasPlayerFlagEx(PLAYER_FLAGS_EX_MERCENARY_MODE))
-            continue;
-
         uint32 repGain = Reputation;
         AddPct(repGain, player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
         AddPct(repGain, player->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction_id));
@@ -687,9 +680,13 @@ void Battleground::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
     }
 }
 
-void Battleground::UpdateWorldState(int32 worldStateId, int32 value, bool hidden /*= false*/)
+void Battleground::UpdateWorldState(uint32 variable, uint32 value, bool hidden /*= false*/)
 {
-    sWorldStateMgr->SetValue(worldStateId, value, hidden, GetBgMap());
+    WorldPackets::WorldState::UpdateWorldState worldstate;
+    worldstate.VariableID = variable;
+    worldstate.Value = value;
+    worldstate.Hidden = hidden;
+    SendPacketToAll(worldstate.Write());
 }
 
 void Battleground::EndBattleground(uint32 winner)
@@ -705,7 +702,7 @@ void Battleground::EndBattleground(uint32 winner)
 
         PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
 
-        SetWinner(PVP_TEAM_ALLIANCE);
+        SetWinner(BG_TEAM_ALLIANCE);
     }
     else if (winner == HORDE)
     {
@@ -714,11 +711,11 @@ void Battleground::EndBattleground(uint32 winner)
 
         PlaySoundToAll(SOUND_HORDE_WINS);                   // horde wins sound
 
-        SetWinner(PVP_TEAM_HORDE);
+        SetWinner(BG_TEAM_HORDE);
     }
     else
     {
-        SetWinner(PVP_TEAM_NEUTRAL);
+        SetWinner(BG_TEAM_NEUTRAL);
     }
 
     CharacterDatabasePreparedStatement* stmt = nullptr;
@@ -771,9 +768,10 @@ void Battleground::EndBattleground(uint32 winner)
             player->SpawnCorpseBones();
         }
         else
+   
             //needed cause else in av some creatures will kill the players at the end
             player->CombatStop();
-
+    
         // remove temporary currency bonus auras before rewarding player
         player->RemoveAura(SPELL_HONORABLE_DEFENDER_25Y);
         player->RemoveAura(SPELL_HONORABLE_DEFENDER_60Y);
@@ -821,14 +819,14 @@ void Battleground::EndBattleground(uint32 winner)
                 // TODO: loss honor xp
             }
 
-            player->UpdateCriteria(CriteriaType::WinBattleground, player->GetMapId());
+            player->UpdateCriteria(CRITERIA_TYPE_WIN_BG, player->GetMapId());
             if (!guildAwarded)
             {
                 guildAwarded = true;
                 if (ObjectGuid::LowType guildId = GetBgMap()->GetOwnerGuildId(player->GetBGTeam()))
                 {
                     if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-                        guild->UpdateCriteria(CriteriaType::WinBattleground, player->GetMapId(), 0, 0, nullptr, player);
+                        guild->UpdateCriteria(CRITERIA_TYPE_WIN_BG, player->GetMapId(), 0, 0, nullptr, player);
                 }
             }
         }
@@ -845,7 +843,7 @@ void Battleground::EndBattleground(uint32 winner)
 
         player->SendDirectMessage(pvpMatchComplete.GetRawPacket());
 
-        player->UpdateCriteria(CriteriaType::ParticipateInBattleground, player->GetMapId());
+        player->UpdateCriteria(CRITERIA_TYPE_COMPLETE_BATTLEGROUND, player->GetMapId());
     }
 }
 
@@ -863,8 +861,7 @@ uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
 
 void Battleground::BlockMovement(Player* player)
 {
-    // movement disabled NOTE: the effect will be automatically removed by client when the player is teleported from the battleground, so no need to send with uint8(1) in RemovePlayerAtLeave()
-    player->SetClientControl(player, false);
+    player->SetClientControl(player, 0);                          // movement disabled NOTE: the effect will be automatically removed by client when the player is teleported from the battleground, so no need to send with uint8(1) in RemovePlayerAtLeave()
 }
 
 void Battleground::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool SendPacket)
@@ -899,12 +896,6 @@ void Battleground::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
             player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
         player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-        player->RemoveAura(SPELL_MERCENARY_HORDE_1);
-        player->RemoveAura(SPELL_MERCENARY_HORDE_REACTIONS);
-        player->RemoveAura(SPELL_MERCENARY_ALLIANCE_1);
-        player->RemoveAura(SPELL_MERCENARY_ALLIANCE_REACTIONS);
-        player->RemoveAura(SPELL_MERCENARY_SHAPESHIFT);
-        player->RemovePlayerFlagEx(PLAYER_FLAGS_EX_MERCENARY_MODE);
 
         if (!player->IsAlive())                              // resurrect on exit
         {
@@ -976,7 +967,7 @@ void Battleground::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
         player->SetBGTeam(0);
 
         // remove all criterias on bg leave
-        player->ResetCriteria(CriteriaFailEvent::LeaveBattleground, GetMapId(), true);
+        player->ResetCriteria(CRITERIA_CONDITION_BG_MAP, GetMapId(), true);
 
         if (Transport)
             player->TeleportToBGEntryPoint();
@@ -990,7 +981,7 @@ void Battleground::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
 // this method is called when no players remains in battleground
 void Battleground::Reset()
 {
-    SetWinner(PVP_TEAM_NEUTRAL);
+    SetWinner(BG_TEAM_NEUTRAL);
     SetStatus(STATUS_WAIT_QUEUE);
     SetElapsedTime(0);
     SetRemainingTime(0);
@@ -1010,6 +1001,8 @@ void Battleground::Reset()
     for (BattlegroundScoreMap::const_iterator itr = PlayerScores.begin(); itr != PlayerScores.end(); ++itr)
         delete itr->second;
     PlayerScores.clear();
+
+    ResetBGSubclass();
 
     _playerPositions.clear();
 }
@@ -1050,14 +1043,11 @@ void Battleground::AddPlayer(Player* player)
     bp.OfflineRemoveTime = 0;
     bp.Team = team;
     bp.ActiveSpec = player->GetPrimarySpecialization();
-    bp.Mercenary = player->IsMercenaryForBattlegroundQueueType(GetQueueId());
 
-    bool const isInBattleground = IsPlayerInBattleground(player->GetGUID());
     // Add to list/maps
     m_Players[player->GetGUID()] = bp;
 
-    if (!isInBattleground)
-        UpdatePlayersCountByTeam(team, false);                  // +1 player
+    UpdatePlayersCountByTeam(team, false);                  // +1 player
 
     WorldPackets::Battleground::BattlegroundPlayerJoined playerJoined;
     playerJoined.Guid = player->GetGUID();
@@ -1086,9 +1076,9 @@ void Battleground::AddPlayer(Player* player)
     {
         Milliseconds duration(GetElapsedTime() - BG_START_DELAY_2M);
         pvpMatchInitialize.Duration = std::chrono::duration_cast<Seconds>(duration);
-        pvpMatchInitialize.StartTime = GameTime::GetSystemTime() - duration;
+        pvpMatchInitialize.StartTime = GameTime::GetGameTimeSystemPoint() - duration;
     }
-    pvpMatchInitialize.ArenaFaction = player->GetBGTeam() == HORDE ? PVP_TEAM_HORDE : PVP_TEAM_ALLIANCE;
+    pvpMatchInitialize.ArenaFaction = player->GetBGTeam() == HORDE ? BG_TEAM_HORDE : BG_TEAM_ALLIANCE;
     pvpMatchInitialize.BattlemasterListID = GetTypeID();
     pvpMatchInitialize.Registered = false;
     pvpMatchInitialize.AffectsRating = isRated();
@@ -1119,32 +1109,15 @@ void Battleground::AddPlayer(Player* player)
             Seconds countdownMaxForBGType = Seconds(isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX);
 
             WorldPackets::Misc::StartTimer startTimer;
-            startTimer.Type         = WorldPackets::Misc::StartTimer::Pvp;
+            startTimer.Type         = 0;
             startTimer.TimeLeft     = std::chrono::duration_cast<Seconds>(countdownMaxForBGType - Milliseconds(GetElapsedTime()));
             startTimer.TotalTime    = countdownMaxForBGType;
             player->SendDirectMessage(startTimer.Write());
         }
-
-        if (bp.Mercenary)
-        {
-            if (bp.Team == HORDE)
-            {
-                player->CastSpell(player, SPELL_MERCENARY_HORDE_1);
-                player->CastSpell(player, SPELL_MERCENARY_HORDE_REACTIONS);
-            }
-            else if (bp.Team == ALLIANCE)
-            {
-                player->CastSpell(player, SPELL_MERCENARY_ALLIANCE_1);
-                player->CastSpell(player, SPELL_MERCENARY_ALLIANCE_REACTIONS);
-            }
-            player->CastSpell(player, SPELL_MERCENARY_SHAPESHIFT);
-            player->SetPlayerFlagEx(PLAYER_FLAGS_EX_MERCENARY_MODE);
-        }
     }
 
     // reset all map criterias on map enter
-    if (!isInBattleground)
-        player->ResetCriteria(CriteriaFailEvent::LeaveBattleground, GetMapId(), true);
+    player->ResetCriteria(CRITERIA_CONDITION_BG_MAP, GetMapId(), true);
 
     // setup BG group membership
     PlayerAddedToBGCheckIfBGIsRunning(player);
@@ -1337,17 +1310,17 @@ void Battleground::BuildPvPLogDataPacket(WorldPackets::Battleground::PVPMatchSta
         {
             playerData.IsInWorld = true;
             playerData.PrimaryTalentTree = player->GetPrimarySpecialization();
-            playerData.Sex = player->GetGender();
-            playerData.Race = player->GetRace();
-            playerData.Class = player->GetClass();
+            playerData.Sex = player->getGender();
+            playerData.Race = player->getRace();
+            playerData.Class = player->getClass();
             playerData.HonorLevel = player->GetHonorLevel();
         }
 
         pvpLogData.Statistics.push_back(playerData);
     }
 
-    pvpLogData.PlayerCount[PVP_TEAM_HORDE] = int8(GetPlayersCountByTeam(HORDE));
-    pvpLogData.PlayerCount[PVP_TEAM_ALLIANCE] = int8(GetPlayersCountByTeam(ALLIANCE));
+    pvpLogData.PlayerCount[BG_TEAM_HORDE] = int8(GetPlayersCountByTeam(HORDE));
+    pvpLogData.PlayerCount[BG_TEAM_ALLIANCE] = int8(GetPlayersCountByTeam(ALLIANCE));
 }
 
 bool Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
@@ -1553,22 +1526,11 @@ void Battleground::SpawnBGObject(uint32 type, uint32 respawntime)
         if (GameObject* obj = map->GetGameObject(BgObjects[type]))
         {
             if (respawntime)
-            {
                 obj->SetLootState(GO_JUST_DEACTIVATED);
-
-                if (GameObjectOverride const* goOverride = obj->GetGameObjectOverride())
-                    if (goOverride->Flags & GO_FLAG_NODESPAWN)
-                    {
-                        // This function should be called in GameObject::Update() but in case of
-                        // GO_FLAG_NODESPAWN flag the function is never called, so we call it here
-                        obj->SendGameObjectDespawn();
-                    }
-            }
-            else if (obj->getLootState() == GO_JUST_DEACTIVATED)
-            {
-                // Change state from GO_JUST_DEACTIVATED to GO_READY in case battleground is starting again
-                obj->SetLootState(GO_READY);
-            }
+            else
+                if (obj->getLootState() == GO_JUST_DEACTIVATED)
+                    // Change state from GO_JUST_DEACTIVATED to GO_READY in case battleground is starting again
+                    obj->SetLootState(GO_READY);
             obj->SetRespawnTime(respawntime);
             map->AddToMap(obj);
         }
@@ -1668,22 +1630,6 @@ bool Battleground::DelObject(uint32 type)
     return false;
 }
 
-bool Battleground::RemoveObjectFromWorld(uint32 type)
-{
-    if (!BgObjects[type])
-        return true;
-
-    if (GameObject* obj = GetBgMap()->GetGameObject(BgObjects[type]))
-    {
-        obj->RemoveFromWorld();
-        BgObjects[type].Clear();
-        return true;
-    }
-    TC_LOG_INFO("bg.battleground", "Battleground::RemoveObjectFromWorld: gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
-        type, BgObjects[type].ToString().c_str(), GetMapId(), m_InstanceID);
-    return false;
-}
-
 bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId /*= TEAM_NEUTRAL*/)
 {
     uint32 entry = (teamId == TEAM_ALLIANCE) ? BG_CREATURE_ENTRY_A_SPIRITGUIDE : BG_CREATURE_ENTRY_H_SPIRITGUIDE;
@@ -1764,12 +1710,6 @@ void Battleground::EndNow()
 // buffs are in their positions when battleground starts
 void Battleground::HandleTriggerBuff(ObjectGuid go_guid)
 {
-    if (!FindBgMap())
-    {
-        TC_LOG_ERROR("bg.battleground", "Battleground::HandleTriggerBuff called with null bg map, %s", go_guid.ToString().c_str());
-        return;
-    }
-
     GameObject* obj = GetBgMap()->GetGameObject(go_guid);
     if (!obj || obj->GetGoType() != GAMEOBJECT_TYPE_TRAP || !obj->isSpawned())
         return;
@@ -1817,8 +1757,6 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
         if (killer == victim)
             return;
 
-        uint32 killerTeam = GetPlayerTeam(killer->GetGUID());
-
         UpdatePlayerScore(killer, SCORE_HONORABLE_KILLS, 1);
         UpdatePlayerScore(killer, SCORE_KILLING_BLOWS, 1);
 
@@ -1828,7 +1766,7 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
             if (!creditedPlayer || creditedPlayer == killer)
                 continue;
 
-            if (itr->second.Team == killerTeam && creditedPlayer->IsAtGroupRewardDistance(victim))
+            if (creditedPlayer->GetTeam() == killer->GetTeam() && creditedPlayer->IsAtGroupRewardDistance(victim))
                 UpdatePlayerScore(creditedPlayer, SCORE_HONORABLE_KILLS, 1);
         }
     }
@@ -1836,7 +1774,7 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
     if (!isArena())
     {
         // To be able to remove insignia -- ONLY IN Battlegrounds
-        victim->SetUnitFlag(UNIT_FLAG_SKINNABLE);
+        victim->AddUnitFlag(UNIT_FLAG_SKINNABLE);
         RewardXPAtKill(killer, victim);
     }
 }
@@ -1861,14 +1799,6 @@ bool Battleground::IsPlayerInBattleground(ObjectGuid guid) const
     BattlegroundPlayerMap::const_iterator itr = m_Players.find(guid);
     if (itr != m_Players.end())
         return true;
-    return false;
-}
-
-bool Battleground::IsPlayerMercenaryInBattleground(ObjectGuid guid) const
-{
-    auto itr = m_Players.find(guid);
-    if (itr != m_Players.end())
-        return itr->second.Mercenary;
     return false;
 }
 
@@ -1926,15 +1856,14 @@ void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
 
 WorldSafeLocsEntry const* Battleground::GetClosestGraveyard(Player* player)
 {
-    return sObjectMgr->GetClosestGraveyard(*player, GetPlayerTeam(player->GetGUID()), player);
+    return sObjectMgr->GetClosestGraveyard(*player, player->GetTeam(), player);
 }
 
-void Battleground::TriggerGameEvent(uint32 gameEventId)
+void Battleground::StartCriteriaTimer(CriteriaTimedTypes type, uint32 entry)
 {
-    GameEvents::TriggerForMap(gameEventId, GetBgMap());
     for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-            GameEvents::TriggerForPlayer(gameEventId, player);
+            player->StartCriteriaTimer(type, entry);
 }
 
 void Battleground::SetBracket(PVPDifficultyEntry const* bracketEntry)
@@ -1945,10 +1874,7 @@ void Battleground::SetBracket(PVPDifficultyEntry const* bracketEntry)
 void Battleground::RewardXPAtKill(Player* killer, Player* victim)
 {
     if (sWorld->getBoolConfig(CONFIG_BG_XP_FOR_KILL) && killer && victim)
-    {
-        Player* killers[] = { killer };
-        KillRewarder(Trinity::IteratorPair(std::begin(killers), std::end(killers)), victim, true).Reward();
-    }
+        killer->RewardPlayerAndGroupAtKill(victim, true);
 }
 
 uint32 Battleground::GetTeamScore(uint32 teamId) const
@@ -1964,6 +1890,12 @@ void Battleground::HandleAreaTrigger(Player* player, uint32 trigger, bool /*ente
 {
     TC_LOG_DEBUG("bg.battleground", "Unhandled AreaTrigger %u in Battleground %u. Player coords (x: %f, y: %f, z: %f)",
                    trigger, player->GetMapId(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+}
+
+bool Battleground::CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/)
+{
+    TC_LOG_ERROR("bg.battleground", "Battleground::CheckAchievementCriteriaMeet: No implementation for criteria %u", criteriaId);
+    return false;
 }
 
 char const* Battleground::GetName() const

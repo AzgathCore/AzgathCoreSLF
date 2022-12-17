@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "Timer.h"
 #include "World.h"
+#include "WorldPacket.h"
 #include <unordered_map>
 
 namespace
@@ -116,7 +117,7 @@ void CharacterCache::DeleteCharacterCacheEntry(ObjectGuid const& guid, std::stri
     _characterCacheByNameStore.erase(name);
 }
 
-void CharacterCache::UpdateCharacterData(ObjectGuid const& guid, std::string const& name, Optional<uint8> gender /*= {}*/, Optional<uint8> race /*= {}*/)
+void CharacterCache::UpdateCharacterData(ObjectGuid const& guid, std::string const& name, uint8* gender /*= nullptr*/, uint8* race /*= nullptr*/)
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
@@ -182,7 +183,6 @@ void CharacterCache::UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 sl
     if (itr == _characterCacheStore.end())
         return;
 
-    ASSERT(slot < 3);
     itr->second.ArenaTeamId[slot] = arenaTeamId;
 }
 
@@ -197,6 +197,7 @@ void CharacterCache::UpdateCharacterInfoDeleted(ObjectGuid const& guid, bool del
     if (name)
         itr->second.Name = *name;
 }
+
 
 /*
 Getters
@@ -294,9 +295,7 @@ uint32 CharacterCache::GetCharacterArenaTeamIdByGuid(ObjectGuid guid, uint8 type
     if (itr == _characterCacheStore.end())
         return 0;
 
-    uint8 slot = ArenaTeam::GetSlotByType(type);
-    ASSERT(slot < 3);
-    return itr->second.ArenaTeamId[slot];
+    return itr->second.ArenaTeamId[ArenaTeam::GetSlotByType(type)];
 }
 
 bool CharacterCache::GetCharacterNameAndClassByGUID(ObjectGuid guid, std::string& name, uint8& _class) const

@@ -16,7 +16,6 @@
  */
 
 #include "WorldSession.h"
-#include "AchievementMgr.h"
 #include "AzeriteItem.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -46,7 +45,7 @@ void WorldSession::HandleInspectOpcode(WorldPackets::Inspect::Inspect& inspect)
     WorldPackets::Inspect::InspectResult inspectResult;
     inspectResult.DisplayInfo.Initialize(player);
 
-    if (GetPlayer()->CanBeGameMaster() || sWorld->getIntConfig(CONFIG_TALENTS_INSPECTING) + (GetPlayer()->GetEffectiveTeam() == player->GetEffectiveTeam()) > 1)
+    if (GetPlayer()->CanBeGameMaster() || sWorld->getIntConfig(CONFIG_TALENTS_INSPECTING) + (GetPlayer()->GetTeamId() == player->GetTeamId()) > 1)
     {
         PlayerTalentMap const* talents = player->GetTalentMap(player->GetActiveTalentGroup());
         for (PlayerTalentMap::value_type const& v : *talents)
@@ -60,7 +59,7 @@ void WorldSession::HandleInspectOpcode(WorldPackets::Inspect::Inspect& inspect)
 
     if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
     {
-        inspectResult.GuildData.emplace();
+        inspectResult.GuildData = boost::in_place();
         inspectResult.GuildData->GuildGUID = guild->GetGUID();
         inspectResult.GuildData->NumGuildMembers = guild->GetMembersCount();
         inspectResult.GuildData->AchievementPoints = guild->GetAchievementMgr().GetAchievementPoints();

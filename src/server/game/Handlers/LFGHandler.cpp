@@ -25,7 +25,10 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "World.h"
+#include "WorldPacket.h"
 
 void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::DFJoin& dfJoin)
 {
@@ -142,7 +145,7 @@ void WorldSession::SendLfgPlayerLockInfo()
     TC_LOG_DEBUG("lfg", "SMSG_LFG_PLAYER_INFO %s", GetPlayerInfo().c_str());
 
     // Get Random dungeons that can be done at a certain level and expansion
-    uint8 level = GetPlayer()->GetLevel();
+    uint8 level = GetPlayer()->getLevel();
     uint32 contentTuningReplacementConditionMask = GetPlayer()->m_playerData->CtrOptions->ContentTuningConditionMask;
     lfg::LfgDungeonSet const& randomDungeons = sLFGMgr->GetRandomAndSeasonalDungeons(level, GetExpansion(), contentTuningReplacementConditionMask);
 

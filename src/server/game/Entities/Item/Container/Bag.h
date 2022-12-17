@@ -26,6 +26,7 @@
 class TC_GAME_API Bag : public Item
 {
     public:
+
         Bag();
         ~Bag();
 
@@ -34,6 +35,7 @@ class TC_GAME_API Bag : public Item
 
         bool Create(ObjectGuid::LowType guidlow, uint32 itemid, ItemContext context, Player const* owner) override;
 
+        void Clear();
         void StoreItem(uint8 slot, Item* pItem, bool update);
         void RemoveItem(uint8 slot, bool update);
 
@@ -46,11 +48,11 @@ class TC_GAME_API Bag : public Item
 
         // DB operations
         // overwrite virtual Item::SaveToDB
-        void SaveToDB(CharacterDatabaseTransaction trans) override;
+        void SaveToDB(CharacterDatabaseTransaction& trans) override;
         // overwrite virtual Item::LoadFromDB
         bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry) override;
         // overwrite virtual Item::DeleteFromDB
-        void DeleteFromDB(CharacterDatabaseTransaction trans) override;
+        void DeleteFromDB(CharacterDatabaseTransaction& trans) override;
 
     protected:
         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
@@ -61,20 +63,6 @@ class TC_GAME_API Bag : public Item
     public:
         void BuildValuesUpdateForPlayerWithMask(UpdateData* data, UF::ObjectData::Mask const& requestedObjectMask, UF::ItemData::Mask const& requestedItemMask,
             UF::ContainerData::Mask const& requestedContainerMask, Player const* target) const;
-
-        struct ValuesUpdateForPlayerWithMaskSender // sender compatible with MessageDistDeliverer
-        {
-            explicit ValuesUpdateForPlayerWithMaskSender(Bag const* owner) : Owner(owner) { }
-
-            Bag const* Owner;
-            UF::ObjectData::Base ObjectMask;
-            UF::ItemData::Base ItemMask;
-            UF::ContainerData::Base ContainerMask;
-
-            void operator()(Player const* player) const;
-        };
-
-        std::string GetDebugInfo() const override;
 
         UF::UpdateField<UF::ContainerData, 0, TYPEID_CONTAINER> m_containerData;
 

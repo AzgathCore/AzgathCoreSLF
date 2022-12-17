@@ -26,6 +26,7 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include <map>
+#include <set>
 #include <unordered_map>
 
 class Item;
@@ -96,19 +97,18 @@ constexpr std::size_t MAX_FAVORITE_AUCTIONS = 100;
 
 enum class AuctionHouseFilterMask : uint32
 {
-    None                        = 0x0,
-    UncollectedOnly             = 0x1,
-    UsableOnly                  = 0x2,
-    UpgradesOnly                = 0x4,
-    ExactMatch                  = 0x8,
-    PoorQuality                 = 0x10,
-    CommonQuality               = 0x20,
-    UncommonQuality             = 0x40,
-    RareQuality                 = 0x80,
-    EpicQuality                 = 0x100,
-    LegendaryQuality            = 0x200,
-    ArtifactQuality             = 0x400,
-    LegendaryCraftedItemOnly    = 0x800,
+    None                = 0x0,
+    UncollectedOnly     = 0x1,
+    UsableOnly          = 0x2,
+    UpgradesOnly        = 0x4,
+    ExactMatch          = 0x8,
+    PoorQuality         = 0x10,
+    CommonQuality       = 0x20,
+    UncommonQuality     = 0x40,
+    RareQuality         = 0x80,
+    EpicQuality         = 0x100,
+    LegendaryQuality    = 0x200,
+    ArtifactQuality     = 0x400,
 };
 
 DEFINE_ENUM_FLAG(AuctionHouseFilterMask);
@@ -179,7 +179,7 @@ struct AuctionsBucketKey
 
     static std::size_t Hash(AuctionsBucketKey const& bucket);
     static AuctionsBucketKey ForItem(Item* item);
-    static AuctionsBucketKey ForCommodity(ItemTemplate const* itemTemplate);
+    static AuctionsBucketKey ForCommodity(uint32 itemId);
 };
 
 bool operator<(AuctionsBucketKey const& left, AuctionsBucketKey const& right);
@@ -189,7 +189,7 @@ namespace std
     template<>
     struct hash<AuctionsBucketKey>
     {
-        size_t operator()(AuctionsBucketKey const& key) const noexcept
+        size_t operator()(AuctionsBucketKey const& key) const
         {
             return AuctionsBucketKey::Hash(key);
         }
@@ -223,14 +223,6 @@ struct AuctionsBucketData
     class Sorter;
 };
 
-enum class AuctionPostingServerFlag : uint8
-{
-    None        = 0x0,
-    GmLogBuyer  = 0x1  // write transaction to gm log file for buyer (optimization flag - avoids querying database for offline player permissions)
-};
-
-DEFINE_ENUM_FLAG(AuctionPostingServerFlag);
-
 // This structure represents the result of a single C_AuctionHouse.PostItem/PostCommodity call
 struct AuctionPosting
 {
@@ -245,9 +237,8 @@ struct AuctionPosting
     uint64 BuyoutOrUnitPrice = 0;
     uint64 Deposit = 0;
     uint64 BidAmount = 0;
-    SystemTimePoint StartTime = SystemTimePoint::min();
-    SystemTimePoint EndTime = SystemTimePoint::min();
-    EnumFlag<AuctionPostingServerFlag> ServerFlags = AuctionPostingServerFlag::None;
+    std::chrono::system_clock::time_point StartTime = std::chrono::system_clock::time_point::min();
+    std::chrono::system_clock::time_point EndTime = std::chrono::system_clock::time_point::min();
 
     GuidUnorderedSet BidderHistory;
 
@@ -264,7 +255,7 @@ struct CommodityQuote
 {
     uint64 TotalPrice = 0;
     uint32 Quantity = 0;
-    TimePoint ValidTo = TimePoint::min();
+    std::chrono::steady_clock::time_point ValidTo = std::chrono::steady_clock::time_point::min();
 };
 
 struct AuctionThrottleResult
@@ -286,7 +277,7 @@ public:
         uint32 Global = 0;
         uint32 Cursor = 0;
         uint32 Tombstone = 0;
-        TimePoint NextAllowedReplication = TimePoint::min();
+        std::chrono::steady_clock::time_point NextAllowedReplication = std::chrono::steady_clock::time_point::min();
 
         bool IsReplicationInProgress() const { return Cursor != Tombstone && Global != 0; }
     };
@@ -322,7 +313,7 @@ public:
     void BuildReplicate(WorldPackets::AuctionHouse::AuctionReplicateResponse& replicateResponse, Player* player,
         uint32 global, uint32 cursor, uint32 tombstone, uint32 count);
 
-    uint64 CalculateAuctionHouseCut(uint64 bidAmount) const;
+    uint64 CalcualteAuctionHouseCut(uint64 bidAmount) const;
 
     CommodityQuote const* CreateCommodityQuote(Player* player, uint32 itemId, uint32 quantity);
     void CancelCommodityQuote(ObjectGuid guid);
@@ -416,7 +407,7 @@ class TC_GAME_API AuctionHouseMgr
 
         struct PlayerThrottleObject
         {
-            TimePoint PeriodEnd;
+            std::chrono::steady_clock::time_point PeriodEnd;
             uint8 QueriesRemaining = 100;
         };
 
@@ -427,7 +418,7 @@ class TC_GAME_API AuctionHouseMgr
         uint32 _replicateIdGenerator;
 
         std::unordered_map<ObjectGuid, PlayerThrottleObject> _playerThrottleObjects;
-        TimePoint _playerThrottleObjectsCleanupTime;
+        std::chrono::steady_clock::time_point _playerThrottleObjectsCleanupTime;
 };
 
 #define sAuctionMgr AuctionHouseMgr::instance()

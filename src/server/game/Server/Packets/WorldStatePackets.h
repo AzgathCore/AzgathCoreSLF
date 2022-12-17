@@ -24,7 +24,7 @@ namespace WorldPackets
 {
     namespace WorldState
     {
-        class TC_GAME_API InitWorldStates final : public ServerPacket
+        class InitWorldStates final : public ServerPacket
         {
         public:
             struct WorldStateInfo
@@ -57,6 +57,25 @@ namespace WorldPackets
             int32 Value       = 0;
             bool Hidden   = false; ///< @todo: research
             uint32 VariableID = 0;
+        };
+
+        struct ElaspedTimer
+        {
+            ElaspedTimer() { }
+            ElaspedTimer(uint32 timerID, time_t currentDuration) : TimerID(timerID), CurrentDuration(currentDuration) { }
+
+            uint32 TimerID = 0;
+            time_t CurrentDuration = time_t(0);
+        };
+
+        class StartElapsedTimers final : public ServerPacket
+        {
+        public:
+            StartElapsedTimers() : ServerPacket(SMSG_START_ELAPSED_TIMERS, 4) { }
+
+            WorldPacket const* Write() override;
+
+            std::vector<ElaspedTimer> Timers;
         };
     }
 }

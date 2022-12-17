@@ -20,7 +20,6 @@
 #include "AuctionHousePackets.h"
 #include "AccountMgr.h"
 #include "Bag.h"
-#include "BattlePetMgr.h"
 #include "DB2Stores.h"
 #include "CharacterCache.h"
 #include "CollectionMgr.h"
@@ -36,6 +35,7 @@
 #include "Player.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
+#include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -79,12 +79,12 @@ AuctionsBucketKey AuctionsBucketKey::ForItem(Item* item)
         };
     }
     else
-        return ForCommodity(itemTemplate);
+        return ForCommodity(item->GetEntry());
 }
 
-AuctionsBucketKey AuctionsBucketKey::ForCommodity(ItemTemplate const* itemTemplate)
+AuctionsBucketKey AuctionsBucketKey::ForCommodity(uint32 itemId)
 {
-    return { itemTemplate->GetId(), uint16(itemTemplate->GetBaseItemLevel()), 0, 0 };
+    return { itemId, 0, 0, 0 };
 }
 
 bool operator<(AuctionsBucketKey const& left, AuctionsBucketKey const& right)
@@ -224,7 +224,7 @@ void AuctionPosting::BuildAuctionItem(WorldPackets::AuctionHouse::AuctionItem* a
     }
 
     // all (not optional<>)
-    auctionItem->DurationLeft = uint32(std::max(std::chrono::duration_cast<Milliseconds>(EndTime - GameTime::GetSystemTime()).count(), Milliseconds::zero().count()));
+    auctionItem->DurationLeft = uint32(std::max(std::chrono::duration_cast<Milliseconds>(EndTime - GameTime::GetGameTimeSystemPoint()).count(), Milliseconds::zero().count()));
     auctionItem->DeleteReason = 0;
 
     // SMSG_AUCTION_LIST_ITEMS_RESULT (only if owned)
@@ -244,10 +244,6 @@ void AuctionPosting::BuildAuctionItem(WorldPackets::AuctionHouse::AuctionItem* a
     // SMSG_AUCTION_LIST_BIDDER_ITEMS_RESULT, SMSG_AUCTION_LIST_OWNER_ITEMS_RESULT, SMSG_AUCTION_REPLICATE_RESPONSE (if commodity)
     if (sendKey)
         auctionItem->AuctionBucketKey.emplace(AuctionsBucketKey::ForItem(Items[0]));
-
-    // all
-    if (!Items[0]->m_itemData->Creator->IsEmpty())
-        auctionItem->Creator = *Items[0]->m_itemData->Creator;
 }
 
 uint64 AuctionPosting::CalculateMinIncrement(uint64 bidAmount)
@@ -403,7 +399,7 @@ private:
 
 AuctionHouseMgr::AuctionHouseMgr() : mHordeAuctions(6), mAllianceAuctions(2), mNeutralAuctions(1), mGoblinAuctions(7), _replicateIdGenerator(0)
 {
-    _playerThrottleObjectsCleanupTime = GameTime::Now() + Hours(1);
+    _playerThrottleObjectsCleanupTime = GameTime::GetGameTimeSteadyPoint() + Hours(1);
 }
 
 AuctionHouseMgr::~AuctionHouseMgr()
@@ -555,12 +551,12 @@ void AuctionHouseMgr::LoadAuctions()
             }
 
             Item* item = NewItemOrBag(proto);
-            if (!item->LoadFromDB(itemGuid, ObjectGuid::Create<HighGuid::Player>(fields[51].GetUInt64()), fields, itemEntry))
+            if (!item->LoadFromDB(itemGuid, ObjectGuid::Create<HighGuid::Player>(fields[43].GetUInt64()), fields, itemEntry))
             {
                 delete item;
                 continue;
             }
-            uint32 auctionId = fields[52].GetUInt32();
+            uint32 auctionId = fields[44].GetUInt32();
             itemsByAuction[auctionId].push_back(item);
 
             ++count;
@@ -631,7 +627,6 @@ void AuctionHouseMgr::LoadAuctions()
             auction.BidAmount = fields[7].GetUInt64();
             auction.StartTime = std::chrono::system_clock::from_time_t(fields[8].GetInt64());
             auction.EndTime = std::chrono::system_clock::from_time_t(fields[9].GetInt64());
-            auction.ServerFlags = static_cast<AuctionPostingServerFlag>(fields[10].GetUInt8());
 
             auto biddersItr = biddersByAuction.find(auction.Id);
             if (biddersItr != biddersByAuction.end())
@@ -729,7 +724,7 @@ void AuctionHouseMgr::PendingAuctionProcess(Player* player)
         {
             PendingAuctionInfo const& pendingAuction = *itrAH;
             if (AuctionPosting* auction = GetAuctionsById(pendingAuction.AuctionHouseId)->GetAuction(pendingAuction.AuctionId))
-                auction->EndTime = GameTime::GetSystemTime();
+                auction->EndTime = GameTime::GetGameTimeSystemPoint();
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_AUCTION_EXPIRATION);
             stmt->setUInt32(0, uint32(GameTime::GetGameTime()));
@@ -737,6 +732,7 @@ void AuctionHouseMgr::PendingAuctionProcess(Player* player)
             trans->Append(stmt);
             ++itrAH;
         } while (itrAH != iterMap->second.Auctions.end());
+
         CharacterDatabase.CommitTransaction(trans);
     }
 
@@ -772,7 +768,7 @@ void AuctionHouseMgr::UpdatePendingAuctions()
             for (PendingAuctionInfo const& pendingAuction : itr->second.Auctions)
             {
                 if (AuctionPosting* auction = GetAuctionsById(pendingAuction.AuctionHouseId)->GetAuction(pendingAuction.AuctionId))
-                    auction->EndTime = GameTime::GetSystemTime();
+                    auction->EndTime = GameTime::GetGameTimeSystemPoint();
 
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_AUCTION_EXPIRATION);
                 stmt->setUInt32(0, uint32(GameTime::GetGameTime()));
@@ -792,7 +788,7 @@ void AuctionHouseMgr::Update()
     mNeutralAuctions.Update();
     mGoblinAuctions.Update();
 
-    TimePoint now = GameTime::Now();
+    std::chrono::steady_clock::time_point now = GameTime::GetGameTimeSteadyPoint();
     if (now >= _playerThrottleObjectsCleanupTime)
     {
         for (auto itr = _playerThrottleObjects.begin(); itr != _playerThrottleObjects.end();)
@@ -803,7 +799,7 @@ void AuctionHouseMgr::Update()
                 ++itr;
         }
 
-        _playerThrottleObjectsCleanupTime = now + 1h;
+        _playerThrottleObjectsCleanupTime = now + Hours(1);
     }
 }
 
@@ -814,7 +810,7 @@ uint32 AuctionHouseMgr::GenerateReplicationId()
 
 AuctionThrottleResult AuctionHouseMgr::CheckThrottle(Player* player, bool addonTainted, AuctionCommand command /*= AuctionCommand::SellItem*/)
 {
-    TimePoint now = GameTime::Now();
+    std::chrono::steady_clock::time_point now = GameTime::GetGameTimeSteadyPoint();
     auto itr = _playerThrottleObjects.emplace(std::piecewise_construct, std::forward_as_tuple(player->GetGUID()), std::forward_as_tuple());
     if (itr.second || now > itr.first->second.PeriodEnd)
     {
@@ -1004,7 +1000,6 @@ void AuctionHouseObject::AddAuction(CharacterDatabaseTransaction trans, AuctionP
         stmt->setUInt64(7, auction.BidAmount);
         stmt->setInt64(8, std::chrono::system_clock::to_time_t(auction.StartTime));
         stmt->setInt64(9, std::chrono::system_clock::to_time_t(auction.EndTime));
-        stmt->setUInt8(10, auction.ServerFlags.AsUnderlyingType());
         trans->Append(stmt);
 
         for (Item* item : auction.Items)
@@ -1115,8 +1110,8 @@ void AuctionHouseObject::RemoveAuction(CharacterDatabaseTransaction trans, Aucti
 
 void AuctionHouseObject::Update()
 {
-    SystemTimePoint curTime = GameTime::GetSystemTime();
-    TimePoint curTimeSteady = GameTime::Now();
+    std::chrono::system_clock::time_point curTime = GameTime::GetGameTimeSystemPoint();
+    std::chrono::steady_clock::time_point curTimeSteady = GameTime::GetGameTimeSteadyPoint();
     ///- Handle expired auctions
 
     // Clear expired throttled players
@@ -1280,7 +1275,7 @@ void AuctionHouseObject::BuildListBuckets(WorldPackets::AuctionHouse::AuctionLis
                     if (player->HasSpell(itemTemplate->Effects[1]->SpellID))
                         continue;
 
-                    if (BattlePetSpeciesEntry const* battlePetSpecies = BattlePets::BattlePetMgr::GetBattlePetSpeciesBySpell(itemTemplate->Effects[1]->SpellID))
+                    if (BattlePetSpeciesEntry const* battlePetSpecies = sSpellMgr->GetBattlePetSpecies(itemTemplate->Effects[1]->SpellID))
                         if (knownPetSpecies.test(battlePetSpecies->ID))
                             continue;
                 }
@@ -1289,7 +1284,7 @@ void AuctionHouseObject::BuildListBuckets(WorldPackets::AuctionHouse::AuctionLis
 
         if (filters.HasFlag(AuctionHouseFilterMask::UsableOnly))
         {
-            if (bucketData->RequiredLevel && player->GetLevel() < bucketData->RequiredLevel)
+            if (bucketData->RequiredLevel && player->getLevel() < bucketData->RequiredLevel)
                 continue;
 
             if (player->CanUseItem(sObjectMgr->GetItemTemplate(bucket.first.ItemId), true) != EQUIP_ERR_OK)
@@ -1519,7 +1514,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPackets::AuctionHouse::Aucti
 void AuctionHouseObject::BuildReplicate(WorldPackets::AuctionHouse::AuctionReplicateResponse& replicateResponse, Player* player,
     uint32 global, uint32 cursor, uint32 tombstone, uint32 count)
 {
-    TimePoint curTime = GameTime::Now();
+    std::chrono::steady_clock::time_point curTime = GameTime::GetGameTimeSteadyPoint();
 
     auto throttleItr = _replicateThrottleMap.find(player->GetGUID());
     if (throttleItr != _replicateThrottleMap.end())
@@ -1557,18 +1552,14 @@ void AuctionHouseObject::BuildReplicate(WorldPackets::AuctionHouse::AuctionRepli
     replicateResponse.ChangeNumberTombstone = throttleItr->second.Tombstone = !count ? _itemsByAuctionId.rbegin()->first : 0;
 }
 
-uint64 AuctionHouseObject::CalculateAuctionHouseCut(uint64 bidAmount) const
+uint64 AuctionHouseObject::CalcualteAuctionHouseCut(uint64 bidAmount) const
 {
     return std::max(int64(CalculatePct(bidAmount, _auctionHouse->ConsignmentRate) * double(sWorld->getRate(RATE_AUCTION_CUT))), SI64LIT(0));
 }
 
 CommodityQuote const* AuctionHouseObject::CreateCommodityQuote(Player* player, uint32 itemId, uint32 quantity)
 {
-    ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
-    if (!itemTemplate)
-        return nullptr;
-
-    auto bucketItr = _buckets.find(AuctionsBucketKey::ForCommodity(itemTemplate));
+    auto bucketItr = _buckets.find(AuctionsBucketKey::ForCommodity(itemId));
     if (bucketItr == _buckets.end())
         return nullptr;
 
@@ -1600,7 +1591,7 @@ CommodityQuote const* AuctionHouseObject::CreateCommodityQuote(Player* player, u
     CommodityQuote* quote = &_commodityQuotes[player->GetGUID()];
     quote->TotalPrice = totalPrice;
     quote->Quantity = quantity;
-    quote->ValidTo = GameTime::Now() + 30s;
+    quote->ValidTo = GameTime::GetGameTimeSteadyPoint() + 30s;
     return quote;
 }
 
@@ -1611,11 +1602,7 @@ void AuctionHouseObject::CancelCommodityQuote(ObjectGuid guid)
 
 bool AuctionHouseObject::BuyCommodity(CharacterDatabaseTransaction trans, Player* player, uint32 itemId, uint32 quantity, Milliseconds delayForNextAction)
 {
-    ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
-    if (!itemTemplate)
-        return false;
-
-    auto bucketItr = _buckets.find(AuctionsBucketKey::ForCommodity(itemTemplate));
+    auto bucketItr = _buckets.find(AuctionsBucketKey::ForCommodity(itemId));
     if (bucketItr == _buckets.end())
     {
         player->GetSession()->SendAuctionCommandResult(0, AuctionCommand::PlaceBid, AuctionResult::CommodityPurchaseFailed, delayForNextAction);
@@ -1756,21 +1743,21 @@ bool AuctionHouseObject::BuyCommodity(CharacterDatabaseTransaction trans, Player
             if (!sCharacterCache->GetCharacterNameByGuid(auction->Owner, ownerName))
                 ownerName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
 
-            sLog->OutCommand(bidderAccId, "GM %s (Account: %u) bought commodity in auction: %s (Entry: %u Count: %u) and pay money: " UI64FMTD ". Original owner %s (Account: %u)",
+            sLog->outCommand(bidderAccId, "GM %s (Account: %u) bought commodity in auction: %s (Entry: %u Count: %u) and pay money: " UI64FMTD ". Original owner %s (Account: %u)",
                 player->GetName().c_str(), bidderAccId, items[0].Items[0]->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()).c_str(),
                 items[0].Items[0]->GetEntry(), boughtFromAuction, auction->BuyoutOrUnitPrice * boughtFromAuction, ownerName.c_str(),
                 sCharacterCache->GetCharacterAccountIdByGuid(auction->Owner));
         }
 
-        uint64 auctionHouseCut = CalculateAuctionHouseCut(auction->BuyoutOrUnitPrice * boughtFromAuction);
+        uint64 auctionHouseCut = CalcualteAuctionHouseCut(auction->BuyoutOrUnitPrice * boughtFromAuction);
         uint64 depositPart = AuctionHouseMgr::GetCommodityAuctionDeposit(items[0].Items[0]->GetTemplate(), std::chrono::duration_cast<Minutes>(auction->EndTime - auction->StartTime),
             boughtFromAuction);
         uint64 profit = auction->BuyoutOrUnitPrice * boughtFromAuction + depositPart - auctionHouseCut;
 
         if (Player* owner = ObjectAccessor::FindConnectedPlayer(auction->Owner))
         {
-            owner->UpdateCriteria(CriteriaType::MoneyEarnedFromAuctions, profit);
-            owner->UpdateCriteria(CriteriaType::HighestAuctionSale, profit);
+            owner->UpdateCriteria(CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS, profit);
+            owner->UpdateCriteria(CRITERIA_TYPE_HIGHEST_AUCTION_SOLD, profit);
             owner->GetSession()->SendAuctionClosedNotification(auction, (float)sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY), true);
         }
 
@@ -1779,9 +1766,6 @@ bool AuctionHouseObject::BuyCommodity(CharacterDatabaseTransaction trans, Player
             .AddMoney(profit)
             .SendMailTo(trans, MailReceiver(ObjectAccessor::FindConnectedPlayer(auction->Owner), auction->Owner), this, MAIL_CHECK_MASK_COPIED, sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY));
     }
-
-    player->ModifyMoney(-int64(totalPrice));
-    player->SaveGoldToDB(trans);
 
     for (MailedItemsBatch const& batch : items)
     {
@@ -1856,16 +1840,18 @@ void AuctionHouseObject::SendAuctionWon(AuctionPosting const* auction, Player* b
 
     // data for gm.log
     std::string bidderName;
-    bool logGmTrade = auction->ServerFlags.HasFlag(AuctionPostingServerFlag::GmLogBuyer);
+    bool logGmTrade = false;
 
     if (bidder)
     {
         bidderAccId = bidder->GetSession()->GetAccountId();
         bidderName = bidder->GetName();
+        logGmTrade = bidder->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE);
     }
     else
     {
         bidderAccId = sCharacterCache->GetCharacterAccountIdByGuid(auction->Bidder);
+        logGmTrade = AccountMgr::HasPermission(bidderAccId, rbac::RBAC_PERM_LOG_GM_TRADE, realm.Id.Realm);
 
         if (logGmTrade && !sCharacterCache->GetCharacterNameByGuid(auction->Bidder, bidderName))
             bidderName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
@@ -1879,7 +1865,7 @@ void AuctionHouseObject::SendAuctionWon(AuctionPosting const* auction, Player* b
 
         uint32 ownerAccId = sCharacterCache->GetCharacterAccountIdByGuid(auction->Owner);
 
-        sLog->OutCommand(bidderAccId, "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: " UI64FMTD ". Original owner %s (Account: %u)",
+        sLog->outCommand(bidderAccId, "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: " UI64FMTD ". Original owner %s (Account: %u)",
             bidderName.c_str(), bidderAccId, auction->Items[0]->GetNameForLocaleIdx(sWorld->GetDefaultDbcLocale()).c_str(),
             auction->Items[0]->GetEntry(), auction->GetTotalItemCount(), auction->BidAmount, ownerName.c_str(), ownerAccId);
     }
@@ -1909,7 +1895,7 @@ void AuctionHouseObject::SendAuctionWon(AuctionPosting const* auction, Player* b
             bidder->SendDirectMessage(packet.Write());
 
             // FIXME: for offline player need also
-            bidder->UpdateCriteria(CriteriaType::AuctionsWon, 1);
+            bidder->UpdateCriteria(CRITERIA_TYPE_WON_AUCTIONS, 1);
         }
 
         mail.SendMailTo(trans, MailReceiver(bidder, auction->Bidder), this, MAIL_CHECK_MASK_COPIED);
@@ -1931,14 +1917,14 @@ void AuctionHouseObject::SendAuctionSold(AuctionPosting const* auction, Player* 
     // owner exist
     if ((owner || sCharacterCache->HasCharacterCacheEntry(auction->Owner)) && !sAuctionBotConfig->IsBotChar(auction->Owner))
     {
-        uint64 auctionHouseCut = CalculateAuctionHouseCut(auction->BidAmount);
+        uint64 auctionHouseCut = CalcualteAuctionHouseCut(auction->BidAmount);
         uint64 profit = auction->BidAmount + auction->Deposit - auctionHouseCut;
 
         //FIXME: what do if owner offline
         if (owner)
         {
-            owner->UpdateCriteria(CriteriaType::MoneyEarnedFromAuctions, profit);
-            owner->UpdateCriteria(CriteriaType::HighestAuctionSale, auction->BidAmount);
+            owner->UpdateCriteria(CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS, profit);
+            owner->UpdateCriteria(CRITERIA_TYPE_HIGHEST_AUCTION_SOLD, auction->BidAmount);
             //send auction owner notification, bidder must be current!
             owner->GetSession()->SendAuctionClosedNotification(auction, (float)sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY), true);
         }
@@ -1958,6 +1944,7 @@ void AuctionHouseObject::SendAuctionExpired(AuctionPosting const* auction, Chara
     {
         if (owner)
             owner->GetSession()->SendAuctionClosedNotification(auction, 0.0f, false);
+
 
         auto itemItr = auction->Items.begin();
         while (itemItr != auction->Items.end())
@@ -2018,7 +2005,7 @@ void AuctionHouseObject::SendAuctionInvoice(AuctionPosting const* auction, Playe
 
         MailDraft(AuctionHouseMgr::BuildItemAuctionMailSubject(AuctionMailType::Invoice, auction),
             AuctionHouseMgr::BuildAuctionInvoiceMailBody(auction->Bidder, auction->BidAmount, auction->BuyoutOrUnitPrice, auction->Deposit,
-                CalculateAuctionHouseCut(auction->BidAmount), sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY), eta))
+                CalcualteAuctionHouseCut(auction->BidAmount), sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY), eta))
             .SendMailTo(trans, MailReceiver(owner, auction->Owner), this, MAIL_CHECK_MASK_COPIED);
     }
 }

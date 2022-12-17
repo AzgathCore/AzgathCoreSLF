@@ -18,17 +18,117 @@
 /* ScriptData
 SDName: Hinterlands
 SD%Complete: 100
-SDComment: Quest support:
+SDComment: Quest support: 836
 SDCategory: The Hinterlands
 EndScriptData */
 
 /* ContentData
+npc_oox09hl
 EndContentData */
 
 #include "ScriptMgr.h"
 #include "MotionMaster.h"
-#include "Position.h"
-#include "ScriptedCreature.h"
+#include "Player.h"
+#include "ScriptedEscortAI.h"
+
+/*######
+## npc_oox09hl
+######*/
+
+enum eOOX
+{
+    SAY_OOX_START           = 0,
+    SAY_OOX_AGGRO           = 1,
+    SAY_OOX_AMBUSH          = 2,
+    SAY_OOX_AMBUSH_REPLY    = 3,
+    SAY_OOX_END             = 4,
+    QUEST_RESQUE_OOX_09     = 836,
+    NPC_MARAUDING_OWL       = 7808,
+    NPC_VILE_AMBUSHER       = 7809
+};
+
+class npc_oox09hl : public CreatureScript
+{
+public:
+    npc_oox09hl() : CreatureScript("npc_oox09hl") { }
+
+    struct npc_oox09hlAI : public EscortAI
+    {
+        npc_oox09hlAI(Creature* creature) : EscortAI(creature) { }
+
+        void Reset() override { }
+
+        void JustEngagedWith(Unit* who) override
+        {
+            if (who->GetEntry() == NPC_MARAUDING_OWL || who->GetEntry() == NPC_VILE_AMBUSHER)
+                return;
+
+            Talk(SAY_OOX_AGGRO);
+        }
+
+        void JustSummoned(Creature* summoned) override
+        {
+            summoned->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+        }
+
+        void QuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_RESQUE_OOX_09)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetFaction(player->GetTeam() == ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
+                Talk(SAY_OOX_START, player);
+                EscortAI::Start(false, false, player->GetGUID(), quest);
+            }
+        }
+
+        void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override
+        {
+            switch (waypointId)
+            {
+                case 26:
+                    Talk(SAY_OOX_AMBUSH);
+                    break;
+                case 43:
+                    Talk(SAY_OOX_AMBUSH);
+                    break;
+                case 64:
+                    Talk(SAY_OOX_END);
+                    if (Player* player = GetPlayerForEscort())
+                        player->GroupEventHappens(QUEST_RESQUE_OOX_09, me);
+                    break;
+            }
+        }
+
+        void WaypointStarted(uint32 pointId, uint32 /*pathId*/) override
+        {
+            switch (pointId)
+            {
+                case 27:
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        const Position src = {147.927444f, -3851.513428f, 130.893f, 0};
+                        Position dst = me->GetRandomPoint(src, 7.0f);
+                        DoSummon(NPC_MARAUDING_OWL, dst, 25000, TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+                    }
+                    break;
+                case 44:
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        const Position src = {-141.151581f, -4291.213867f, 120.130f, 0};
+                        Position dst = me->GetRandomPoint(src, 7.0f);
+                        me->SummonCreature(NPC_VILE_AMBUSHER, dst, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000);
+                    }
+                    break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_oox09hlAI(creature);
+    }
+};
 
 /*######
 ## npc_sharpbeak used by Entrys 43161 & 51125
@@ -136,7 +236,129 @@ public:
     }
 };
 
+enum TrainedRazorbeak
+{
+    QUEST_RAZORBEAKFRIENDS = 26546,
+    SPELL_FEED_RAZORBEAK = 80782,
+    NPC_RAZORBEAK_CREDIT = 43236
+};
+
+struct npc_trained_razorbeak : public ScriptedAI
+{
+    npc_trained_razorbeak(Creature* creature) : ScriptedAI(creature) {}
+
+    void SpellHit(Unit* caster, const SpellInfo* spell) override
+    {
+        if (spell->Id != SPELL_FEED_RAZORBEAK)
+            return;
+
+        Player* player = caster->ToPlayer();
+        if (player && player->GetQuestStatus(QUEST_RAZORBEAKFRIENDS) == QUEST_STATUS_INCOMPLETE)
+            player->KilledMonsterCredit(NPC_RAZORBEAK_CREDIT, ObjectGuid::Empty);
+    }
+
+};
+
+enum FacesEvil
+{
+    NPC_MASK_BURNT_CREDIT = 42704
+};
+
+class spell_tiki_torch : public SpellScript
+{
+    PrepareSpellScript(spell_tiki_torch);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Creature* target = GetHitCreature())
+            {
+                player->RewardPlayerAndGroupAtEvent(NPC_MASK_BURNT_CREDIT, GetCaster());
+                target->DisappearAndDie();
+            }
+        }
+    }
+
+    void SelectTarget(WorldObject*& target)
+    {
+        target = GetCaster()->FindNearestCreature(NPC_MASK_BURNT_CREDIT, 15.0f, true);
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_tiki_torch::SelectTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_tiki_torch::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+enum RitualShadra
+{
+    NPC_SHADRA_NW_ALTAR_BUNNY = 43067,
+    NPC_SHADRA_SW_ALTAR_BUNNY = 43068,
+    NPC_SHADRA_E_ALTAR_BUNNY = 43069
+};
+
+class spell_ritual_of_shadra : public SpellScript
+{
+    PrepareSpellScript(spell_ritual_of_shadra);
+
+    void SelectTarget(WorldObject*& target)
+    {
+        target = GetCaster()->FindNearestCreature(NPC_SHADRA_NW_ALTAR_BUNNY, 15.0f, true);
+        if (!target)
+            target = GetCaster()->FindNearestCreature(NPC_SHADRA_SW_ALTAR_BUNNY, 15.0f, true);
+        if (!target)
+            target = GetCaster()->FindNearestCreature(NPC_SHADRA_E_ALTAR_BUNNY, 15.0f, true);
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Creature* northwest = GetCaster()->FindNearestCreature(NPC_SHADRA_NW_ALTAR_BUNNY, 15.0f, true);
+        Creature* southwest = GetCaster()->FindNearestCreature(NPC_SHADRA_SW_ALTAR_BUNNY, 15.0f, true);
+        Creature* east = GetCaster()->FindNearestCreature(NPC_SHADRA_E_ALTAR_BUNNY, 15.0f, true);
+
+        if (!northwest && !southwest && !east)
+            return SPELL_FAILED_INCORRECT_AREA;
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Creature* hitCreature = GetHitCreature();
+        Player* player = GetCaster()->ToPlayer();
+        if (!hitCreature || !player)
+            return;
+
+        switch (hitCreature->GetEntry())
+        {
+        case NPC_SHADRA_NW_ALTAR_BUNNY:
+            player->RewardPlayerAndGroupAtEvent(hitCreature->GetEntry(), GetCaster());
+            break;
+        case NPC_SHADRA_SW_ALTAR_BUNNY:
+            player->RewardPlayerAndGroupAtEvent(hitCreature->GetEntry(), GetCaster());
+            break;
+        case NPC_SHADRA_E_ALTAR_BUNNY:
+            player->RewardPlayerAndGroupAtEvent(hitCreature->GetEntry(), GetCaster());
+            break;
+        default:
+            break;
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_ritual_of_shadra::SelectTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_ritual_of_shadra::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_ritual_of_shadra::CheckRequirement);
+    }
+};
+
 void AddSC_hinterlands()
 {
+    new npc_oox09hl();
     new npc_sharpbeak();
+    RegisterCreatureAI(npc_trained_razorbeak);
+    RegisterSpellScript(spell_tiki_torch);
+    RegisterSpellScript(spell_ritual_of_shadra);
 }

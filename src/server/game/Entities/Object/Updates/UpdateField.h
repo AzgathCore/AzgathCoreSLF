@@ -238,7 +238,7 @@ namespace UF
     private:
         void RemoveValue()
         {
-            if (_field.has_value())
+            if (_field.is_initialized())
                 _field.DestroyValue();
         }
 
@@ -329,7 +329,7 @@ namespace UF
             std::conditional_t<PublicSet, UpdateFieldPublicSetter<V>, UpdateFieldSetter<V>>>>>
             ModifyValue(OptionalUpdateField<V, BlockBit, Bit>(T::* field), uint32 /*dummy*/)
         {
-            if (!(_value.*field).has_value())
+            if (!(_value.*field).is_initialized())
                 (_value.*field).ConstructValue();
 
             _value._changesMask.Set(BlockBit);
@@ -433,7 +433,7 @@ namespace UF
             std::conditional_t<PublicSet, UpdateFieldPublicSetter<value_type>, UpdateFieldSetter<value_type>>>>>
             ModifyValue(uint32 /*dummy*/)
         {
-            if (!_value.has_value())
+            if (!_value.is_initialized())
                 _value.ConstructValue();
 
             return { *(_value._value) };
@@ -639,7 +639,7 @@ namespace UF
         template<typename T, uint32 BlockBit, uint32 Bit>
         void ClearChangesMask(OptionalUpdateField<T, BlockBit, Bit>& field, std::true_type)
         {
-            if (field.has_value())
+            if (field.is_initialized())
                 field._value->ClearChangesMask();
         }
 
@@ -751,12 +751,12 @@ namespace UF
             return std::end(_values);
         }
 
-        static constexpr std::size_t size()
+        std::size_t size() const
         {
             return Size;
         }
 
-        T const& operator[](std::size_t index) const
+        T const& operator[](uint32 index) const
         {
             return _values[index];
         }
@@ -764,19 +764,6 @@ namespace UF
     private:
         T _values[Size] = {};
     };
-
-    // workaround functions for internal compiler errors in msvc 19.33.31629
-    template<typename T>
-    constexpr std::size_t size()
-    {
-        return T::size();
-    }
-
-    template<typename T>
-    constexpr std::size_t size_of_value_type()
-    {
-        return sizeof(typename T::value_type);
-    }
 
     template<typename T, std::size_t Size, uint32 Bit, uint32 FirstElementBit>
     class UpdateFieldArray : public UpdateFieldArrayBase<T, Size>
@@ -918,7 +905,7 @@ namespace UF
             DestroyValue();
         }
 
-        bool has_value() const
+        bool is_initialized() const
         {
             return !!_value;
         }
