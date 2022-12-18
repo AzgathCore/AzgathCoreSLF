@@ -2974,7 +2974,7 @@ void ActivePlayerData::WriteCreate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> f
     for (std::size_t i = 0; i < 12; ++i)
     {
         data << uint32(BuybackPrice[i]);
-        data << uint32(BuybackTimestamp[i]);
+        data << int64(BuybackTimestamp[i]);
     }
     data << uint16(TodayHonorableKills);
     data << uint16(YesterdayHonorableKills);
@@ -4037,7 +4037,7 @@ void ActivePlayerData::WriteUpdate(ByteBuffer& data, Mask const& changesMask, bo
             }
             if (changesMask[563 + i])
             {
-                data << uint32(BuybackTimestamp[i]);
+                data << int64(BuybackTimestamp[i]);
             }
         }
     }

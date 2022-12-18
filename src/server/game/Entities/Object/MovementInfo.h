@@ -136,6 +136,7 @@ struct MovementForce
     TaggedPosition<Position::XYZ> Direction;
     uint32 TransportID = 0;
     float Magnitude = 0.0f;
+    int32 Unused910 = 0;
     uint8 Type = 0;
 };
 

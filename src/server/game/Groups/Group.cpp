@@ -399,6 +399,7 @@ bool Group::AddMember(Player* player)
     MemberSlot member;
     member.guid         = player->GetGUID();
     member.name         = player->GetName();
+    member.race         = Races(player->getRace());
     member._class       = player->getClass();
     member.group        = subGroup;
     member.flags        = 0;
@@ -1518,6 +1519,10 @@ void Group::SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot)
         playerInfos.GUID = citr->guid;
         playerInfos.Name = citr->name;
         playerInfos.Class = citr->_class;
+
+        ChrRacesEntry const* race = sChrRacesStore.AssertEntry(citr->race);
+        FactionTemplateEntry const* raceFaction = sFactionTemplateStore.AssertEntry(race->FactionID);
+        playerInfos.FactionGroup = raceFaction->FactionGroup;
 
         playerInfos.Status = MEMBER_STATUS_OFFLINE;
         if (member && member->GetSession() && !member->GetSession()->PlayerLogout())

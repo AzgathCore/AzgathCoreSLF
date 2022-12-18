@@ -487,6 +487,7 @@ void WorldPackets::Movement::CommonMovement::WriteMovementForceWithDirection(Mov
 
     data << uint32(movementForce.TransportID);
     data << float(movementForce.Magnitude);
+    data << int32(movementForce.Unused910);
     data.WriteBits(movementForce.Type, 2);
     data.FlushBits();
 }
@@ -711,6 +712,7 @@ ByteBuffer& operator>>(ByteBuffer& data, MovementForce& movementForce)
     data >> movementForce.Direction;
     data >> movementForce.TransportID;
     data >> movementForce.Magnitude;
+    data >> movementForce.Unused910;
     movementForce.Type = data.ReadBits(2);
 
     return data;
