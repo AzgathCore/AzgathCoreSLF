@@ -824,6 +824,7 @@ namespace WorldPackets
             void Read() override;
 
             Array<int32, 2> SpellVisualKitIDs;
+            int32 SequenceVariation = 0;
         };
 
         class SpecialMountAnim final : public ServerPacket
@@ -835,6 +836,7 @@ namespace WorldPackets
 
             ObjectGuid UnitGUID;
             std::vector<int32> SpellVisualKitIDs;
+            int32 SequenceVariation = 0;
         };
 
         class CrossedInebriationThreshold final : public ServerPacket

@@ -693,6 +693,7 @@ struct GossipMenuItems
     uint32               OptionBroadcastTextId;
     uint32               OptionType;
     uint64               OptionNpcFlag;
+    uint32               Language;
     uint32               ActionMenuId;
     uint32               ActionPoiId;
     bool                 BoxCoded;
@@ -845,8 +846,8 @@ struct PlayerChoiceResponseReward
 struct PlayerChoiceResponseMawPower
 {
     int32 TypeArtFileID = 0;
-    int32 Rarity = 0;
-    uint32 RarityColor = 0;
+    Optional<int32> Rarity;
+    Optional<uint32> RarityColor;
     int32 SpellID = 0;
     int32 MaxStacks = 0;
 };
@@ -878,7 +879,10 @@ struct PlayerChoice
     int32 ChoiceId;
     int32 UiTextureKitId;
     uint32 SoundKitId;
+    uint32 CloseSoundKitId;
+    int64 Duration;
     std::string Question;
+    std::string PendingChoiceText;
     std::vector<PlayerChoiceResponse> Responses;
     bool HideWarboardHeader;
     bool KeepOpenAfterChoice;

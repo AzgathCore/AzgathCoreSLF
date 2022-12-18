@@ -182,6 +182,7 @@ namespace WorldPackets
             ObjectGuid Guid;
             uint32 EmoteID = 0;
             std::vector<int32> SpellVisualKitIDs;
+            int32 SequenceVariation = 0;
         };
 
         class CTextEmote final : public ClientPacket
@@ -195,6 +196,7 @@ namespace WorldPackets
             int32 EmoteID = 0;
             int32 SoundIndex = -1;
             Array<int32, 2> SpellVisualKitIDs;
+            int32 SequenceVariation = 0;
         };
 
         class STextEmote final : public ServerPacket

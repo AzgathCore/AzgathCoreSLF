@@ -138,8 +138,8 @@ struct ItemData : public IsUpdateFieldStructureTag, public HasChangesMask<40>
     void WriteCreate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, Item const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, Item const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, Mask const& changesMask, bool ignoreNestedChangesMask, Item const* owner, Player const* receiver) const;
-    void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
-    void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
+    static void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
+    static void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
     void ClearChangesMask();
 };
 
@@ -201,8 +201,8 @@ struct AzeriteItemData : public IsUpdateFieldStructureTag, public HasChangesMask
     void WriteCreate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, AzeriteItem const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, AzeriteItem const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, Mask const& changesMask, bool ignoreNestedChangesMask, AzeriteItem const* owner, Player const* receiver) const;
-    void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
-    void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
+    static void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
+    static void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
     void ClearChangesMask();
 };
 
@@ -251,7 +251,7 @@ struct PassiveSpellHistory : public IsUpdateFieldStructureTag
     bool operator!=(PassiveSpellHistory const& right) const { return !(*this == right); }
 };
 
-struct UnitData : public IsUpdateFieldStructureTag, public HasChangesMask<189>
+struct UnitData : public IsUpdateFieldStructureTag, public HasChangesMask<194>
 {
     UpdateField<std::vector<uint32>, 0, 1> StateWorldEffectIDs;
     DynamicUpdateField<UF::PassiveSpellHistory, 0, 2> PassiveSpells;
@@ -373,26 +373,27 @@ struct UnitData : public IsUpdateFieldStructureTag, public HasChangesMask<189>
     UpdateField<ObjectGuid, 96, 116> GuildGUID;
     UpdateField<ObjectGuid, 96, 117> SkinningOwnerGUID;
     UpdateField<uint32, 96, 118> SilencedSchoolMask;
-    UpdateFieldArray<uint32, 2, 119, 120> NpcFlags;
+    UpdateField<ObjectGuid, 96, 119> NameplateAttachToGUID;                     // When set, nameplate of this unit will instead appear on that object
+    UpdateFieldArray<uint32, 2, 120, 121> NpcFlags;
     struct NpcFlagsTag : ViewerDependentValueTag<uint32> {};
-    UpdateFieldArray<int32, 6, 122, 123> Power;
-    UpdateFieldArray<int32, 6, 122, 129> MaxPower;
-    UpdateFieldArray<float, 6, 122, 135> PowerRegenFlatModifier;
-    UpdateFieldArray<float, 6, 122, 141> PowerRegenInterruptedFlatModifier;
-    UpdateFieldArray<UF::VisibleItem, 3, 147, 148> VirtualItems;
-    UpdateFieldArray<uint32, 2, 151, 152> AttackRoundBaseTime;
-    UpdateFieldArray<int32, 4, 154, 155> Stats;
-    UpdateFieldArray<int32, 4, 154, 159> StatPosBuff;
-    UpdateFieldArray<int32, 4, 154, 163> StatNegBuff;
-    UpdateFieldArray<int32, 7, 167, 168> Resistances;
-    UpdateFieldArray<int32, 7, 167, 175> BonusResistanceMods;
-    UpdateFieldArray<int32, 7, 167, 182> ManaCostModifier;
+    UpdateFieldArray<int32, 7, 123, 124> Power;
+    UpdateFieldArray<int32, 7, 123, 131> MaxPower;
+    UpdateFieldArray<float, 7, 123, 138> PowerRegenFlatModifier;
+    UpdateFieldArray<float, 7, 123, 145> PowerRegenInterruptedFlatModifier;
+    UpdateFieldArray<UF::VisibleItem, 3, 152, 153> VirtualItems;
+    UpdateFieldArray<uint32, 2, 156, 157> AttackRoundBaseTime;
+    UpdateFieldArray<int32, 4, 159, 160> Stats;
+    UpdateFieldArray<int32, 4, 159, 164> StatPosBuff;
+    UpdateFieldArray<int32, 4, 159, 168> StatNegBuff;
+    UpdateFieldArray<int32, 7, 172, 173> Resistances;
+    UpdateFieldArray<int32, 7, 172, 180> BonusResistanceMods;
+    UpdateFieldArray<int32, 7, 172, 187> ManaCostModifier;
 
     void WriteCreate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, Unit const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, Unit const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, Mask const& changesMask, bool ignoreNestedChangesMask, Unit const* owner, Player const* receiver) const;
-    void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
-    void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
+    static void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
+    static void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
     void ClearChangesMask();
 };
 
@@ -489,8 +490,8 @@ struct PlayerData : public IsUpdateFieldStructureTag, public HasChangesMask<185>
     void WriteCreate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, Player const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, Player const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, Mask const& changesMask, bool ignoreNestedChangesMask, Player const* owner, Player const* receiver) const;
-    void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
-    void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags) const;
+    static void AppendAllowedFieldsMaskForFlag(Mask& allowedMaskForTarget, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
+    static void FilterDisallowedFieldsMaskForFlag(Mask& changesMask, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags);
     void ClearChangesMask();
     bool IsQuestLogChangesMaskSkipped() const { return false; } // bandwidth savings aren't worth the cpu time
 };
@@ -820,11 +821,11 @@ struct GameObjectData : public IsUpdateFieldStructureTag, public HasChangesMask<
 struct DynamicObjectData : public IsUpdateFieldStructureTag, public HasChangesMask<7>
 {
     UpdateField<ObjectGuid, 0, 1> Caster;
-    UpdateField<UF::SpellCastVisual, 0, 2> SpellVisual;
-    UpdateField<int32, 0, 3> SpellID;
-    UpdateField<float, 0, 4> Radius;
-    UpdateField<uint32, 0, 5> CastTime;
-    UpdateField<uint8, 0, 6> Type;
+    UpdateField<uint8, 0, 2> Type;
+    UpdateField<UF::SpellCastVisual, 0, 3> SpellVisual;
+    UpdateField<int32, 0, 4> SpellID;
+    UpdateField<float, 0, 5> Radius;
+    UpdateField<uint32, 0, 6> CastTime;
 
     void WriteCreate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, DynamicObject const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, DynamicObject const* owner, Player const* receiver) const;
@@ -866,7 +867,7 @@ struct ScaleCurve : public IsUpdateFieldStructureTag, public HasChangesMask<7>
     void ClearChangesMask();
 };
 
-struct AreaTriggerData : public IsUpdateFieldStructureTag, public HasChangesMask<14>
+struct AreaTriggerData : public IsUpdateFieldStructureTag, public HasChangesMask<18>
 {
     UpdateField<UF::ScaleCurve, 0, 1> OverrideScaleCurve;
     UpdateField<UF::ScaleCurve, 0, 2> ExtraScaleCurve;
@@ -881,6 +882,9 @@ struct AreaTriggerData : public IsUpdateFieldStructureTag, public HasChangesMask
     UpdateField<float, 0, 11> BoundsRadius2D;
     UpdateField<uint32, 0, 12> DecalPropertiesID;
     UpdateField<ObjectGuid, 0, 13> CreatingEffectGUID;
+    UpdateField<uint32, 0, 14> Field_80;
+    UpdateField<uint32, 0, 15> Field_84;
+    UpdateField<ObjectGuid, 0, 16> Field_88;
 
     void WriteCreate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, AreaTrigger const* owner, Player const* receiver) const;
     void WriteUpdate(ByteBuffer& data, EnumFlag<UpdateFieldFlag> fieldVisibilityFlags, AreaTrigger const* owner, Player const* receiver) const;

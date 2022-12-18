@@ -638,6 +638,7 @@ WorldPacket const* WorldPackets::Misc::AccountHeirloomUpdate::Write()
 void WorldPackets::Misc::MountSpecial::Read()
 {
     SpellVisualKitIDs.resize(_worldPacket.read<uint32>());
+    _worldPacket >> SequenceVariation;
     for (int32& spellVisualKitId : SpellVisualKitIDs)
         _worldPacket >> spellVisualKitId;
 }
@@ -646,6 +647,7 @@ WorldPacket const* WorldPackets::Misc::SpecialMountAnim::Write()
 {
     _worldPacket << UnitGUID;
     _worldPacket << uint32(SpellVisualKitIDs.size());
+    _worldPacket << int32(SequenceVariation);
     if (!SpellVisualKitIDs.empty())
         _worldPacket.append(SpellVisualKitIDs.data(), SpellVisualKitIDs.size());
 

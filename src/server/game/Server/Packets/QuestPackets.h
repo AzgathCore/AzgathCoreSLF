@@ -704,8 +704,8 @@ namespace WorldPackets
         {
             int32 Unused901_1 = 0;
             int32 TypeArtFileID = 0;
-            int32 Rarity = 0;
-            uint32 RarityColor = 0;
+            Optional<int32> Rarity;
+            Optional<uint32> RarityColor;
             int32 Unused901_2 = 0;
             int32 SpellID = 0;
             int32 MaxStacks = 0;
@@ -744,7 +744,10 @@ namespace WorldPackets
             int32 ChoiceID = 0;
             int32 UiTextureKitID = 0;
             uint32 SoundKitID = 0;
+            uint32 CloseUISoundKitID = 0;
+            WorldPackets::Duration<Seconds> Duration;
             std::string Question;
+            std::string PendingChoiceText;
             std::vector<PlayerChoiceResponse> Responses;
             bool CloseChoiceFrame = false;
             bool HideWarboardHeader = false;

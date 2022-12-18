@@ -174,6 +174,7 @@ struct GossipMenuItem
     uint32      OptionType;
     std::string BoxMessage;
     uint32      BoxMoney;
+    uint32      Language;
 };
 
 // need an ordered container

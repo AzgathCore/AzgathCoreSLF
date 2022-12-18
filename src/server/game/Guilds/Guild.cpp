@@ -1368,11 +1368,10 @@ void Guild::HandleRoster(WorldSession* session)
     session->SendPacket(roster.Write());
 }
 
-void Guild::SendQueryResponse(WorldSession* session, ObjectGuid const& playerGuid)
+void Guild::SendQueryResponse(WorldSession* session)
 {
     WorldPackets::Guild::QueryGuildInfoResponse response;
     response.GuildGuid = GetGUID();
-    response.PlayerGuid = playerGuid;
     response.Info = boost::in_place();
 
     response.Info->GuildGUID = GetGUID();
@@ -1525,7 +1524,7 @@ void Guild::HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo)
 
         SendSaveEmblemResult(session, ERR_GUILDEMBLEM_SUCCESS); // "Guild Emblem saved."
 
-        SendQueryResponse(session, ObjectGuid::Empty);
+        SendQueryResponse(session);
     }
 }
 

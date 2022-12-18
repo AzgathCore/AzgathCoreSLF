@@ -322,8 +322,13 @@ void Object::BuildMovementUpdate(ByteBuffer* data, CreateObjectBits flags) const
         bool HasFallDirection = unit->HasUnitMovementFlag(MOVEMENTFLAG_FALLING);
         bool HasFall = HasFallDirection || unit->m_movementInfo.jump.fallTime != 0;
         bool HasSpline = unit->IsSplineEnabled();
+        bool HasInertia = unit->m_movementInfo.inertia.has_value();
 
         *data << GetGUID();                                             // MoverGUID
+
+        *data << uint32(unit->GetUnitMovementFlags());
+        *data << uint32(unit->GetExtraUnitMovementFlags());
+        *data << uint32(unit->GetExtraUnitMovementFlags2());
 
         *data << uint32(unit->m_movementInfo.time);                     // MoveTime
         *data << float(unit->GetPositionX());
@@ -340,16 +345,22 @@ void Object::BuildMovementUpdate(ByteBuffer* data, CreateObjectBits flags) const
         //for (std::size_t i = 0; i < RemoveForcesIDs.size(); ++i)
         //    *data << ObjectGuid(RemoveForcesIDs);
 
-        data->WriteBits(unit->GetUnitMovementFlags(), 30);
-        data->WriteBits(unit->GetExtraUnitMovementFlags(), 18);
         data->WriteBit(!unit->m_movementInfo.transport.guid.IsEmpty()); // HasTransport
         data->WriteBit(HasFall);                                        // HasFall
         data->WriteBit(HasSpline);                                      // HasSpline - marks that the unit uses spline movement
         data->WriteBit(false);                                          // HeightChangeFailed
         data->WriteBit(false);                                          // RemoteTimeValid
+        data->WriteBit(HasInertia);                                     // HasInertia
 
         if (!unit->m_movementInfo.transport.guid.IsEmpty())
             *data << unit->m_movementInfo.transport;
+
+        if (HasInertia)
+        {
+            *data << unit->m_movementInfo.inertia->guid;
+            *data << unit->m_movementInfo.inertia->force.PositionXYZStream();
+            *data << uint32(unit->m_movementInfo.inertia->lifetime);
+        }
 
         if (HasFall)
         {

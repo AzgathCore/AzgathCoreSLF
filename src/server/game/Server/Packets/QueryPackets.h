@@ -116,7 +116,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Player;
+            Array<ObjectGuid, 500> Players;
         };
 
         struct PlayerGuidLookupData
@@ -138,6 +138,21 @@ namespace WorldPackets
             DeclinedName DeclinedNames;
         };
 
+        struct NameCacheUnused920
+        {
+            uint32 Unused1 = 0;
+            ObjectGuid Unused2;
+            std::string Unused3;
+        };
+
+        struct NameCacheLookupResult
+        {
+            ObjectGuid Player;
+            uint8 Result = 0; // 0 - full packet, != 0 - only guid
+            Optional<PlayerGuidLookupData> Data;
+            Optional<NameCacheUnused920> Unused920;
+        };
+
         class QueryPlayerNameResponse final : public ServerPacket
         {
         public:
@@ -145,9 +160,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            ObjectGuid Player;
-            uint8 Result = 0; // 0 - full packet, != 0 - only guid
-            PlayerGuidLookupData Data;
+            std::vector<NameCacheLookupResult> Players;
         };
 
         class QueryPageText final : public ClientPacket

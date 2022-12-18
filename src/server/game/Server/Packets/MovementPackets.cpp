@@ -28,26 +28,27 @@ ByteBuffer& operator<<(ByteBuffer& data, MovementInfo const& movementInfo)
     bool hasFallDirection = movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR);
     bool hasFallData = hasFallDirection || movementInfo.jump.fallTime != 0;
     bool hasSpline = false; // todo 6.x send this infos
+    bool hasInertia = movementInfo.inertia.has_value();
 
     data << movementInfo.guid;
-    data << movementInfo.time;
+    data << uint32(movementInfo.flags);
+    data << uint32(movementInfo.flags2);
+    data << uint32(movementInfo.flags3);
+    data << uint32(movementInfo.time);
     data << movementInfo.pos.PositionXYZOStream();
-    data << movementInfo.pitch;
-    data << movementInfo.splineElevation;
+    data << float(movementInfo.pitch);
+    data << float(movementInfo.splineElevation);
 
     uint32 removeMovementForcesCount = 0;
     data << removeMovementForcesCount;
 
-    uint32 int168 = 0;
-    data << int168;
+    uint32 moveIndex = 0;
+    data << moveIndex;
 
     /*for (uint32 i = 0; i < removeMovementForcesCount; ++i)
     {
         data << ObjectGuid;
     }*/
-
-    data.WriteBits(movementInfo.flags, 30);
-    data.WriteBits(movementInfo.flags2, 18);
 
     data.WriteBit(hasTransportData);
     data.WriteBit(hasFallData);
@@ -55,24 +56,32 @@ ByteBuffer& operator<<(ByteBuffer& data, MovementInfo const& movementInfo)
 
     data.WriteBit(false); // HeightChangeFailed
     data.WriteBit(false); // RemoteTimeValid
+    data.WriteBit(hasInertia);
 
     data.FlushBits();
 
     if (hasTransportData)
         data << movementInfo.transport;
 
+    if (hasInertia)
+    {
+        data << movementInfo.inertia->guid;
+        data << movementInfo.inertia->force.PositionXYZStream();
+        data << uint32(movementInfo.inertia->lifetime);
+    }
+
     if (hasFallData)
     {
-        data << movementInfo.jump.fallTime;
-        data << movementInfo.jump.zspeed;
+        data << uint32(movementInfo.jump.fallTime);
+        data << float(movementInfo.jump.zspeed);
 
         data.WriteBit(hasFallDirection);
         data.FlushBits();
         if (hasFallDirection)
         {
-            data << movementInfo.jump.sinAngle;
-            data << movementInfo.jump.cosAngle;
-            data << movementInfo.jump.xyspeed;
+            data << float(movementInfo.jump.sinAngle);
+            data << float(movementInfo.jump.cosAngle);
+            data << float(movementInfo.jump.xyspeed);
         }
     }
 
@@ -84,6 +93,9 @@ ByteBuffer& operator>>(ByteBuffer& data, MovementInfo& movementInfo)
     //bool hasSpline = false;
 
     data >> movementInfo.guid;
+    data >> movementInfo.flags;
+    data >> movementInfo.flags2;
+    data >> movementInfo.flags3;
     data >> movementInfo.time;
     data >> movementInfo.pos.PositionXYZOStream();
     data >> movementInfo.pitch;
@@ -101,18 +113,25 @@ ByteBuffer& operator>>(ByteBuffer& data, MovementInfo& movementInfo)
         data >> guid;
     }
 
-    movementInfo.flags = data.ReadBits(30);
-    movementInfo.flags2 = data.ReadBits(18);
-
     bool hasTransport = data.ReadBit();
     bool hasFall = data.ReadBit();
     /*hasSpline = */data.ReadBit(); // todo 6.x read this infos
 
     data.ReadBit(); // HeightChangeFailed
     data.ReadBit(); // RemoteTimeValid
+    bool hasInertia = data.ReadBit();
 
     if (hasTransport)
         data >> movementInfo.transport;
+
+    if (hasInertia)
+    {
+        movementInfo.inertia.emplace();
+
+        data >> movementInfo.inertia->guid;
+        data >> movementInfo.inertia->force.PositionXYZStream();
+        data >> movementInfo.inertia->lifetime;
+    }
 
     if (hasFall)
     {
@@ -977,6 +996,8 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Movement::MoveSetCompound
     data.WriteBit(stateChange.CollisionHeight.is_initialized());
     data.WriteBit(stateChange.MovementForce_.is_initialized());
     data.WriteBit(stateChange.MovementForceGUID.is_initialized());
+    data.WriteBit(stateChange.MovementInertiaGUID.has_value());
+    data.WriteBit(stateChange.MovementInertiaLifetimeMs.has_value());
     data.FlushBits();
 
     if (stateChange.MovementForce_)
@@ -1004,6 +1025,12 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Movement::MoveSetCompound
 
     if (stateChange.MovementForceGUID)
         data << *stateChange.MovementForceGUID;
+
+    if (stateChange.MovementInertiaGUID)
+        data << *stateChange.MovementInertiaGUID;
+
+    if (stateChange.MovementInertiaLifetimeMs)
+        data << uint32(*stateChange.MovementInertiaLifetimeMs);
 
     return data;
 }
