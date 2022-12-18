@@ -189,7 +189,7 @@ enum AzeriteTierUnlockSetFlags
     AZERITE_TIER_UNLOCK_SET_FLAG_DEFAULT = 0x1
 };
 
-#define BATTLE_PET_SPECIES_MAX_ID 3189
+#define BATTLE_PET_SPECIES_MAX_ID 3248
 
 enum BattlePetSpeciesFlags
 {
@@ -1423,7 +1423,7 @@ enum class SpellShapeshiftFormFlags : int32
 
 DEFINE_ENUM_FLAG(SpellShapeshiftFormFlags);
 
-#define TaxiMaskSize 339
+#define TaxiMaskSize 345
 typedef std::array<uint8, TaxiMaskSize> TaxiMask;
 
 enum TotemCategoryType

@@ -573,7 +573,8 @@ struct BroadcastTextEntry
     uint16 EmotesID;
     uint8 Flags;
     uint32 ChatBubbleDurationMs;
-    uint32 SoundEntriesID[2];
+    int32 VoiceOverPriorityID;
+    std::array<uint32, 2> SoundKitID;
     uint16 EmoteID[MAX_BROADCAST_TEXT_EMOTES];
     uint16 EmoteDelay[MAX_BROADCAST_TEXT_EMOTES];
 };
@@ -2139,6 +2140,8 @@ struct ItemSparseEntry
     uint32 DurationInInventory;
     float QualityModifier;
     uint32 BagFamily;
+    int32 StartQuestID;
+    int32 LanguageID;
     float ItemRange;
     float StatPercentageOfSocket[MAX_ITEM_PROTO_STATS];
     int32 StatPercentEditor[MAX_ITEM_PROTO_STATS];
@@ -2166,7 +2169,6 @@ struct ItemSparseEntry
     uint16 ZoneBound[MAX_ITEM_PROTO_ZONES];
     uint16 ItemSet;
     uint16 LockID;
-    uint16 StartQuestID;
     uint16 PageID;
     uint16 ItemDelay;
     uint16 MinFactionID;
@@ -2182,7 +2184,6 @@ struct ItemSparseEntry
     uint8 SheatheType;
     uint8 Material;
     uint8 PageMaterialID;
-    uint8 LanguageID;
     uint8 Bonding;
     uint8 DamageDamageType;
     int8 StatModifierBonusStat[MAX_ITEM_PROTO_STATS];
@@ -2237,8 +2238,11 @@ struct LanguageWordsEntry
 
 struct LanguagesEntry
 {
-    LocalizedString Name;
     uint32 ID;
+    LocalizedString Name;
+    int32 Flags;
+    int32 UiTextureKitID;
+    int32 UiTextureKitElementCount;
 };
 
 struct LFGDungeonsEntry
@@ -3418,7 +3422,7 @@ struct TaxiNodesEntry
     uint16 ContinentID;
     int32 ConditionID;
     uint16 CharacterBitNumber;
-    uint8 Flags;
+    uint16 Flags;
     int32 UiTextureKitID;
     int32 MinimapAtlasMemberID;
     float Facing;
