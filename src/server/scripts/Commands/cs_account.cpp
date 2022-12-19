@@ -31,6 +31,7 @@ EndScriptData */
 #include "Log.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "SecretMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 

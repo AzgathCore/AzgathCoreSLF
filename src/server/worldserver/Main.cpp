@@ -45,6 +45,7 @@
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
 #include "ScriptReloadMgr.h"
+#include "SecretMgr.h"
 #include "TCSoap.h"
 #include "World.h"
 #include "WorldSocket.h"

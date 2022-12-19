@@ -36,6 +36,7 @@
 #include "MySQLThreading.h"
 #include "ProcessPriority.h"
 #include "RealmList.h"
+#include "SecretMgr.h"
 #include "SessionManager.h"
 #include "SslContext.h"
 #include "Util.h"

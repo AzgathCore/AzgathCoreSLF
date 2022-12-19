@@ -55,6 +55,10 @@ gSOAP (a portable development toolkit for C and C++ XML Web services and XML dat
 recastnavigation (Recast is state of the art navigation mesh construction toolset for games)
   https://github.com/recastnavigation/recastnavigation
   Version: 2c85309280dbc9c82029e7ab16dfb01b9235c74e
+  
+argon2
+  https://github.com/P-H-C/phc-winner-argon2
+  Version: 62358ba
 
 CascLib (An open-source implementation of library for reading CASC storage from Blizzard games since 2014)
   https://github.com/ladislav-zezula/CascLib
