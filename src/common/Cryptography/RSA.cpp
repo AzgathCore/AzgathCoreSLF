@@ -16,6 +16,8 @@
  */
 
 #include "RSA.h"
+#include "HMAC.h"
+#include "Memory.h"
 #include "BigNumber.h"
 #include <openssl/bn.h>
 #include <openssl/pem.h>

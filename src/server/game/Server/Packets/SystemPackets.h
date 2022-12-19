@@ -130,6 +130,7 @@ namespace WorldPackets
             uint32 KioskSessionMinutes                   = 0;
             int32 GameRuleUnknown1                       = 0;
             int16 MaxPlayerNameQueriesPerPacket          = 50;
+            int16 PlayerNameQueryTelemetryInterval       = 600;
             bool ItemRestorationButtonEnabled        = false;
             bool CharUndeleteEnabled                 = false; ///< Implemented
             bool BpayStoreDisabledByParentalControls = false;
@@ -199,6 +200,7 @@ namespace WorldPackets
             int32 GameRuleUnknown1 = 0;
             std::vector<GameRuleValuePair> GameRuleValues;
             int16 MaxPlayerNameQueriesPerPacket = 50;
+            int16 PlayerNameQueryTelemetryInterval = 600;
         };
 
         class MOTD final : public ServerPacket

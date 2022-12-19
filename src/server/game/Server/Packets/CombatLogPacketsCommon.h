@@ -76,6 +76,7 @@ namespace WorldPackets
             uint8 TargetMaxScalingLevel = 0;
             int8 TargetScalingLevelDelta = 0;
             uint32 Flags = NO_LEVEL_SCALING | NO_ITEM_LEVEL_SCALING;
+            int32 Unused927 = 0;
 
             template<class T, class U>
             bool GenerateDataForUnits(T* attacker, U* target);

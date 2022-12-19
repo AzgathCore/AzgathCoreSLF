@@ -482,6 +482,7 @@ WorldPacket const* WorldPackets::Party::PartyUpdate::Write()
     _worldPacket << PartyGUID;
     _worldPacket << uint32(SequenceNum);
     _worldPacket << LeaderGUID;
+    _worldPacket << uint8(LeaderFactionGroup);
     _worldPacket << uint32(PlayerList.size());
     _worldPacket.WriteBit(LfgInfos.is_initialized());
     _worldPacket.WriteBit(LootSettings.is_initialized());
